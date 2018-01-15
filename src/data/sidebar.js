@@ -182,7 +182,7 @@ const sidebarData = {
           text: '省市区'
         }
       ]
-    } 
+    }
   ]
 }
 export default sidebarData

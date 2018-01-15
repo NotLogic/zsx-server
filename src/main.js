@@ -9,7 +9,6 @@ import iView from 'iview'
 import 'iview/dist/styles/iview.css'
 import './styles/common.css'
 Vue.config.productionTip = false
-// Vue.use(axios)
 Vue.use(iView)
 
 // router.beforeEach((to, from, next) => {})
