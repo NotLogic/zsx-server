@@ -43,6 +43,28 @@ const sidebarData = {
         }
       ]
     }, {
+      key: 'notes',
+      title: '帖子管理',
+      icon: '',
+      children: [
+        {
+          key: 'notes_child',
+          icon: '',
+          text: '帖子管理'
+        }
+      ]
+    }, {
+      key: 'comment',
+      title: '评论管理',
+      icon: '',
+      children: [
+        {
+          key: 'comment_child',
+          icon: '',
+          text: '评论管理'
+        }
+      ]
+    }, {
       key: 'ad',
       title: '广告管理',
       icon: '',
@@ -51,6 +73,39 @@ const sidebarData = {
           key: 'ad_child',
           icon: '',
           text: '广告管理'
+        }
+      ]
+    }, {
+      key: 'appGroup',
+      title: '群组管理',
+      icon: '',
+      children: [
+        {
+          key: 'appGroup_child',
+          icon: '',
+          text: '群组管理'
+        }
+      ]
+    }, {
+      key: 'adviceBack',
+      title: '意见反馈',
+      icon: '',
+      children: [
+        {
+          key: 'adviceBack_child',
+          icon: '',
+          text: '意见反馈'
+        }
+      ]
+    }, {
+      key: 'complaint',
+      title: '举报管理',
+      icon: '',
+      children: [
+        {
+          key: 'complaint_child',
+          icon: '',
+          text: '举报管理'
         }
       ]
     }, {
@@ -90,7 +145,44 @@ const sidebarData = {
           text: '政务信息'
         }
       ]
-    }
+    }, {
+      key: 'sensitiveWord',
+      title: '敏感词库',
+      icon: '',
+      children: [
+        {
+          key: 'sensitiveWord_child',
+          icon: '',
+          text: '敏感词库'
+        }
+      ]
+    }, {
+      key: 'thirdparty',
+      title: 'API管理',
+      icon: '',
+      children: [
+        {
+          key: 'thirdpartyClass',
+          icon: '',
+          text: 'API分类'
+        }, {
+          key: 'thirdpartySetting',
+          icon: '',
+          text: 'API配置'
+        }
+      ]
+    }, {
+      key: 'basiceData',
+      title: '基础数据管理',
+      icon: '',
+      children: [
+        {
+          key: 'province',
+          icon: '',
+          text: '省市区'
+        }
+      ]
+    } 
   ]
 }
 export default sidebarData

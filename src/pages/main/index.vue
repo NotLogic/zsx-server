@@ -11,8 +11,6 @@
         <Button type="text" @click="toggleClick" :style="{transform: 'rotateZ(' + (this.hideMenuText ? '-90' : '0') + 'deg)'}">
           <Icon type="navicon" size="32"></Icon>
         </Button>
-
-        <router-link :to="{name: 'user'}">user</router-link>
         <Button @click="exitToLogin">注销账号</Button>
       </div>
       <div class="middle">中间</div>
