@@ -2,7 +2,6 @@ import main from '@/pages/main'
 const loginRoute = {
   path: '/login',
   name: 'login',
-  // component: require('@/pages/login')
   component: resolve => { require(['@/pages/login'], resolve) }
 }
 const mainRoute = {
@@ -11,6 +10,7 @@ const mainRoute = {
   component: main
 }
 const appRoutes = [
+  // 权限管理
   {
     path: '/authority',
     name: 'authority',
@@ -19,20 +19,56 @@ const appRoutes = [
       {
         path: 'resource',
         name: 'resource',
-        // component: require('@/pages/authority/resource.vue')
         component: resolve => { require(['@/pages/authority/resource'], resolve) }
       },
       {
         path: 'role',
         name: 'role',
-        // component: require('@/pages/authority/role.vue')
         component: resolve => { require(['@/pages/authority/role'], resolve) }
       },
       {
         path: 'user',
         name: 'user',
-        // component: require('@/pages/authority/user.vue')
         component: resolve => { require(['@/pages/authority/user'], resolve) }
+      }
+    ]
+  },
+  // 会员管理
+  {
+    path: '/member',
+    name: 'member',
+    component: main,
+    children: [
+      {
+        path: 'member_child',
+        name: 'member_child',
+        component: resolve => { require(['@/pages/member'], resolve) }
+      }
+    ]
+  },
+  // 新闻管理
+  {
+    path: '/news',
+    name: 'news',
+    component: main,
+    children: [
+      {
+        path: 'news_child',
+        name: 'news_child',
+        component: resolve => { require(['@/pages/news'], resolve) }
+      }
+    ]
+  },
+  // 广告管理
+  {
+    path: '/ad',
+    name: 'ad',
+    component: main,
+    children: [
+      {
+        path: 'ad_child',
+        name: 'ad_child',
+        component: resolve => { require(['@/pages/ad'], resolve) }
       }
     ]
   },
@@ -44,13 +80,11 @@ const appRoutes = [
       {
         path: 'workClass',
         name: 'workClass',
-        // component: require('@/pages/guide/workClass.vue')
         component: resolve => { require(['@/pages/guide/workClass'], resolve) }
       },
       {
         path: 'workMatter',
         name: 'workMatter',
-        // component: require('@/pages/guide/workMatter.vue')
         component: resolve => { require(['@/pages/guide/workMatter'], resolve) }
       }
     ]
@@ -63,7 +97,6 @@ const appRoutes = [
       {
         path: 'policy_child',
         name: 'policy_child',
-        // component: require('@/pages/policy')
         component: resolve => { require(['@/pages/policy'], resolve) }
       }
     ]
@@ -76,7 +109,6 @@ const appRoutes = [
       {
         path: 'gover_child',
         name: 'gover_child',
-        // component: require('@/pages/gover')
         component: resolve => { require(['@/pages/gover'], resolve) }
       }
     ]

@@ -13,7 +13,6 @@
         </Button>
 
         <router-link :to="{name: 'user'}">user</router-link>
-        <router-link :to="{name: 'home'}">home</router-link>
         <Button @click="exitToLogin">注销账号</Button>
       </div>
       <div class="middle">中间</div>

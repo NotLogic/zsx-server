@@ -2,7 +2,7 @@
 const sidebarData = {
   data: [
     {
-      key: 'resource',
+      key: 'authority',
       title: '权限管理',
       icon: '',
       children: [
@@ -11,22 +11,22 @@ const sidebarData = {
           icon: '',
           text: '资源管理'
         }, {
-          key: 'resource',
+          key: 'role',
           icon: '',
           text: '角色管理'
         }, {
-          key: 'resource',
+          key: 'user',
           icon: '',
           text: '用户管理'
         }
       ]
     }, {
-      key: 'user',
+      key: 'member',
       title: '会员管理',
       icon: '',
       children: [
         {
-          key: 'user_child',
+          key: 'member_child',
           icon: '',
           text: '会员管理'
         }
@@ -59,11 +59,11 @@ const sidebarData = {
       icon: '',
       children: [
         {
-          key: 'guide_work-class',
+          key: 'workClass',
           icon: '',
           text: '办事分类'
         }, {
-          key: 'guide_work-matter',
+          key: 'workMatter',
           icon: '',
           text: '办事事项'
         }

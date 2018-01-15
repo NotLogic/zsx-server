@@ -8,7 +8,7 @@
         <Icon type="item.icon"></Icon>
         {{item.title}}
       </MenuItem>
-      <Submenu v-if="item.children.length>=1" :name="item.key">
+      <Submenu v-else :name="item.key">
         <template slot="title">
           <Icon type="item.icon"></Icon>
           {{item.title}}
@@ -33,15 +33,11 @@
     data () {
       return {
         theme: 'dark',
-        accordion: false, // 是否开启手风琴模式
-        message: 'hellow'
-        // sidebarData: sidebarData.data,
-        // sidebarData2: sidebarData.data2
+        accordion: false // 是否开启手风琴模式
       }
     },
     methods: {
       menuSelect (name) {
-        console.log(name)
         // name和路由绑定好不好？是不是太死板了
         this.$router.push({name: name})
       }
