@@ -13,9 +13,14 @@
         </Button>
         <Button @click="exitToLogin">注销账号</Button>
       </div>
-      <div class="middle">中间</div>
+      <div class="middle">
+        <!-- <tags-page-opened :pageTagsList="pageTagsList"></tags-page-opened> -->
+        中间快捷导航按钮组
+      </div>
       <div class="single-page" :style="{left:hideMenuText?0:'200px'}">
-        <router-view></router-view>
+        <div class="single-box">
+          <router-view></router-view>
+        </div>
       </div>
       <div class="copyright" :style="{left:hideMenuText?0:'200px'}">
         Copyright © 阿斯蒂芬规划局版权所有
@@ -27,7 +32,7 @@
 <script>
   // import Cookies from 'js-cookie'
   import sidebar from '@/components/sidebar'
-  import sidebarData from '@/data/sidebar.js'
+  import sidebarData from '@/assets/data/sidebar.js'
   export default {
     components: {
       sidebar
@@ -39,7 +44,7 @@
       }
     },
     // 计算属性 引入vuex进行状态管理，从store实例中读取状态最简单的方法就是在计算属性中返回某个状态
-    computed: {},
+    // computed: {},
     mounted () {
       // console.log(this.$route)
     },
@@ -91,7 +96,8 @@
   }
   .main .right .top{
     height: 60px;
-    background: antiquewhite;
+    background: #fff;
+    border-bottom: 1px solid #eee;
   }
   .main .right .middle{
     height: 40px;
@@ -103,11 +109,19 @@
     left: 200px;
     right: 0;
     bottom: 60px;
-    background: aqua;
+    background: #f5f7f9;
     overflow: auto;
     padding: 10px;
     transition: left .3s;
     overflow: auto;
+  }
+  .single-box{
+    background-color: #fff;
+    padding: 10px;
+    height: 100%;
+    border: 1px solid #eee;
+    /* background: url('../../assets/images/welcome.jpg') no-repeat center;
+    background-size: cover; */
   }
   .main .right .copyright{
     position: absolute;
@@ -117,7 +131,7 @@
     left: 200px;
     text-align: center;
     line-height: 60px;
-    background: beige;
+    background: #f5f7f9;
     transition: left .3s;
   }
 </style>

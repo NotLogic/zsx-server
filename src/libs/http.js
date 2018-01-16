@@ -1,4 +1,2 @@
-import axios from 'axios'
-
-const http = {}
-export default http
+// import axios from 'axios'
+export default { }

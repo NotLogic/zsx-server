@@ -147,13 +147,17 @@ const sidebarData = {
       ]
     }, {
       key: 'sensitiveWord',
-      title: '敏感词库',
+      title: '敏感词',
       icon: '',
       children: [
         {
-          key: 'sensitiveWord_child',
+          key: 'sensitiveWords',
           icon: '',
           text: '敏感词库'
+        }, {
+          key: 'sensitiveWordSettting',
+          icon: '',
+          text: '敏感词规则'
         }
       ]
     }, {

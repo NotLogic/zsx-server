@@ -1,13 +1,13 @@
 <template>
-  <div class="sensitiveWord">
-    敏感词
+  <div class="sensitiveWordSettting">
+    敏感词匹配规则
     <router-link :to="{name: 'main'}">返回主页</router-link>
   </div>
 </template>
 
 <script>
   export default {
-    name: 'sensitiveWord'
+    name: 'sensitiveWordSettting'
   }
 </script>
 

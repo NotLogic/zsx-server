@@ -188,9 +188,13 @@ const appRoutes = [
     component: main,
     children: [
       {
-        path: 'sensitiveWord_child',
-        name: 'sensitiveWord_child',
-        component: resolve => { require(['@/pages/sensitiveWord'], resolve) }
+        path: 'sensitiveWords',
+        name: 'sensitiveWords',
+        component: resolve => { require(['@/pages/sensitiveWord/sensitiveWords.vue'], resolve) }
+      }, {
+        path: 'sensitiveWordSettting',
+        name: 'sensitiveWordSettting',
+        component: resolve => { require(['@/pages/sensitiveWord/sensitiveWordSettting.vue'], resolve) }
       }
     ]
   },
