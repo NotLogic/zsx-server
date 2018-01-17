@@ -1,7 +1,7 @@
 <template>
   <div class="work-matter">
     办事事项
-    <Button type="primary" @click="addRow" size="small">添加行</Button>
+    <Button type="primary" @click="addRow" size="small">添加</Button>
     <mainTable :columns="columns1" :data="data1"></mainTable>
     <paging :total="myTotal"></paging>
   </div>
@@ -24,7 +24,7 @@
     },
     methods: {
       addRow () {
-        console.log('添加行')
+        console.log('添加')
       }
     },
     // 生命周期钩子函数VNode替换原始dom时触发，不是对象，切记

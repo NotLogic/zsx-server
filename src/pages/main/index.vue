@@ -1,19 +1,21 @@
 <template>
   <div class="zsx-main main" id="main">
-    <div class="left" v-show="!hideMenuText">
+    <div class="side-menu" v-show="!hideMenuText">
       <div class="logo">
         <img src="/static/images/logo.jpg" alt="">
       </div>
       <sidebar :sidebarData="sidebarData.data"></sidebar>
     </div>
     <div class="right" :style="{paddingLeft: hideMenuText ? '0' : '200px'}">
-      <div class="top">
+      <div class="header">
         <Button type="text" @click="toggleClick" :style="{transform: 'rotateZ(' + (this.hideMenuText ? '-90' : '0') + 'deg)'}">
           <Icon type="navicon" size="32"></Icon>
         </Button>
-        <Button @click="exitToLogin">注销账号</Button>
+        <Button type="text" style="float: right;margin-right: 15px;margin-top: 5px;" class="btn-logout" icon="log-out" size="large" @click="exitToLogin">
+          注销
+        </Button>
       </div>
-      <div class="middle">
+      <div class="open-page-wrapper">
         <!-- <tags-page-opened :pageTagsList="pageTagsList"></tags-page-opened> -->
         中间快捷导航按钮组
       </div>
@@ -69,7 +71,7 @@
 </script>
 
 <style scoped>
-  .main .left{
+  .main .side-menu{
     position: absolute;
     left: 0;
     top: 0;
@@ -78,11 +80,11 @@
     background: rgb(73, 80, 96);
     z-index: 1;
   }
-  .left .logo{
+  .side-menu .logo{
     padding: 10px 0;
     text-align: center;
   }
-  .left .logo img{
+  .side-menu .logo img{
     max-width: 80%;
   }
   .main .right{
@@ -92,14 +94,14 @@
     top: 0;
     width: 100%;
     height: 100%;
-    transition: padding-left .3s;
+    /*transition: padding-left .3s;*/
   }
-  .main .right .top{
+  .main .right .header{
     height: 60px;
     background: #fff;
     border-bottom: 1px solid #eee;
   }
-  .main .right .middle{
+  .main .right .open-page-wrapper{
     height: 40px;
   }
   .main .right .single-page{
@@ -112,7 +114,7 @@
     background: #f5f7f9;
     overflow: auto;
     padding: 10px;
-    transition: left .3s;
+    /*transition: left .3s;*/
     overflow: auto;
   }
   .single-box{
@@ -132,6 +134,6 @@
     text-align: center;
     line-height: 60px;
     background: #f5f7f9;
-    transition: left .3s;
+    /*transition: left .3s;*/
   }
 </style>

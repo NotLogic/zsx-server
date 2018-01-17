@@ -12,8 +12,8 @@
       total: [String, Number]
     },
     methods: {
-      pagingNumChange (currentPage) {
-        console.log('当前页： ', currentPage)
+      pagingNumChange (currPage) {
+        console.log('当前页： ', currPage)
       },
       pagingSizeChange (pageSize) {
         console.log('每页几个： ', pageSize)

@@ -4,12 +4,13 @@ const loginRoute = {
   name: 'login',
   component: resolve => { require(['@/pages/login'], resolve) }
 }
-const mainRoute = {
+export const mainRoutes = {
   path: '/',
   name: 'main',
-  component: main
+  component: main,
+  children: []
 }
-const appRoutes = [
+export const appRoutes = [
   // 权限管理
   {
     path: '/authority',
@@ -239,7 +240,7 @@ const errorRoutes = [
 ]
 const routes = [
   loginRoute,
-  mainRoute,
+  mainRoutes,
   ...appRoutes,
   ...errorRoutes
 ]
