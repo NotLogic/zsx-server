@@ -4,21 +4,29 @@
       <div class="logo">
         <img src="/static/images/logo.jpg" alt="">
       </div>
-      <sidebar :sidebarData="sidebarData.data"></sidebar>
+      <sidebar :sidebarData="sidebarData"></sidebar>
     </div>
-    <div class="right" :style="{paddingLeft: hideMenuText ? '0' : '200px'}">
-      <div class="header">
-        <Button type="text" @click="toggleClick" :style="{transform: 'rotateZ(' + (this.hideMenuText ? '-90' : '0') + 'deg)'}">
-          <Icon type="navicon" size="32"></Icon>
-        </Button>
-        <Button type="text" style="float: right;margin-right: 15px;margin-top: 5px;" class="btn-logout" icon="log-out" size="large" @click="exitToLogin">
-          注销
-        </Button>
+    <div class="all-right" :style="{paddingLeft: hideMenuText ? '0' : '200px'}">
+      <div class="main-header">
+        <div class="navicon-con">
+          <Button type="text" @click="toggleClick" :style="{transform: 'rotateZ(' + (this.hideMenuText ? '-90' : '0') + 'deg)'}">
+            <Icon type="navicon" size="32"></Icon>
+          </Button>
+        </div>        
+        <div class="header-middle-con">
+          <div class="main-breadcrumb">
+            <breadcrumb-nav :currentPath="currentPath"></breadcrumb-nav>
+          </div>
+        </div>
+        <div class="header-avator-con">
+          <Button type="text" class="btn-logout" icon="log-out" size="large" @click="exitToLogin">
+            注销
+          </Button>
+        </div>
       </div>
-      <div class="open-page-wrapper">
-        <!-- <tags-page-opened :pageTagsList="pageTagsList"></tags-page-opened> -->
-        中间快捷导航按钮组
-      </div>
+      <!-- 已打开过页面的快捷导航 -->
+      <tags-page-opened :pageTagsList="pageTagsList"></tags-page-opened>
+      <!-- 单页内容展示区域 -->
       <div class="single-page" :style="{left:hideMenuText?0:'200px'}">
         <div class="single-box">
           <router-view></router-view>
@@ -34,15 +42,30 @@
 <script>
   // import Cookies from 'js-cookie'
   import sidebar from '@/components/sidebar'
+  import tagsPageOpened from '@/components/tagsPageOpened'
+  import breadcrumbNav from '@/components/breadcrumbNav'
   import sidebarData from '@/assets/data/sidebar.js'
   export default {
     components: {
-      sidebar
+      sidebar,
+      tagsPageOpened,
+      breadcrumbNav
     },
     data () {
       return {
         hideMenuText: false,
+        // pageTagsList: [],
+        // currentPath: [],
         sidebarData: sidebarData
+        // sidebarData: []
+      }
+    },
+    computed: {
+      pageTagsList () {
+        return this.$store.state.pageTagsList
+      },
+      currentPath () {
+        return this.$store.state.currentPath  // 当前面包屑数组
       }
     },
     // 计算属性 引入vuex进行状态管理，从store实例中读取状态最简单的方法就是在计算属性中返回某个状态
@@ -79,6 +102,7 @@
     width: 200px;
     background: rgb(73, 80, 96);
     z-index: 1;
+    overflow: auto;
   }
   .side-menu .logo{
     padding: 10px 0;
@@ -87,7 +111,7 @@
   .side-menu .logo img{
     max-width: 80%;
   }
-  .main .right{
+  .main .all-right{
     box-sizing: border-box;
     position: absolute;
     padding-left: 200px;
@@ -96,15 +120,16 @@
     height: 100%;
     /*transition: padding-left .3s;*/
   }
-  .main .right .header{
+  .main .all-right .main-header{
     height: 60px;
+    line-height: 60px;
     background: #fff;
     border-bottom: 1px solid #eee;
   }
-  .main .right .open-page-wrapper{
-    height: 40px;
-  }
-  .main .right .single-page{
+  .navicon-con{float: left}
+  .header-middle-con{float: left}
+  .header-avator-con{float: right}
+  .main .all-right .single-page{
     box-sizing: border-box;
     position: absolute;
     top:100px;
@@ -125,7 +150,7 @@
     /* background: url('../../assets/images/welcome.jpg') no-repeat center;
     background-size: cover; */
   }
-  .main .right .copyright{
+  .main .all-right .copyright{
     position: absolute;
     height: 60px;
     bottom: 0;

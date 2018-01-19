@@ -4,27 +4,27 @@
     <Form inline>
       <Button type="primary" @click="addRow" size="small">添加</Button>
     </Form>
-    <Form ref="formSearch" inline :label-width="80">
-        <FormItem label="分类名称" prop="searchClassName">
+    <Form :model="formSearch" ref="formSearch" :rules="rules" inline :label-width="80">
+        <FormItem label="分类名称" prop="className">
             <Input v-model="formSearch.className" placeholder="分类名称" size="small" style="width: 120px"></Input>
         </FormItem>
         <FormItem label="关联地区">
             <Cascader :data="provinceCityData" v-model="derail_address_obj_s" @on-change="searchAddrChange" filterable size="small" style="margin-top: 5px;"></Cascader>
         </FormItem>
-        <FormItem label="状态" prop="searchClassStatus">
+        <FormItem label="状态" prop="classStatus">
             <Select v-model="formSearch.classStatus" placeholder="请选择" style="width: 80px;" size="small" clearable>
                 <Option value="0">无效</Option>
                 <Option value="1">有效</Option>
             </Select>
         </FormItem>
-        <FormItem label="分类类别" prop="SearchClassType">
+        <FormItem label="分类类别" prop="classType">
             <Select v-model="formSearch.classType" size="small" style="width: 80px;">
               <Option value="0">个人</Option>
               <Option value="1">企业</Option>
             </Select>
         </FormItem>
         <Button type="primary" style="margin-top: 5px;" @click="submitSearch('formSearch')" size="small">查找</Button>
-        <Button type="ghost" style="margin-left: 8px;margin-top: 5px;" @click="_resetSearch('formSearch')" size="small">清空</Button>
+        <Button type="ghost" style="margin-left: 8px;margin-top: 5px;" @click="resetSearch('formSearch')" size="small">清空</Button>
     </Form>
     <mainTable :columns="columns" :data="pager.data"></mainTable>
     <paging :total="pager.total"></paging>
@@ -88,7 +88,7 @@
 <script>
   import mainTable from '@/components/mainTable'
   import paging from '@/components/paging'
-  import utils from '@/libs/utils.js'
+  import util from '@/libs/util'
   export default {
     components: {
       mainTable,
@@ -96,37 +96,72 @@
     },
     data () {
       return {
-        // 全局
         dialogShow: false,
         dialogSubmitLoading: false,
-        label: {
-          'edit': '编辑',
-          'add': '新增'
-        },
-        currDialog: 'add',
-        baseUrl: '',
-        pager: {
-          url: '',
-          currPage: '',
-          order: '',
-          pagesize: '',
-          sort: '',
-          total: 100,
-          data: [
-            // 模拟数据
-            {
-              id: 123,
-              className: '分类1',
-              cityCode: 123456,
-              classStatus: 1,
-              classIcon: 'http://fanyi.bdstatic.com/static/translation/img/header/logo_cbfea26.png',
-              classType: 0
-            }
-          ]
-        },
-        // 局部
         derail_address_obj_s: [],
-        provinceCityData: [],
+        provinceCityData: [
+          {
+            label: '北京',
+            value: '110000',
+            children: [
+              {
+                label: '东区',
+                value: '111100',
+                children: [
+                  {
+                    label: '东门',
+                    value: '111111'
+                  }, {
+                    label: '西门',
+                    value: '111112'
+                  }
+                ]
+              }, {
+                label: '西区',
+                value: '111200',
+                children: [
+                  {
+                    label: '南门',
+                    value: '111113'
+                  }, {
+                    label: '北门',
+                    value: '111114'
+                  }
+                ]
+              }
+            ]
+          }, {
+            label: '河南',
+            value: '220000',
+            children: [
+              {
+                label: '郑州',
+                value: '221100',
+                children: [
+                  {
+                    label: '这区',
+                    value: '221111'
+                  }, {
+                    label: '那区',
+                    value: '221112'
+                  }
+                ]
+              }, {
+                label: '许昌',
+                value: '221200',
+                children: [
+                  {
+                    label: '许昌县',
+                    value: '221211'
+                  }, {
+                    label: '襄城县',
+                    value: '221212'
+                  }
+                ]
+              }
+            ]
+          }
+        ],
         provinceCity: [],
         formSearch: {
           input: '',
@@ -221,10 +256,30 @@
                   },
                   on: {
                     click: () => {
-                      this.getAddrByCityId(1)
+                      // this.$store.commit('editRow', {
+                      //   'vm': this,
+                      //   'create': create,
+                      //   'params': params
+                      // })
+                      var vm = this
+                      vm.$store.dialogShow = true
+                      vm.$store.currDialog = 'edit'
+                      // var _formDialog = $.extend({}, this.pager.data[index])
+                      // if (typeof(initDialogData) != 'undefined') {
+                      //     _formDialog = initDialogData
+                      // }
+                      // $.each(_formDialog, function (key, val) {
+                      //     if (typeof(vm.formDialog[key]) == 'undefined') {
+                      //         delete _formDialog[key];
+                      //     }
+                      //     if (util.isNumber(val)) {
+                      //         _formDialog[key] = String(val);
+                      //     }
+                      // })
+                      // this.formDialog = _formDialog;
                     }
                   }
-                }, 'View'),
+                }, '编辑'),
                 create('Button', {
                   props: {
                     type: 'error',
@@ -232,10 +287,14 @@
                   },
                   on: {
                     click: () => {
-                      this.getAddrByCityId(2)
+                      this.$store.dispatch('delRow', {
+                        'vm': this,
+                        'create': create,
+                        'params': params
+                      })
                     }
                   }
-                }, 'Delete')
+                }, '删除')
               ])
             }
           }
@@ -252,10 +311,23 @@
     },
     methods: {
       addRow () {
-        const vm = this
-        vm.dialogShow = true
+        this.$store.commit('addRow', {
+          'vm': this
+        })
       },
-      _resetSearch (name) {},
+      initDialog (data) {
+        console.log(data)
+      },
+      resetSearch (name) {
+        // 重置一些this.$refs[name].resetFields()无法重置的内容
+        // vm.$store.commit('reserForm', name)
+        this.derail_address_obj_s = []
+        this.$refs[name].resetFields()
+      },
+      resetDialogForm (name) {
+        this.provinceCity = []
+        this.$refs[name].resetFields()
+      },
       searchAddrChange () {},
       addrChange () {},
       handleSuccess () {},
@@ -263,66 +335,26 @@
       getAddrByCityId (cityId) {
         return '数据成功'
       },
-      resetDialogForm (name) {
-        const vm = this
-        vm.$refs[name].resetFields()
-      },
-      submitDialogForm (name) {
-        const vm = this
-        // 成功后重置表单
-        vm.dialogShow = false
-        vm.resetDialogForm(name)
-      },
-      // 全局
-      pagingFiltData (obj) {
-        for (let key in obj) {
-          if (typeof obj[key] !== 'string') {
-            continue
-          }
-          if (obj[key].trim() === '') {
-            delete obj[key]
-          }
-        }
-        delete obj.data
-        return obj
-      },
-      paging (currPage) {
-        const vm = this
-        if (!isNaN(currPage)) {
-          vm.pager.currPage = parseInt(currPage)
-        }
-        console.log(utils)
-        // ss.ajax({
-        //   type: ('type' in vm.pager) ? vm.pager.type : 'post',
-        //   url: vm.baseUrl + vm.pager.url,
-        //   data: vm.pagingFiltData(vm.pager),
-        //   success: function (result) {
-        //     var _result = result
-        //     var _data = []
-        //     var _res = {}
-        //     if (typeof vm.pagerResult === 'function') {
-        //       _result = vm.pagerResult(result)
-        //     }
-        //     _data = [].concat(_result.data)
-        //     utils.extend(true, _res, vm.pager, _result)
-        //     _res.data = _data
-        //     vm.pager = _res
-        //   }
-        // })
-      },
       initData () {}
     },
-    watch: {
-      'pager.currPage': function (val, oldVal) {
-        console.log(val)
-        this.paging()
+    // 计算属性
+    computed: {
+      pager () {
+        return this.$store.state.pager
+      },
+      label () {
+        return this.$store.state.label
+      },
+      currDialog () {
+        return this.$store.state.currDialog
       }
     },
+    watch: {},
     // 生命周期钩子函数VNode替换原始dom时触发，不是对象，切记
     mounted () {
       // console.log('原始DOM被VNode替换')
       this.initData()
-      this.paging()
+      console.log(util)
     }
   }
 </script>

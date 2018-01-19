@@ -25,10 +25,6 @@
             <FormItem>
               <Button @click="handleSubmit" type="primary" long>登录</Button>
             </FormItem>
-            <!--<router-link :to="{name: 'main',query: {name:1},params: {aa:1,bb:2}}">传数据到main</router-link>-->
-            <!-- 带查询参数 -->
-            <!--<router-link :to="{name: 'main',query: {name:1}}">传数据到main</router-link>-->
-            <!--<router-link :to="{path: '/',query: {name:1}}">传数据到main</router-link>-->
           </Form>
           <p>输入任意内容跳转主页</p>
         </div>
@@ -67,8 +63,10 @@
             // console.log(Cookies.get('userName'))
             this.$Message.success('登陆成功')
             this.$router.push({
-              name: 'main'
+              name: 'home'
             })
+            // 根据是否登录保存用户信息
+            // 保存返回的权限信息到sessionStorage
           }
         })
       }

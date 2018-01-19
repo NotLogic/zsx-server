@@ -4,7 +4,7 @@ import Vue from 'vue'
 import App from './App'
 import router from './router'
 import iView from 'iview'
-// import store from './vuex'
+import store from './vuex'
 // import axios from './libs/http.js' // 经过封装的axios
 // import axios from 'axios'  // 未封装的axios
 // import utils from './libs/utils.js'
@@ -20,7 +20,7 @@ Vue.use(iView)
 new Vue({
   el: '#app',
   router,
-  // store,
+  store,
   render: h => h(App),
   data: {
     currentPageName: ''
