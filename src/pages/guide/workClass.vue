@@ -1,6 +1,5 @@
 <template>
   <div class="work-class">
-    办事分类
     <Form inline>
       <Button type="primary" @click="addRow" size="small">添加</Button>
     </Form>
@@ -75,7 +74,7 @@
               </Upload>
             </FormItem>
           </Col>
-        </Row>
+        </Row>        
       </Form>
       <div slot="footer">
         <Button @click="resetDialogForm('formDialog')">清空</Button>
@@ -256,27 +255,11 @@
                   },
                   on: {
                     click: () => {
-                      // this.$store.commit('editRow', {
-                      //   'vm': this,
-                      //   'create': create,
-                      //   'params': params
-                      // })
-                      var vm = this
-                      vm.$store.dialogShow = true
-                      vm.$store.currDialog = 'edit'
-                      // var _formDialog = $.extend({}, this.pager.data[index])
-                      // if (typeof(initDialogData) != 'undefined') {
-                      //     _formDialog = initDialogData
-                      // }
-                      // $.each(_formDialog, function (key, val) {
-                      //     if (typeof(vm.formDialog[key]) == 'undefined') {
-                      //         delete _formDialog[key];
-                      //     }
-                      //     if (util.isNumber(val)) {
-                      //         _formDialog[key] = String(val);
-                      //     }
-                      // })
-                      // this.formDialog = _formDialog;
+                      this.$store.commit('editRow', {
+                        'vm': this,
+                        'params': params,
+                        'initDialog': this.initDialog(params.row)
+                      })
                     }
                   }
                 }, '编辑'),
@@ -316,7 +299,9 @@
         })
       },
       initDialog (data) {
-        console.log(data)
+        this.formDialog.cityCode = data.cityCode
+        this.provinceCity = [data.cityCode.toString().slice(0, 2) + '0000', data.cityCode.toString().slice(0, 4) + '00', data.cityCode.toString()]
+        this.formDialog.classStatus = data.classStatus
       },
       resetSearch (name) {
         // 重置一些this.$refs[name].resetFields()无法重置的内容

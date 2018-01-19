@@ -26,5 +26,24 @@ new Vue({
     currentPageName: ''
   },
   mountd () {},
-  created () {}
+  created () {},
+  methods: {
+    genBtnEdit (vm, create, params) {
+      return create('Button', {
+        props: {
+          type: 'primary',
+          size: 'small'
+        },
+        on: {
+          click: () => {
+            this.$store.commit('editRow', {
+              'vm': this,
+              'create': create,
+              'params': params
+            })
+          }
+        }
+      }, '编辑')
+    }
+  }
 })

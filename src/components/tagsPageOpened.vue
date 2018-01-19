@@ -1,6 +1,5 @@
 <template>
-  <div class="tagsPageOpened">
-    先不考虑样式问题
+  <div class="tagsPageOpened">    
     <Tag 
       v-for="item in pageTagsList"
       :key="item.name"
@@ -8,8 +7,7 @@
       closable
       color="blue"
       @click.native="openPage(item.name)"
-      @on-close="closePage">{{item.title}}</Tag>
-    pageTagsList : {{pageTagsList}}
+      @on-close="closePage">{{item.title}}</Tag>    
   </div>
 </template>
 

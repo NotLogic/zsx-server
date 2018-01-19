@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import {mainRoutes, appRoutes} from '@/router/routes'
+// import util from '@/libs/util'
 // import state from './state'
 // import * as getters from './getters'
 // import * as mutations from './mutations'
@@ -27,7 +28,7 @@ export default new Vuex.Store({
         {
           id: 123,
           className: '分类1',
-          cityCode: 123456,
+          cityCode: 111112,
           classStatus: 1,
           classIcon: 'http://fanyi.bdstatic.com/static/translation/img/header/logo_cbfea26.png',
           classType: 0
@@ -83,7 +84,18 @@ export default new Vuex.Store({
       payload.vm.dialogShow = true
     },
     editRow (state, payload) {
-      console.log(payload)
+      for (let key in payload.vm.formDialog) {
+        if (typeof payload.params.row[key] === 'number') {
+          payload.vm.formDialog[key] = payload.params.row[key].toString()
+        } else {
+          payload.vm.formDialog[key] = payload.params.row[key]
+        }
+      }
+      if (typeof payload.initDialog === 'function') {
+        payload.initDialog(payload.params.row)
+      }
+      console.log(payload.vm.formDialog)
+      payload.vm.dialogShow = true
     }
   },
   actions: {

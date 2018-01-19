@@ -1,5 +1,7 @@
 <template>
-  <Table :columns='columns' :data='data'></Table>
+  <!-- <div class="wrapper-pagination"> -->
+    <Table :columns='columns' :data='data'></Table>
+  <!-- </div>   -->
 </template>
 
 <script>
@@ -13,5 +15,7 @@ export default {
 </script>
 
 <style scoped>
-
+  /* .wrapper-pagination{
+    padding: 15px 0;
+  } */
 </style>
