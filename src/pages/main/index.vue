@@ -1,10 +1,10 @@
 <template>
   <div class="zsx-main main" id="main">
-    <div class="side-menu" v-show="!hideMenuText">
+    <div class="side-menu" :style="{left: hideMenuText ? '-200px' : '0'}">
       <div class="logo">
         <img src="/static/images/logo.jpg" alt="">
       </div>
-      <sidebar :sidebarData="sidebarData"></sidebar>
+      <sidebar :menuList="menuList"></sidebar>
     </div>
     <div class="all-right" :style="{paddingLeft: hideMenuText ? '0' : '200px'}">
       <div class="main-header">
@@ -29,7 +29,9 @@
       <!-- 单页内容展示区域 -->
       <div class="single-page" :style="{left:hideMenuText?0:'200px'}">
         <div class="single-box">
-          <router-view></router-view>
+          <keep-alive :include="cachePage">
+            <router-view></router-view>
+          </keep-alive>          
         </div>
       </div>
       <div class="copyright" :style="{left:hideMenuText?0:'200px'}">
@@ -44,7 +46,7 @@
   import sidebar from '@/components/sidebar'
   import tagsPageOpened from '@/components/tagsPageOpened'
   import breadcrumbNav from '@/components/breadcrumbNav'
-  import sidebarData from '@/assets/data/sidebar.js'
+  // import sidebarData from '@/assets/data/sidebar.js'
   export default {
     components: {
       sidebar,
@@ -53,19 +55,24 @@
     },
     data () {
       return {
-        hideMenuText: false,
+        hideMenuText: false
         // pageTagsList: [],
         // currentPath: [],
-        sidebarData: sidebarData
         // sidebarData: []
       }
     },
     computed: {
+      menuList () {
+        return this.$store.state.menuList
+      },
       pageTagsList () {
         return this.$store.state.pageTagsList
       },
       currentPath () {
         return this.$store.state.currentPath  // 当前面包屑数组
+      },
+      cachePage () {
+        return this.$store.state.cachePage
       }
     },
     // 计算属性 引入vuex进行状态管理，从store实例中读取状态最简单的方法就是在计算属性中返回某个状态
@@ -96,13 +103,14 @@
 <style scoped>
   .main .side-menu{
     position: absolute;
-    left: 0;
     top: 0;
     height: 100%;
     width: 200px;
     background: rgb(73, 80, 96);
     z-index: 1;
-    overflow: auto;
+    /* overflow: auto; */
+    overflow: hidden;
+    transition: left .3s;
   }
   .side-menu .logo{
     padding: 10px 0;
@@ -118,7 +126,7 @@
     top: 0;
     width: 100%;
     height: 100%;
-    /*transition: padding-left .3s;*/
+    transition: padding-left .3s;
   }
   .main .all-right .main-header{
     height: 60px;
@@ -139,7 +147,7 @@
     background: #f5f7f9;
     overflow: auto;
     padding: 10px;
-    /*transition: left .3s;*/
+    transition: left .3s;
     overflow: auto;
   }
   .single-box{
@@ -159,6 +167,6 @@
     text-align: center;
     line-height: 60px;
     background: #f5f7f9;
-    /*transition: left .3s;*/
+    transition: left .3s;
   }
 </style>

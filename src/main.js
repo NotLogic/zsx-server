@@ -4,6 +4,7 @@ import Vue from 'vue'
 import App from './App'
 import router from './router'
 import iView from 'iview'
+import 'babel-polyfill'
 import store from './vuex'
 // import axios from './libs/http.js' // 经过封装的axios
 // import axios from 'axios'  // 未封装的axios
@@ -25,25 +26,10 @@ new Vue({
   data: {
     currentPageName: ''
   },
-  mountd () {},
+  computed: {},
+  mounted () {
+    this.$store.commit('updateMenulist')
+  },
   created () {},
-  methods: {
-    genBtnEdit (vm, create, params) {
-      return create('Button', {
-        props: {
-          type: 'primary',
-          size: 'small'
-        },
-        on: {
-          click: () => {
-            this.$store.commit('editRow', {
-              'vm': this,
-              'create': create,
-              'params': params
-            })
-          }
-        }
-      }, '编辑')
-    }
-  }
+  methods: {}
 })

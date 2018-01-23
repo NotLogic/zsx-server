@@ -8,9 +8,6 @@ const util = {
         obj[key] = data[key]
       }
       return obj
-    } else {
-      console.log('扩展数据不是数组或对象')
-      return null
     }
   },
   arrDiff (a1, a2) {

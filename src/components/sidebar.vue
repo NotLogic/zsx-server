@@ -3,20 +3,20 @@
 </style>
 <template>
   <Menu :theme="theme" :active-name="currentPageName" :open-names="openedSubmenuArr" :accordion="accordion" @on-select="menuSelect" width="auto">
-    <template v-for="item in sidebarData">
-      <MenuItem v-if="item.children.length<1" :name="item.key" :key="item.key">
-        <Icon :type="item.icon"></Icon>
-        {{item.title}}
+    <template v-for="item in menuList">
+      <MenuItem v-if="item.children.length<1" :name="item.name" :key="item.name">
+        <Icon :type="item.meta.icon"></Icon>
+        {{item.meta.title}}
       </MenuItem>
-      <Submenu v-else :name="item.key">
+      <Submenu v-else :name="item.name">
         <template slot="title">
-          <Icon :type="item.icon"></Icon>
-          {{item.title}}
+          <Icon :type="item.meta.icon"></Icon>
+          {{item.meta.title}}
         </template>
         <template v-for="child in item.children" >
-          <MenuItem :name="child.key" :key="child.key">
-            <Icon :type="child.icon"></Icon>
-            {{child.title}}
+          <MenuItem :name="child.name" :key="child.name">
+            <Icon :type="child.meta.icon"></Icon>
+            {{child.meta.title}}
           </MenuItem>
         </template>
       </Submenu>
@@ -28,7 +28,7 @@
   export default {
     name: 'sidebar',
     props: {
-      sidebarData: Array
+      menuList: Array
     },
     data () {
       return {

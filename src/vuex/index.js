@@ -1,13 +1,12 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import {mainRoutes, appRoutes} from '@/router/routes'
-// import util from '@/libs/util'
+import util from '@/libs/util'
 // import state from './state'
 // import * as getters from './getters'
 // import * as mutations from './mutations'
 
 window.Vuex || Vue.use(Vuex)
-// 暂时不使用vuex进行管理，等后期或对vuex熟悉后使用
 export default new Vuex.Store({
   state: {
     label: {
@@ -15,7 +14,6 @@ export default new Vuex.Store({
       'add': '新增'
     },
     currDialog: 'add',
-    baseUrl: '',
     pager: {
       url: '',
       currPage: '',
@@ -52,6 +50,8 @@ export default new Vuex.Store({
       path: '/',
       name: 'main'
     }],
+    accessArr: [], // 带有页面权限数据的数组 实例： [{pageName: 'main', access: 1}, {pageName: 'member_index', access: 0}]  数组中的 pageName 可以改为其他，改过之后下边也要相应的去改
+    cachePage: [], // 要缓存的页面name数组
     currentPageName: '',
     currentPath: [
       {
@@ -78,7 +78,7 @@ export default new Vuex.Store({
     },
     resetSearch (state, name) {
       this.resetForm(name)
-      // 搜索commit
+      // 搜索dispatch
     },
     addRow (state, payload) {
       payload.vm.dialogShow = true
@@ -94,8 +94,50 @@ export default new Vuex.Store({
       if (typeof payload.initDialog === 'function') {
         payload.initDialog(payload.params.row)
       }
-      console.log(payload.vm.formDialog)
       payload.vm.dialogShow = true
+    },
+    // 从路由中初始化左侧菜单数据
+    updateMenulist (state) {
+      let menuList = []
+      let _appRoutes = util.extend(appRoutes)
+      _appRoutes.forEach((item, index) => {
+        // 根据 accessArr 改变item.meta.access
+        if (state.accessArr.length) { // 更改所有的父路由
+          state.accessArr.forEach(accessArrItem => {
+            if (item.name === accessArrItem.pageName) {
+              item.meta.access = accessArrItem.access
+            }
+          })
+        }
+        // 父元素access为1
+        if (item.meta.access !== 'undefined' && item.meta.access) {
+          if (item.children.length && state.accessArr.length) {
+            state.accessArr.forEach(accessArrItem => {
+              item.children.forEach(child => {
+                if (child.name === accessArrItem.pageName) {
+                  child.meta.access = accessArrItem.access
+                }
+              })
+            })
+          }
+          if (item.children.length === 1) {
+            if (item.children[0].meta.access) {
+              menuList.push(item)
+            }
+          } else {
+            //  子路由不只一个
+            let len = menuList.push(item) // 为什么这里的menuList.push(item)===length
+            let childrenArr = []
+            childrenArr = item.children.filter(child => {
+              if (child.meta.access !== 'undefined' && child.meta.access) {
+                return child
+              }
+            })
+            menuList[len - 1].children = childrenArr
+          }
+        }
+      })
+      state.menuList = menuList
     }
   },
   actions: {

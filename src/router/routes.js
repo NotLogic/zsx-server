@@ -15,6 +15,7 @@ export const mainRoutes = {
   component: main,
   meta: {
     title: '首页',
+    access: 1,
     icon: ''
   },
   redirect: {
@@ -26,6 +27,7 @@ export const mainRoutes = {
       name: 'home',
       meta: {
         title: '首页',
+        access: 1,
         icon: ''
       },
       component: resolve => { require(['@/pages/home'], resolve) }
@@ -39,7 +41,8 @@ export const appRoutes = [
     name: 'authority',
     meta: {
       title: '权限管理',
-      icon: ''
+      access: 1,
+      icon: 'key'
     },
     component: main,
     children: [
@@ -48,6 +51,7 @@ export const appRoutes = [
         name: 'resource',
         meta: {
           title: '资源管理',
+          access: 1,
           icon: ''
         },
         component: resolve => { require(['@/pages/authority/resource'], resolve) }
@@ -57,6 +61,7 @@ export const appRoutes = [
         name: 'role',
         meta: {
           title: '角色管理',
+          access: 1,
           icon: ''
         },
         component: resolve => { require(['@/pages/authority/role'], resolve) }
@@ -66,6 +71,7 @@ export const appRoutes = [
         name: 'user',
         meta: {
           title: '用户管理',
+          access: 1,
           icon: ''
         },
         component: resolve => { require(['@/pages/authority/user'], resolve) }
@@ -78,6 +84,7 @@ export const appRoutes = [
     name: 'member',
     meta: {
       title: '会员管理',
+      access: 1,
       icon: ''
     },
     component: main,
@@ -87,6 +94,7 @@ export const appRoutes = [
         name: 'member_index',
         meta: {
           title: '会员管理',
+          access: 1,
           icon: ''
         },
         component: resolve => { require(['@/pages/member'], resolve) }
@@ -100,6 +108,7 @@ export const appRoutes = [
     component: main,
     meta: {
       title: '新闻管理',
+      access: 1,
       icon: ''
     },
     children: [
@@ -108,6 +117,7 @@ export const appRoutes = [
         name: 'news_index',
         meta: {
           title: '新闻管理',
+          access: 1,
           icon: ''
         },
         component: resolve => { require(['@/pages/news'], resolve) }
@@ -120,6 +130,7 @@ export const appRoutes = [
     name: 'notes',
     meta: {
       title: '帖子管理',
+      access: 1,
       icon: ''
     },
     component: main,
@@ -129,6 +140,7 @@ export const appRoutes = [
         name: 'notes_index',
         meta: {
           title: '帖子管理',
+          access: 1,
           icon: ''
         },
         component: resolve => { require(['@/pages/notes'], resolve) }
@@ -141,6 +153,7 @@ export const appRoutes = [
     name: 'comment',
     meta: {
       title: '评论管理',
+      access: 1,
       icon: ''
     },
     component: main,
@@ -150,6 +163,7 @@ export const appRoutes = [
         name: 'comment_index',
         meta: {
           title: '评论管理',
+          access: 1,
           icon: ''
         },
         component: resolve => { require(['@/pages/comment'], resolve) }
@@ -162,6 +176,7 @@ export const appRoutes = [
     name: 'ad',
     meta: {
       title: '广告管理',
+      access: 1,
       icon: ''
     },
     component: main,
@@ -171,6 +186,7 @@ export const appRoutes = [
         name: 'ad_index',
         meta: {
           title: '广告管理',
+          access: 1,
           icon: ''
         },
         component: resolve => { require(['@/pages/ad'], resolve) }
@@ -183,6 +199,7 @@ export const appRoutes = [
     name: 'appGroup',
     meta: {
       title: '群组管理',
+      access: 1,
       icon: ''
     },
     component: main,
@@ -192,6 +209,7 @@ export const appRoutes = [
         name: 'appGroup_index',
         meta: {
           title: '群组管理',
+          access: 1,
           icon: ''
         },
         component: resolve => { require(['@/pages/appGroup'], resolve) }
@@ -204,6 +222,7 @@ export const appRoutes = [
     name: 'adviceBack',
     meta: {
       title: '意见反馈',
+      access: 1,
       icon: ''
     },
     component: main,
@@ -213,6 +232,7 @@ export const appRoutes = [
         name: 'adviceBack_index',
         meta: {
           title: '意见反馈',
+          access: 1,
           icon: ''
         },
         component: resolve => { require(['@/pages/adviceBack'], resolve) }
@@ -225,6 +245,7 @@ export const appRoutes = [
     name: 'complaint',
     meta: {
       title: '举报管理',
+      access: 1,
       icon: ''
     },
     component: main,
@@ -234,6 +255,7 @@ export const appRoutes = [
         name: 'complaint_index',
         meta: {
           title: '举报管理',
+          access: 1,
           icon: ''
         },
         component: resolve => { require(['@/pages/complaint'], resolve) }
@@ -246,6 +268,7 @@ export const appRoutes = [
     name: 'guide',
     meta: {
       title: '办事指南',
+      access: 1,
       icon: ''
     },
     component: main,
@@ -255,6 +278,7 @@ export const appRoutes = [
         name: 'workClass',
         meta: {
           title: '办事分类',
+          access: 1,
           icon: ''
         },
         component: resolve => { require(['@/pages/guide/workClass'], resolve) }
@@ -264,6 +288,7 @@ export const appRoutes = [
         name: 'workMatter',
         meta: {
           title: '办事事项',
+          access: 1,
           icon: ''
         },
         component: resolve => { require(['@/pages/guide/workMatter'], resolve) }
@@ -276,6 +301,7 @@ export const appRoutes = [
     name: 'policy',
     meta: {
       title: '招商引资',
+      access: 1,
       icon: ''
     },
     component: main,
@@ -285,6 +311,7 @@ export const appRoutes = [
         name: 'policy_index',
         meta: {
           title: '招商引资',
+          access: 1,
           icon: ''
         },
         component: resolve => { require(['@/pages/policy'], resolve) }
@@ -297,6 +324,7 @@ export const appRoutes = [
     name: 'gover',
     meta: {
       title: '政务信息',
+      access: 1,
       icon: ''
     },
     component: main,
@@ -306,6 +334,7 @@ export const appRoutes = [
         name: 'gover_index',
         meta: {
           title: '政务信息',
+          access: 1,
           icon: ''
         },
         component: resolve => { require(['@/pages/gover'], resolve) }
@@ -319,6 +348,7 @@ export const appRoutes = [
     component: main,
     meta: {
       title: '敏感词',
+      access: 1,
       icon: ''
     },
     children: [
@@ -327,6 +357,7 @@ export const appRoutes = [
         name: 'sensitiveWords',
         meta: {
           title: '敏感词库',
+          access: 1,
           icon: ''
         },
         component: resolve => { require(['@/pages/sensitiveWord/sensitiveWords.vue'], resolve) }
@@ -335,6 +366,7 @@ export const appRoutes = [
         name: 'sensitiveWordSettting',
         meta: {
           title: '匹配规则',
+          access: 1,
           icon: ''
         },
         component: resolve => { require(['@/pages/sensitiveWord/sensitiveWordSettting.vue'], resolve) }
@@ -347,6 +379,7 @@ export const appRoutes = [
     name: 'thirdparty',
     meta: {
       title: 'API管理',
+      access: 1,
       icon: ''
     },
     component: main,
@@ -356,6 +389,7 @@ export const appRoutes = [
         name: 'thirdpartyClass',
         meta: {
           title: 'API分类',
+          access: 1,
           icon: ''
         },
         component: resolve => { require(['@/pages/thirdparty/thirdpartyClass'], resolve) }
@@ -365,6 +399,7 @@ export const appRoutes = [
         name: 'thirdpartySetting',
         meta: {
           title: 'API配置',
+          access: 1,
           icon: ''
         },
         component: resolve => { require(['@/pages/thirdparty/thirdpartySetting'], resolve) }
@@ -377,6 +412,7 @@ export const appRoutes = [
     name: 'basiceData',
     meta: {
       title: '基础数据',
+      access: 1,
       icon: ''
     },
     component: main,
@@ -386,6 +422,7 @@ export const appRoutes = [
         name: 'province',
         meta: {
           title: '省市区',
+          access: 1,
           icon: ''
         },
         component: resolve => { require(['@/pages/basiceData/province'], resolve) }

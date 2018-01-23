@@ -1,5 +1,5 @@
 <template>
-  <div class="tagsPageOpened">    
+  <div class="tags-page-opened">    
     <Tag 
       v-for="item in pageTagsList"
       :key="item.name"
@@ -33,7 +33,7 @@
 </script>
 
 <style scoped>
-  .tagsPageOpened{
+  .tags-page-opened{
     padding: 0 15px;
     overflow: hidden;
     height: 40px;
