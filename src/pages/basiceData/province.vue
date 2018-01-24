@@ -1,13 +1,360 @@
 <template>
   <div class="province">
-    省市区
-    <router-link :to="{name: 'main'}">返回主页</router-link>
+    <div style="padding: 10px 0">
+      <Button type="primary" size="small" style="margin-right: 10px;" @click="addRow('province')">添加</Button>
+      <Button type="primary" size="small" @click="checkData">校验所有数据</Button>
+    </div>
+    <main-table :columns="provinceColumns" :data="provinceData"></main-table>
+
+    <!-- 市弹窗 -->
+    <Modal v-model="cityDialogShow" title="市" :mask-closable="false" width="750">
+      <div style="margin-bottom: 10px;">
+        <Button type="primary" @click="addRow('city')" size="small">{{label.add}}</Button>
+      </div>
+      <main-table :columns="cityColumns" :data="cityData" size="small"></main-table>
+      <div slot="footer">
+        <Button type="primary" @click="closeModal('cityDialogShow')">确定</Button>
+      </div>
+    </Modal>
+
+    <!-- 区弹窗 -->
+    <Modal v-model="areaDialogShow" title="区" :mask-closable="false" width="750">
+      <div style="margin-bottom: 10px;">
+        <Button type="primary" @click="addRow('area')" size="small">{{label.add}}</Button>
+      </div>
+      <main-table :columns="areaColumns" :data="areaData" size="small"></main-table>
+      <div slot="footer">
+        <Button type="primary" @click="closeModal('areaDialogShow')">确定</Button>
+      </div>
+    </Modal>
+
+    <!-- 添加/编辑 弹窗 -->
+    <Modal v-model="dialogShow" :title="label[currDialog]" :mask-closable="false" width="750" @on-cancel="resetDialog">
+      <Form :model="formDialog" ref="formDialog" :rules="rules" :label-width="80">
+        <Row>
+          <Col span="12">
+            <FormItem v-if="choice === 'province'" label="省份名称" prop="provinceName">
+              <Input v-model="formDialog.provinceName" placeholder="请输入省份名称"></Input>
+            </FormItem>
+            <FormItem v-else-if="choice === 'city'" label="市名称" prop="cityName">
+              <Input v-model="formDialog.cityName" placeholder="请输入市名称"></Input>
+            </FormItem>
+            <FormItem v-else-if="choice === 'area'" label="区名称" prop="areaName">
+              <Input v-model="formDialog.areaName" placeholder="请输入区名称"></Input>
+            </FormItem>
+          </Col>
+        </Row>
+      </Form>
+      <div slot="footer">
+        <Button @click="resetDialog">{{label.clear}}</Button>
+        <Button type="primary" @click="submitDialogForm('formDialog')" :loading="dialogSubmitLoading">
+          {{label.submit}}
+        </Button>
+      </div>
+    </Modal>
   </div>
 </template>
 
 <script>
+  import util from '@/libs/util'
+  import mainTable from '@/components/mainTable'
   export default {
-    name: 'province'
+    name: 'province',
+    components: {
+      mainTable
+    },
+    data () {
+      return {
+        label: {
+          'edit': '编辑',
+          'add': '添加',
+          'clear': '清空',
+          'submit': '提交',
+          'delete': '删除'
+        },
+        currDialog: 'edit',
+        dialogShow: false,
+        cityDialogShow: false,
+        areaDialogShow: false,
+        dialogSubmitLoading: false,
+        formDialog: {
+          id: '',
+          provinceName: '',
+          cityName: '',
+          areaName: ''
+        },
+        choice: '',
+        chinaJson: {},
+        chinaData: [],
+        provinceData: [],
+        cityData: [],
+        areaData: [],
+        provinceColumns: [
+          {
+            title: '省code',
+            key: 'id',
+            width: 200,
+            fixed: 'left'
+          }, {
+            title: '省份',
+            key: 'provinceName',
+            render: (create, params) => {
+              let vm = this
+              return create('Button', {
+                props: {
+                  type: 'text'
+                },
+                on: {
+                  click: function () {
+                    vm.showCity(params.row.id)
+                  }
+                }
+              }, params.row.provinceName)
+            }
+          }, {
+            title: '操作',
+            key: 'action',
+            width: 200,
+            align: 'center',
+            fixed: 'right',
+            render: (create, params) => {
+              let vm = this
+              return create('div', [
+                (function (vm, create, params) {
+                  return create('Button', {
+                    props: { type: 'primary', size: 'small' },
+                    style: { marginRight: '5px' },
+                    on: {
+                      click: function () {
+                        // vm.checkCity(params)
+                      }
+                    }
+                  }, '校验')
+                })(vm, create, params),
+                (function (vm, create, params) {
+                  return create('Button', {
+                    props: { type: 'primary', size: 'small' },
+                    style: { marginRight: '5px' },
+                    on: {
+                      click: function () {
+                        // vm.editRow(params.row, 'province')
+                      }
+                    }
+                  }, vm.label.edit)
+                })(vm, create, params),
+                (function (vm, create, params) {
+                  return create('Button', {
+                    props: { type: 'error', size: 'small' },
+                    on: {
+                      click: function () {
+                        // vm.deleteRow(params.index, params.row.id, '100000', 'province')
+                      }
+                    }
+                  }, vm.label.delete)
+                })(vm, create, params)
+              ])
+            }
+          }
+        ],
+        cityColumns: [
+          {
+            title: '市code',
+            key: 'id',
+            width: 200,
+            fixed: 'left'
+          }, {
+            title: '市',
+            key: 'cityName',
+            render: (create, params) => {
+              let vm = this
+              return create('Button', {
+                props: {
+                  type: 'text'
+                },
+                on: {
+                  click: function () {
+                    vm.showArea(params.row.id)
+                  }
+                }
+              }, params.row.cityName)
+            }
+          }, {
+            title: '操作',
+            key: 'action',
+            width: 200,
+            align: 'center',
+            fixed: 'right',
+            render: (create, params) => {
+              let vm = this
+              return create('div', [
+                (function (vm, create, params) {
+                  return create('Button', {
+                    props: { type: 'primary', size: 'small' },
+                    style: { marginRight: '5px' },
+                    on: {
+                      click: function () {
+                        // vm.checkCity(params)
+                      }
+                    }
+                  }, '校验')
+                })(vm, create, params),
+                (function (vm, create, params) {
+                  return create('Button', {
+                    props: { type: 'primary', size: 'small' },
+                    style: { marginRight: '5px' },
+                    on: {
+                      click: function () {
+                        // vm.editRow(params.row, 'province')
+                      }
+                    }
+                  }, vm.label.edit)
+                })(vm, create, params),
+                (function (vm, create, params) {
+                  return create('Button', {
+                    props: { type: 'error', size: 'small' },
+                    on: {
+                      click: function () {
+                        // vm.deleteRow(params.index, params.row.id, '100000', 'province')
+                      }
+                    }
+                  }, vm.label.delete)
+                })(vm, create, params)
+              ])
+            }
+          }
+        ],
+        areaColumns: [
+          {
+            title: '区code',
+            key: 'id',
+            width: 200,
+            fixed: 'left'
+          }, {
+            title: '区',
+            key: 'areaName'
+          }, {
+            title: '操作',
+            key: 'action',
+            width: 200,
+            align: 'center',
+            fixed: 'right',
+            render: (create, params) => {
+              let vm = this
+              return create('div', [
+                (function (vm, create, params) {
+                  return create('Button', {
+                    props: { type: 'primary', size: 'small' },
+                    style: { marginRight: '5px' },
+                    on: {
+                      click: function () {
+                        // vm.checkCity(params)
+                      }
+                    }
+                  }, '校验')
+                })(vm, create, params),
+                (function (vm, create, params) {
+                  return create('Button', {
+                    props: { type: 'primary', size: 'small' },
+                    style: { marginRight: '5px' },
+                    on: {
+                      click: function () {
+                        // vm.editRow(params.row, 'province')
+                      }
+                    }
+                  }, vm.label.edit)
+                })(vm, create, params),
+                (function (vm, create, params) {
+                  return create('Button', {
+                    props: { type: 'error', size: 'small' },
+                    on: {
+                      click: function () {
+                        // vm.deleteRow(params.index, params.row.id, '100000', 'province')
+                      }
+                    }
+                  }, vm.label.delete)
+                })(vm, create, params)
+              ])
+            }
+          }
+        ],
+        rules: {}
+      }
+    },
+    methods: {
+      closeModal (name) {
+        this[name] = false
+      },
+      showCity (provinceId) {
+        var vm = this
+        vm.choice = 'city'
+        vm.cityData = vm.getCityData(provinceId)
+        vm.cityDialogShow = true
+      },
+      showArea (cityId) {
+        var vm = this
+        vm.choice = 'area'
+        vm.areaData = vm.getAreaData(cityId)
+        vm.areaDialogShow = true
+      },
+      getCityData (provinceId) {
+        var vm = this
+        var data = util.extend(vm.chinaJson[provinceId])
+        var dataArr = []
+        for (let key in data) {
+          dataArr.push({
+            'id': key,
+            'cityName': data[key]
+          })
+        }
+        return dataArr
+      },
+      getAreaData (cityId) {
+        var vm = this
+        var data = util.extend(vm.chinaJson[cityId])
+        var dataArr = []
+        for (let key in data) {
+          dataArr.push({
+            'id': key,
+            'areaName': data[key]
+          })
+        }
+        return dataArr
+      },
+      resetDialog () {
+        var vm = this
+        if (vm.formDialog.id) vm.formDialog.id = ''
+        if (vm.formDialog.provinceName) vm.formDialog.provinceName = ''
+        if (vm.formDialog.cityName) vm.formDialog.cityName = ''
+        if (vm.formDialog.areaName) vm.formDialog.areaName = ''
+      },
+      submitDialogForm (name) {
+        console.log(name)
+      },
+      addRow (choice) {
+        let vm = this
+        vm.choice = choice
+        vm.currDialog = 'add'
+        vm.dialogShow = true
+      },
+      // 校验所有数据
+      checkData () {}
+    },
+    computed: {},
+    mounted () {
+      this.$axios.get('/static/data/address.json').then(res => {
+        this.chinaJson = util.extend(res.data)
+        this.chinaData = util.getChinaDataByJson(util.extend(res.data))
+        let provinceData = []
+        util.extend(this.chinaData).forEach(item => {
+          provinceData.push({
+            'id': item.value,
+            'provinceName': item.label
+          })
+        })
+        this.provinceData = provinceData
+      })
+    },
+    watch: {}
   }
 </script>
 

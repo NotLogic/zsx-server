@@ -2,7 +2,7 @@
 
 </style>
 <template>
-  <Menu :theme="theme" :active-name="currentPageName" :open-names="openedSubmenuArr" :accordion="accordion" @on-select="menuSelect" width="auto">
+  <Menu ref="sideMenu" :theme="theme" :active-name="currentPageName" :open-names="openedSubmenuArr" :accordion="accordion" @on-select="menuSelect" width="auto">
     <template v-for="item in menuList">
       <MenuItem v-if="item.children.length<1" :name="item.name" :key="item.name">
         <Icon :type="item.meta.icon"></Icon>
@@ -45,6 +45,23 @@
         // name和路由绑定好不好？是不是太死板了
         this.$router.push({name: name})
       }
+    },
+    watch: {
+      $route (to) {
+        this.currentPageName = to.name
+        sessionStorage.currentPageName = to.name
+      },
+      currentPageName () {
+        this.openedSubmenuArr = this.$store.state.openedSubmenuArr
+        this.$nextTick(() => {
+          this.$refs.sideMenu.updateOpened()
+        })
+      }
+    },
+    updated () {
+      this.$nextTick(() => {
+        this.$refs.sideMenu.updateOpened()
+      })
     }
   }
 </script>

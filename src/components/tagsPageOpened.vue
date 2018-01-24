@@ -1,13 +1,13 @@
 <template>
-  <div class="tags-page-opened">    
-    <Tag 
+  <div class="tags-page-opened">
+    <Tag
       v-for="item in pageTagsList"
       :key="item.name"
       type="dot"
-      closable
+      :closable="item.name==='home' ? true : false"
       color="blue"
       @click.native="openPage(item.name)"
-      @on-close="closePage">{{item.title}}</Tag>    
+      @on-close="closePage">{{item.title}}</Tag>
   </div>
 </template>
 
@@ -25,7 +25,6 @@
     methods: {
       closePage (name) {},
       openPage (name) {
-        console.log(name)
         this.$router.push({name: name})
       }
     }

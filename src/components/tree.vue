@@ -3,7 +3,7 @@
 </template>
 
 <script>
-import util from '@/libs/util'
+// import util from '@/libs/util'
 export default {
   name: 'tree',
   props: {

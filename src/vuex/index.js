@@ -35,11 +35,11 @@ export default new Vuex.Store({
     },
     // 1
     routers: [
-      ...mainRoutes,
+      mainRoutes,
       ...appRoutes
     ],
     menuList: [],
-    tagsList: [],
+    tagsList: [...mainRoutes.children], // 标签（点击跳转的）路由都在里边 ，左侧菜单中的路由在main.vue中push进去
     pageTagsList: [{
       title: '首页',
       path: '/',
@@ -66,10 +66,7 @@ export default new Vuex.Store({
   mutations: {
     pagingFiltData (state, obj) {
       for (let key in obj) {
-        if (typeof obj[key] !== 'string') {
-          continue
-        }
-        if (obj[key].trim() === '') {
+        if (typeof obj[key] === 'string' && obj[key].trim() === '') {
           delete obj[key]
         }
       }
@@ -80,8 +77,8 @@ export default new Vuex.Store({
       this.resetForm(name)
       // 搜索dispatch
     },
-    addRow (state, payload) {
-      payload.vm.dialogShow = true
+    addRow (state, vm) {
+      vm.dialogShow = true
     },
     editRow (state, payload) {
       for (let key in payload.vm.formDialog) {

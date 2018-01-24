@@ -24,7 +24,6 @@ const createLintingRule = () => ({
 module.exports = {
   context: path.resolve(__dirname, '../'),
   entry: {
-    'babel-polyfill': 'babel-polyfill',
     app: './src/main.js'
   },
   output: {
@@ -43,7 +42,8 @@ module.exports = {
   },
   module: {
     rules: [
-      ...(config.dev.useEslint ? [createLintingRule()] : []),
+      // 关闭对js和vue的变态检测
+      // ...(config.dev.useEslint ? [createLintingRule()] : []),
       {
         test: /\.vue$/,
         loader: 'vue-loader',

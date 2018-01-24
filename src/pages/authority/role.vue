@@ -4,7 +4,6 @@
       <Button type="primary" @click="addRow" size="small">添加</Button>
     </div>
     <mainTable :columns="columns" :data="pager.data"></mainTable>
-    <paging :total="pager.total"></paging>
     <Modal v-model="dialogShow" :title="label[currDialog]" :mask-closable="false" width="750" @on-cancel="resetDialogForm('formDialog')">
       <Form :model="formDialog" ref="formDialog" :rules="rules" :label-width="80">
         <Row>
@@ -33,6 +32,7 @@
     <!-- 授权弹窗 -->
     <Modal v-model="grantShow" title="授权" :mask-closable="false" width="550" @on-cancel="resetGrantForm('grantDialog')">
       <Form :model="grantDialog" ref="grantDialog" :rules="rules">
+        <!-- 在组件中操作时会修改从父组件传过去的数据，暂时没有想到解决办法，所以先不做成组件 -->
         <!-- <access-tree style="max-height: 400px;overflow:auto;" :treeData="treeData" :loadDataFn="loadTreeData"></access-tree> -->
         <Tree :data="treeData" :load-data="loadDataFn" show-checkbox empty-text="加载数据中..." @on-check-change="treeCheckChange"></Tree>
       </Form>
@@ -41,7 +41,7 @@
           <Button @click="treeExpand">{{opened ? "折叠" : "展开"}}</Button>
           <Button type="primary" @click="treeCheckAll">{{selectAll ? "清空" : "全选"}}</Button>
           <Button type="primary" @click="treeToggle">反选</Button>
-        </template>        
+        </template>
         <Button type="primary" @click="submitGrantForm('grantDialog')">确定</Button>
       </div>
     </Modal>
@@ -51,14 +51,12 @@
 <script>
   import mainTable from '@/components/mainTable'
   import accessTree from '@/components/tree'
-  import paging from '@/components/paging'
   import util from '@/libs/util'
   import {appRoutes} from '@/router/routes'
   export default {
     name: 'role',
     components: {
       mainTable,
-      paging,
       accessTree
     },
     data () {
@@ -243,7 +241,7 @@
           item.children.forEach(item => {
             item.checked = !item.checked
           })
-        })        
+        })
         vm.selectAll = vm.checkSelectAll() ? true : false
       },
       loadTreeData (roleId) {

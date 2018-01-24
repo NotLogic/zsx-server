@@ -12,7 +12,7 @@
           <Button type="text" @click="toggleClick" :style="{transform: 'rotateZ(' + (this.hideMenuText ? '-90' : '0') + 'deg)'}">
             <Icon type="navicon" size="32"></Icon>
           </Button>
-        </div>        
+        </div>
         <div class="header-middle-con">
           <div class="main-breadcrumb">
             <breadcrumb-nav :currentPath="currentPath"></breadcrumb-nav>
@@ -31,7 +31,7 @@
         <div class="single-box">
           <keep-alive :include="cachePage">
             <router-view></router-view>
-          </keep-alive>          
+          </keep-alive>
         </div>
       </div>
       <div class="copyright" :style="{left:hideMenuText?0:'200px'}">
@@ -66,7 +66,7 @@
         return this.$store.state.menuList
       },
       pageTagsList () {
-        return this.$store.state.pageTagsList
+        return this.$store.state.pageOpenedList  // 所有打开的页面
       },
       currentPath () {
         return this.$store.state.currentPath  // 当前面包屑数组
@@ -155,6 +155,7 @@
     padding: 10px;
     height: 100%;
     border: 1px solid #eee;
+    overflow: auto;
     /* background: url('../../assets/images/welcome.jpg') no-repeat center;
     background-size: cover; */
   }

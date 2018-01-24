@@ -1,7 +1,9 @@
 <template>
   <div class="work-class">
     <Form inline>
-      <Button type="primary" @click="addRow" size="small">添加</Button>
+      <FormItem>
+        <Button type="primary" @click="addRow" size="small">添加</Button>
+      </FormItem>
     </Form>
     <Form :model="formSearch" ref="formSearch" :rules="rules" inline :label-width="80">
         <FormItem label="分类名称" prop="className">
@@ -68,13 +70,12 @@
                       :on-success="handleSuccess"
                       :show-upload-list="false"
                       :format="['jpg','jpeg','png']"
-                      :on-format-error="handleFormatError"
-                      :max-size="2048">
+                      :on-format-error="handleFormatError">
                 <Button type="ghost" icon="ios-cloud-upload-outline">上传文件</Button>
               </Upload>
             </FormItem>
           </Col>
-        </Row>        
+        </Row>
       </Form>
       <div slot="footer">
         <Button @click="resetDialogForm('formDialog')">清空</Button>
@@ -87,13 +88,14 @@
 <script>
   import mainTable from '@/components/mainTable'
   import paging from '@/components/paging'
-  import util from '@/libs/util'
+  // import util from '@/libs/util'
   export default {
+    name: 'workClass',
     components: {
       mainTable,
       paging
     },
-    data () {
+    data: function () {
       return {
         dialogShow: false,
         dialogSubmitLoading: false,
@@ -181,7 +183,6 @@
           {
             title: '编号',
             key: 'id',
-            width: 200,
             fixed: 'left'
           },
           {
@@ -216,8 +217,9 @@
               } else {
                 return create('img', {
                   style: {
-                    maxWidth: '100px',
-                    maxHeight: '100px'
+                    margin: '5px 0',
+                    maxWidth: '100%',
+                    maxHeight: '100%'
                   },
                   attrs: {
                     src: params.row.classIcon
@@ -284,19 +286,17 @@
         ],
         rules: {
           className: [
-            { required: true, message: '请填写分类名称', trigger: 'blur' }
+            {required: true, message: '请填写分类名称', trigger: 'blur'}
           ],
           classType: [
-            { required: true, message: '分类类别不能为空', trigger: 'change' }
+            {required: true, message: '分类类别不能为空', trigger: 'change'}
           ]
         }
       }
     },
     methods: {
       addRow () {
-        this.$store.commit('addRow', {
-          'vm': this
-        })
+        this.$store.commit('addRow', this)
       },
       initDialog (data) {
         this.formDialog.cityCode = data.cityCode
@@ -339,7 +339,6 @@
     mounted () {
       // console.log('原始DOM被VNode替换')
       this.initData()
-      console.log(util)
     }
   }
 </script>
