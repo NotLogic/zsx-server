@@ -1,13 +1,159 @@
 <template>
-  <div class="sensitiveWordSettting">
-    敏感词匹配规则
-    <router-link :to="{name: 'main'}">返回主页</router-link>
+  <div class="sensitive-word-settting">
+    <Form inline>
+      <FormItem>
+        <Button type="primary" @click="addRow" size="small">添加规则</Button>
+      </FormItem>
+    </Form>
+    <mainTable :columns="columns" :data="pager.data"></mainTable>
+    <Modal v-model="dialogShow" :title="label[currDialog]" :mask-closable="false" @on-cancel="resetDialogForm('formDialog')">
+      <Form :model="formDialog" ref="formDialog" :rules="rules" :label-width="100">
+        <FormItem label="匹配规则">
+          <RadioGroup v-model="formDialog.matchType">
+            <Radio label="1">最小匹配规则</Radio>
+            <Radio label="2">最大匹配规则</Radio>
+          </RadioGroup>
+        </FormItem>
+        <FormItem label="是否设为默认">
+          <RadioGroup v-model="formDialog.isdefault">
+            <Radio label="0">否</Radio>
+            <Radio label="1">是</Radio>
+          </RadioGroup>
+        </FormItem>
+        <FormItem label="敏感词替换为" prop="rpWord">
+          <Input v-model="formDialog.rpWord" placeholder="请输替换内容"></Input>
+        </FormItem>
+      </Form>
+      <div slot="footer">
+        <Button @click="resetDialogForm('formDialog')">{{label.clear}}</Button>
+        <Button type="primary" @click="submitDialogForm('formDialog')" :loading="dialogSubmitLoading">
+          {{label.submit}}
+        </Button>
+      </div>
+    </Modal>
   </div>
 </template>
 
 <script>
+  import mainTable from '@/components/mainTable'
   export default {
-    name: 'sensitiveWordSettting'
+    name: 'sensitiveWordSettting',
+    components: {
+      mainTable
+    },
+    data: function () {
+      return {
+        label: {
+          'edit': '编辑',
+          'add': '添加',
+          'clear': '清空',
+          'submit': '提交',
+          'delete': '删除'
+        },
+        currDialog: 'edit',
+        dialogShow: false,
+        dialogSubmitLoading: false,
+        pager: {
+          data: [
+            {
+              id: '213123',
+              rpWord: "as",
+              matchType: "2",
+              isdefault: "1"
+            }
+          ],
+          total: 100
+        },
+        formDialog: {
+          rpWord: "",
+          matchType: "1",
+          isdefault: "0"
+        },
+        columns: [
+          {
+            title: 'id',
+            key: 'id'
+          },
+          {
+            title: '替换规则',
+            key: 'rpWord'
+          },
+          {
+            title: '匹配规则',
+            key: 'matchType',
+            render: function (create, params) {
+              var map = {
+                1: "最小匹配规则",
+                2: "最大匹配规则"
+              }
+              return create('span', map[params.row.matchType])
+            }
+          },
+          {
+            title: '是否默认',
+            key: 'isdefault',
+            render: function (create, params) {
+              var map = {
+                0: "否",
+                1: "是"
+              }
+              return create('span', map[params.row.isdefault])
+            }
+          },
+          {
+            title: '操作',
+            key: 'action',
+            align: 'center',
+            fixed: 'right',
+            width: 200,
+            render: (create, params) => {
+              var vm = this
+              return create('div', [
+                create('Button', {
+                  props: {type: 'primary', size: 'small'},
+                  style: {marginRight: '5px'},
+                  on: {
+                    click: function () {
+                      vm.$store.commit('editRow', {
+                        'vm': vm,
+                        'params': params
+                      })
+                    }
+                  }
+                }, '编辑'),
+                create('Button', {
+                  props: {
+                    type: 'error',
+                    size: 'small'
+                  },
+                  on: {
+                    click: () => {
+                      console.log('删除')
+                    }
+                  }
+                }, '删除')
+              ])
+            }
+          }
+        ],
+        rules: {
+          rpWord: [{required: true, message: '请填写分类名称', trigger: 'blur'}]
+        }
+      }
+    },
+    methods: {
+      addRow () {
+        this.$store.commit('addRow', this)
+      },
+      upExeclSuccess () {},
+      handleFormatError () {},
+      resetDialogForm (name) {
+        let vm = this
+        vm.formDialog.id = '0'
+        vm.$refs[name].resetFields()
+      },
+      submitDialogForm (name) {}
+    }
   }
 </script>
 

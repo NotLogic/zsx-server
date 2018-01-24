@@ -1,6 +1,6 @@
 <template>
   <div class="wrapper-pagination">
-    <Page :total="total" show-sizer show-elevator @on-change="pagingNumChange" @on-page-size-change="pagingSizeChange"></Page>
+    <Page :total="total" show-sizer show-elevator :page-size="pageSize" :page-size-opts="pageSizeOpts" @on-change="pagingNumChange" @on-page-size-change="pagingSizeChange"></Page>
   </div>
 </template>
 
@@ -9,7 +9,17 @@
   export default {
     name: 'paging',
     props: {
-      total: [String, Number]
+      total: [String, Number],
+      pageSize: {
+        type: Number,
+        default: 10
+      },
+      pageSizeOpts: {
+        type: Array,
+        default: function () {
+          return [10, 20, 30, 40]
+        }
+      }
     },
     methods: {
       pagingNumChange (currPage) {

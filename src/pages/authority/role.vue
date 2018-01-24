@@ -114,6 +114,7 @@
             'align': 'center',
             'fixed': 'right',
             render: (create, params) => {
+              let vm = this
               if (params.row.name === '超管') {
                 return create('Button', {
                   props: {
@@ -122,8 +123,8 @@
                   },
                   on: {
                     click: () => {
-                      this.$store.commit('editRow', {
-                        'vm': this,
+                      vm.$store.commit('editRow', {
+                        'vm': vm,
                         'params': params
                       })
                     }

@@ -15,12 +15,12 @@
       </FormItem>
       <FormItem label="状态" prop="status">
         <Select v-model="formSearch.status" placeholder="请选择" style="width: 80px;" size="small" clearable>
-          <Option value="0">无效</Option>
-          <Option value="1">有效</Option>
+          <Option value="0">未发布</Option>
+          <Option value="1">已发布</Option>
         </Select>
       </FormItem>
       <Button type="ghost" style="margin-right: 8px;margin-top: 5px;" @click="resetSearch('formSearch')" size="small">清空</Button>
-      <Button type="primary" style="margin-top: 5px;" @click="submitSearch('formSearch')" size="small">查找</Button>
+      <Button type="primary" style="margin-top: 5px;" @click="submitSearch('formSearch')" size="small">搜索</Button>
     </Form>
     <mainTable :columns="columns" :data="pager.data"></mainTable>
     <paging :total="pager.total"></paging>
@@ -132,7 +132,7 @@
               content: '手动阀手动阀',
               sourceUrl: 'http://localhost:8090/policy/index',
               policySoucre: 'sdf',
-              policyDate: 'sdffgh',
+              policyDate: '',
               dateRule: 'fghghj',
               status: '1'
             }
@@ -192,21 +192,6 @@
                 })
               }
             }
-          },
-          {
-            title: "来源地址",
-            key: "sourceUrl",
-            width: 250,
-            render: (create, params) => {
-              var vm = this
-              return create('a', {
-                style: {},
-                attrs: {
-                  href: params.row.sourceUrl,
-                  target: '_blank'
-                }
-              }, params.row.sourceUrl)
-            }
           }, {
             title: "所属省",
             key: "provinceId",
@@ -244,13 +229,27 @@
               return create('span', txt)
             }
           }, {
-            title: "政策来源",
-            key: "policySoucre",
+            title: "政务来源",
+            key: "governmentSource",
             width: 120,
             sortable: true
           }, {
-            title: "政策时间",
-            key: "policyDate",
+            title: "来源地址",
+            key: "sourceUrl",
+            width: 250,
+            render: (create, params) => {
+              var vm = this
+              return create('a', {
+                style: {},
+                attrs: {
+                  href: params.row.sourceUrl,
+                  target: '_blank'
+                }
+              }, params.row.sourceUrl)
+            }
+          }, {
+            title: "政务发布时间",
+            key: "governmentDate",
             width: 180,
             sortable: true
           }, {
@@ -259,9 +258,9 @@
             width: 180,
             sortable: true
           }, {
-            title: "时间规则",
+            title: "政务时间规则",
             key: "dateRule",
-            width: 140,
+            width: 180,
             sortable: true
           }, {
             title: "状态",
@@ -272,7 +271,7 @@
                 0: '未发布',
                 1: '已发布'
               }
-              return create('span', map[params.row.status]);
+              return create('span', map[params.row.status])
             }
           }, {
             title: "操作",
@@ -297,7 +296,10 @@
                   style: { marginRight: '5px' },
                   on: {
                     click: function () {
-                      console.log('编辑')
+                      vm.$store.commit('editRow', {
+                        'vm': vm,
+                        'params': params
+                      })
                     }
                   }
                 }, '编辑'),
@@ -324,7 +326,9 @@
         this.$store.commit('addRow', this)
       },
       resetDialogForm (name) {
-        this.$refs[name].resetFields()
+        let vm = this
+        vm.formDialog.id = '0'
+        vm.$refs[name].resetFields()
       },
       getProvinceCityArea () {},
       searchAddrChange () {},

@@ -408,7 +408,10 @@
                   style: { marginRight: '5px' },
                   on: {
                     click: function () {
-                      console.log('编辑')
+                      vm.$store.commit('editRow', {
+                        'vm': vm,
+                        'params': params
+                      })
                     }
                   }
                 }, vm.label.edit),
