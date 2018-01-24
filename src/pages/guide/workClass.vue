@@ -97,6 +97,9 @@
     },
     data: function () {
       return {
+        url: {
+          paging: 'workClass/dataGrid.do'
+        },
         dialogShow: false,
         dialogSubmitLoading: false,
         derail_address_obj_s: [],
@@ -320,7 +323,16 @@
       getAddrByCityId (cityId) {
         return '数据成功'
       },
-      initData () {}
+      initData () {
+        let vm = this
+        vm.$http({
+          url: vm.url.paging,
+          method: 'POST',
+          data: {}
+        }).then(function (res) {
+            console.log(res)
+        })
+      }
     },
     // 计算属性
     computed: {
@@ -335,7 +347,7 @@
       }
     },
     watch: {},
-    // 生命周期钩子函数VNode替换原始dom时触发，不是对象，切记
+    // 生命周期钩子函数VNode替换原始dom时触发，钩子函数函数
     mounted () {
       // console.log('原始DOM被VNode替换')
       this.initData()

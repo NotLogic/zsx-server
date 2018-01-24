@@ -341,7 +341,7 @@
     },
     computed: {},
     mounted () {
-      this.$axios.get('/static/data/address.json').then(res => {
+      this.$http.get('/static/data/address.json').then(res => {
         this.chinaJson = util.extend(res.data)
         this.chinaData = util.getChinaDataByJson(util.extend(res.data))
         let provinceData = []

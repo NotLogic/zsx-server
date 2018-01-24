@@ -7,26 +7,28 @@
           欢迎登录
         </p>
         <div class="login-form">
-          <Form ref="loginForm" :model="form" :rules="rules">
-            <FormItem prop="userName">
-              <Input v-model="form.userName" type="text" placeholder="请输入用户名">
-              <span slot="prepend">
+          <Form ref="loginForm" :model="loginForm" :rules="rules">
+            <FormItem prop="username">
+              <Input v-model="loginForm.username" type="text" placeholder="请输入用户名">
+                <span slot="prepend">
                   <Icon :size="16" type="person"></Icon>
                 </span>
               </Input>
             </FormItem>
             <FormItem prop="password">
-              <Input v-model="form.password" type="password" placeholder="请输入密码">
-              <span slot="prepend">
+              <Input v-model="loginForm.password" type="password" placeholder="请输入密码">
+                <span slot="prepend">
                   <Icon :size="16" type="locked"></Icon>
                 </span>
               </Input>
             </FormItem>
             <FormItem>
+              <Checkbox v-model="rememberMe">记住密码</Checkbox>
+            </FormItem>
+            <FormItem>
               <Button @click="handleSubmit" type="primary" long>登录</Button>
             </FormItem>
           </Form>
-          <p>输入任意内容跳转主页</p>
         </div>
       </Card>
     </div>
@@ -35,16 +37,21 @@
 
 <script>
   // import Cookies from 'cookie'
+  import axios from 'axios'
   export default {
     name: 'login',
     data () {
       return {
-        form: {
-          userName: '',
-          password: ''
+        loginUrl: 'login2Index.do',
+        loginUrl2: '/api/login2Index.do',
+        rememberMe: true,
+        loginForm: {
+          username: '',
+          password: '',
+          rememberMe: 1
         },
         rules: {
-          userName: [
+          username: [
             { required: true, message: '账号不能为空', trigger: 'blur' }
           ],
           password: [
@@ -56,19 +63,47 @@
     props: {},
     methods: {
       handleSubmit () {
-        this.$refs.loginForm.validate((valid) => {
+        let vm = this
+        vm.$refs.loginForm.validate((valid) => {
           if (valid) {
-            // Cookies.set('userName', this.form.userName)
-            // Cookies.set('password', this.form.password)
-            // console.log(Cookies.get('userName'))
-            this.$Message.success('登陆成功')
-            this.$router.push({
+            vm.$http({
+              url: vm.loginUrl,
+              method: 'POST',
+              data: vm.loginForm
+            }).then(function (res) {
+                console.log(res)
+            })
+            return
+            // if (vm.rememberMe) {
+            //   // 或者存后台返回的用户信息
+            //   localStorage.user = JSON.stringify(vm.loginForm)
+            // } else {
+            //   sessionStorage.user = vm.loginForm.username
+            //   if (localStorage.user) {
+            //     localStorage.user = ''
+            //   }
+            // }
+            return
+            vm.$Message.success('登陆成功')
+            vm.$router.push({
               name: 'home'
             })
-            // 根据是否登录保存用户信息
-            // 保存返回的权限信息到sessionStorage
           }
         })
+      }
+    },
+    watch: {
+      rememberMe (val) {
+        if (val) {
+          this.loginForm.rememberMe = 1
+        } else {
+          this.loginForm.rememberMe = 0
+        }
+      }
+    },
+    mounted () {
+      if (localStorage.user) {
+        this.loginForm = JSON.parse(localStorage.user)
       }
     }
   }
