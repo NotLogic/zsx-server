@@ -125,7 +125,7 @@
                     click: () => {
                       vm.$store.commit('editRow', {
                         'vm': vm,
-                        'params': params
+                        'data': params.row
                       })
                     }
                   }
@@ -160,9 +160,9 @@
                     },
                     on: {
                       click: () => {
-                        this.$store.commit('editRow', {
-                          'vm': this,
-                          'params': params
+                        vm.$store.commit('editRow', {
+                          'vm': vm,
+                          'data': params.row
                         })
                       }
                     }

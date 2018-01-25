@@ -43,27 +43,17 @@
     },
     data: function () {
       return {
-        label: {
-          'edit': '编辑',
-          'add': '添加',
-          'clear': '清空',
-          'submit': '提交',
-          'delete': '删除'
-        },
         currDialog: 'edit',
         dialogShow: false,
         dialogSubmitLoading: false,
-        pager: {
-          data: [
-            {
-              id: '213123',
-              rpWord: "as",
-              matchType: "2",
-              isdefault: "1"
-            }
-          ],
-          total: 100
-        },
+        data: [
+          {
+            id: '213123',
+            rpWord: "as",
+            matchType: "2",
+            isdefault: "1"
+          }
+        ],
         formDialog: {
           rpWord: "",
           matchType: "1",
@@ -116,7 +106,8 @@
                     click: function () {
                       vm.$store.commit('editRow', {
                         'vm': vm,
-                        'params': params
+                        'data': params.row,
+                        'initDialog': vm.initDialog(params.row)
                       })
                     }
                   }
@@ -141,6 +132,14 @@
         }
       }
     },
+    computed: {
+      pager () {
+        return this.$store.state.pager
+      },
+      label () {
+        return this.$store.state.label
+      }
+    },
     methods: {
       addRow () {
         this.$store.commit('addRow', this)
@@ -152,7 +151,11 @@
         vm.formDialog.id = '0'
         vm.$refs[name].resetFields()
       },
-      submitDialogForm (name) {}
+      submitDialogForm (name) {},
+      initDialog () {}
+    },
+    mounted () {
+      this.$store.state.pager.data = this.data
     }
   }
 </script>

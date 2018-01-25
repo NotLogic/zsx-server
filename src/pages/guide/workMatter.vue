@@ -39,7 +39,7 @@
       <Button type="primary" style="margin-top: 5px;" @click="submitSearch('formSearch')" size="small">查找</Button>
     </Form>
     <mainTable :columns="columns" :data="pager.data"></mainTable>
-    <paging :total="pager.total"></paging>
+    <paging></paging>
     <!-- 弹出框 -->
     <Modal v-model="dialogShow" :title="label[currDialog]" :mask-closable="false" width="750" @on-cancel="resetDialogForm('formDialog')">
       <Form :model="formDialog" ref="formDialog" :rules="rules" :label-width="80">
@@ -198,32 +198,30 @@
     },
     data () {
       return {
+        currDialog: 'add',
         dialogShow: false,
         dialogSubmitLoading: false,
-        pager: {
-          data: [
-            {
-              'id': '931451971265015808',
-              'matterName': '广东省计划生育服务证',
-              'serviceObject': '具备《广东省计划生育服务证》核发申请条件的个人',
-              'matterSoucreName': '深圳市卫生和计划生育局',
-              'matterIcon': '',
-              'workMatterClassName': '生育收养',
-              'matterCreateTime': '2017-11-17 00:00:00',
-              'requiredConditions': '户籍地在广东省内的育龄妇女（含未婚收养、未婚已生育、离婚及丧偶者）男方户籍地在广东省内，女方非广东省户籍但随夫居住在广东省内的育龄妇女',
-              'materialRequested': '1:办理《广东省计划生育服务证》申请表。2:身份证 3:户口本 4:结婚证 5:离婚证、离婚协议或人民法院生效的判决书、 调解书 6:女方免冠小一寸彩照',
-              'onlineManagement': '1.申请。 申请人登录广东省网上办事大厅居民生育服务专窗网页（网址：http://syfw.gdwst.gov.cn），点击“马上登录”注册账号并登录系统；选择要办理的事项并点击“网上申办”填写申请表单，拍摄并上传办事材料照片，确认信息无误后提交申请。 2.受理 受理机构负责核验办事人的申请信息和电子证明材料，核验完成后，提交给男女双方户籍地核实。申请人符合申请资格，并材料齐全、格式规范、符合法定形式的，予以受理；申请人不符合申请资格或材料不齐全、不符合法定形式的，受理人员不予受理。申请人材料不符合要求但可以更正的，退回更正后予以受理。 3.审查。受理后，审查人员对材料进行审查，在7个工作日内作出审查决定。符合办理条件的，出具《广东省计划生育服务证》。 4. 领取结果。申请人可以通过邮寄（邮寄费用自付）、自行领取、委托他人领取等方式领取结果。',
-              'timeLimitExplanation': '承诺期限（7）工作日',
-              'chargingStandard': '不收费',
-              'managementBasis': '无',
-              'workPhone': '0755-82918362',
-              'complaintPhone': '0755-82918437',
-              'matterStatus': '1',
-              'workAddress': '事项地址'
-            }
-          ],
-          total: 100
-        },
+        data: [
+          {
+            'id': '931451971265015808',
+            'matterName': '广东省计划生育服务证',
+            'serviceObject': '具备《广东省计划生育服务证》核发申请条件的个人',
+            'matterSoucreName': '深圳市卫生和计划生育局',
+            'matterIcon': '',
+            'workMatterClassName': '生育收养',
+            'matterCreateTime': '2017-11-17 00:00:00',
+            'requiredConditions': '户籍地在广东省内的育龄妇女（含未婚收养、未婚已生育、离婚及丧偶者）男方户籍地在广东省内，女方非广东省户籍但随夫居住在广东省内的育龄妇女',
+            'materialRequested': '1:办理《广东省计划生育服务证》申请表。2:身份证 3:户口本 4:结婚证 5:离婚证、离婚协议或人民法院生效的判决书、 调解书 6:女方免冠小一寸彩照',
+            'onlineManagement': '1.申请。 申请人登录广东省网上办事大厅居民生育服务专窗网页（网址：http://syfw.gdwst.gov.cn），点击“马上登录”注册账号并登录系统；选择要办理的事项并点击“网上申办”填写申请表单，拍摄并上传办事材料照片，确认信息无误后提交申请。 2.受理 受理机构负责核验办事人的申请信息和电子证明材料，核验完成后，提交给男女双方户籍地核实。申请人符合申请资格，并材料齐全、格式规范、符合法定形式的，予以受理；申请人不符合申请资格或材料不齐全、不符合法定形式的，受理人员不予受理。申请人材料不符合要求但可以更正的，退回更正后予以受理。 3.审查。受理后，审查人员对材料进行审查，在7个工作日内作出审查决定。符合办理条件的，出具《广东省计划生育服务证》。 4. 领取结果。申请人可以通过邮寄（邮寄费用自付）、自行领取、委托他人领取等方式领取结果。',
+            'timeLimitExplanation': '承诺期限（7）工作日',
+            'chargingStandard': '不收费',
+            'managementBasis': '无',
+            'workPhone': '0755-82918362',
+            'complaintPhone': '0755-82918437',
+            'matterStatus': '1',
+            'workAddress': '事项地址'
+          }
+        ],
         matterStatus: [],
         derail_address_arr: [],
         addrDialog: {},
@@ -410,7 +408,7 @@
                     click: function () {
                       vm.$store.commit('editRow', {
                         'vm': vm,
-                        'params': params
+                        'data': params.row
                       })
                     }
                   }
@@ -474,14 +472,15 @@
       label () {
         return this.$store.state.label
       },
-      currDialog () {
-        return this.$store.state.currDialog
+      pager () {
+        return this.$store.state.pager
       }
     },
     watch: {},
     // 生命周期钩子函数VNode替换原始dom时触发，不是对象，切记
     mounted () {
       this.initData()
+      this.$store.state.pager.data = this.data
     }
   }
 </script>

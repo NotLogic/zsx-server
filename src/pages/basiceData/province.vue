@@ -65,13 +65,6 @@
     },
     data () {
       return {
-        label: {
-          'edit': '编辑',
-          'add': '添加',
-          'clear': '清空',
-          'submit': '提交',
-          'delete': '删除'
-        },
         currDialog: 'edit',
         dialogShow: false,
         cityDialogShow: false,
@@ -241,43 +234,46 @@
             render: (create, params) => {
               let vm = this
               return create('div', [
-                (function (vm, create, params) {
-                  return create('Button', {
-                    props: { type: 'primary', size: 'small' },
-                    style: { marginRight: '5px' },
-                    on: {
-                      click: function () {
-                        // vm.checkCity(params)
-                      }
+                create('Button', {
+                  props: { type: 'primary', size: 'small' },
+                  style: { marginRight: '5px' },
+                  on: {
+                    click: function () {
+                      // vm.checkCity(params)
                     }
-                  }, '校验')
-                })(vm, create, params),
-                (function (vm, create, params) {
-                  return create('Button', {
-                    props: { type: 'primary', size: 'small' },
-                    style: { marginRight: '5px' },
-                    on: {
-                      click: function () {
-                        // vm.editRow(params.row, 'province')
-                      }
+                  }
+                }, '校验'),
+                create('Button', {
+                  props: { type: 'primary', size: 'small' },
+                  style: { marginRight: '5px' },
+                  on: {
+                    click: function () {
+                      // vm.editRow(params.row, 'province')
                     }
-                  }, vm.label.edit)
-                })(vm, create, params),
-                (function (vm, create, params) {
-                  return create('Button', {
-                    props: { type: 'error', size: 'small' },
-                    on: {
-                      click: function () {
-                        // vm.deleteRow(params.index, params.row.id, '100000', 'province')
-                      }
+                  }
+                }, vm.label.edit),
+                create('Button', {
+                  props: { type: 'error', size: 'small' },
+                  on: {
+                    click: function () {
+                      // vm.deleteRow(params.index, params.row.id, '100000', 'province')
                     }
-                  }, vm.label.delete)
-                })(vm, create, params)
+                  }
+                }, vm.label.delete)
               ])
             }
           }
         ],
-        rules: {}
+        rules: {
+          provinceName: [{ required: true, message: '省份名称不能为空', trigger: 'blur' }],
+          cityName: [{ required: true, message: '省份名称不能为空', trigger: 'blur' }],
+          areaName: [{ required: true, message: '省份名称不能为空', trigger: 'blur' }]
+        }
+      }
+    },
+    computed: {
+      label () {
+        return this.$store.state.label
       }
     },
     methods: {
@@ -339,7 +335,6 @@
       // 校验所有数据
       checkData () {}
     },
-    computed: {},
     mounted () {
       this.$http.get('/static/data/address.json').then(res => {
         this.chinaJson = util.extend(res.data)

@@ -86,33 +86,23 @@
     },
     data () {
       return {
-        label: {
-          'edit': '编辑',
-          'add': '添加',
-          'clear': '清空',
-          'submit': '提交',
-          'delete': '删除'
-        },
         currDialog: 'edit',
         dialogShow: false,
         dialogSubmitLoading: false,
-        pager: {
-          data: [
-            {
-              id: '213',
-              name: 'ghjk',
-              thirdpartyKey: 'fgh',
-              thirdpartySecret: 'xcv',
-              thirdpartyCode: 'sdfsdf',
-              thirdpartyUser: '123w',
-              thirdpartyPass: '123',
-              orgName: '213',
-              appName: 'asd',
-              isComm: '1'
-            }
-          ],
-          total: 100
-        },
+        data: [
+          {
+            id: '213',
+            name: 'ghjk',
+            thirdpartyKey: 'fgh',
+            thirdpartySecret: 'xcv',
+            thirdpartyCode: 'sdfsdf',
+            thirdpartyUser: '123w',
+            thirdpartyPass: '123',
+            orgName: '213',
+            appName: 'asd',
+            isComm: '1'
+          }
+        ],
         formDialog: {
           id: '',
           name: '',
@@ -190,7 +180,8 @@
                     click: function () {
                       vm.$store.commit('editRow', {
                         'vm': vm,
-                        'params': params
+                        'data': params.row,
+                        'initDialog': vm.initDialog(params.row)
                       })
                     }
                   }
@@ -213,6 +204,14 @@
         rules: {}
       }
     },
+    computed: {
+      label () {
+        return this.$store.state.label
+      },
+      pager () {
+        return this.$store.state.pager
+      }
+    },
     methods: {
       addRow () {
         this.$store.commit('addRow', this)
@@ -222,7 +221,11 @@
         vm.formDialog.id = '0'
         vm.$refs[name].resetFields()
       },
-      submitDialogForm (name) {}
+      submitDialogForm (name) {},
+      initDialog (data) {}
+    },
+    mounted () {
+      this.$store.state.pager.data = this.data
     }
   }
 </script>

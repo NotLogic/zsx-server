@@ -11,27 +11,21 @@ export default new Vuex.Store({
   state: {
     label: {
       'edit': '编辑',
-      'add': '新增'
+      'add': '添加',
+      'clear': '清空',
+      'submit': '提交',
+      'delete': '删除',
+      'search': '搜索'
     },
     currDialog: 'add',
     pager: {
       url: '',
-      currPage: '',
+      currPage: 1,
       order: '',
-      pagesize: '',
+      pagesize: 10,
       sort: '',
       total: 100,
-      data: [
-        // 模拟数据
-        {
-          id: 123,
-          className: '分类1',
-          cityCode: 111112,
-          classStatus: 1,
-          classIcon: 'http://fanyi.bdstatic.com/static/translation/img/header/logo_cbfea26.png',
-          classType: 0
-        }
-      ]
+      data: []
     },
     // 1
     routers: [
@@ -64,15 +58,6 @@ export default new Vuex.Store({
   },
   getters: {},
   mutations: {
-    pagingFiltData (state, obj) {
-      for (let key in obj) {
-        if (typeof obj[key] === 'string' && obj[key].trim() === '') {
-          delete obj[key]
-        }
-      }
-      delete obj.data
-      return obj
-    },
     resetSearch (state, name) {
       this.resetForm(name)
       // 搜索dispatch
@@ -82,16 +67,22 @@ export default new Vuex.Store({
     },
     editRow (state, payload) {
       for (let key in payload.vm.formDialog) {
-        if (typeof payload.params.row[key] === 'number') {
-          payload.vm.formDialog[key] = payload.params.row[key].toString()
-        } else {
-          payload.vm.formDialog[key] = payload.params.row[key]
-        }
+        // 有些值需要number类型，数据类型不要转换
+        // if (typeof payload.data[key] === 'number') {
+        //   payload.vm.formDialog[key] = payload.data[key].toString()
+        // } else {
+        //   payload.vm.formDialog[key] = payload.data[key]
+        // }
+        payload.vm.formDialog[key] = payload.data[key]
       }
       if (typeof payload.initDialog === 'function') {
-        payload.initDialog(payload.params.row)
+        payload.initDialog(payload.data)
       }
       payload.vm.dialogShow = true
+    },
+    // 重置提交表单 预处理 + reset，公共的只有reset只有一行，就不放到vuex中了吧； 提交成功后要调用，从vuex中调用组件中的函数这样好吗？
+    resetDialogForm (state, payload) {
+      payload.vm.$refs[payload.name].resetFields()
     },
     // 从路由中初始化左侧菜单数据
     updateMenulist (state) {
@@ -138,12 +129,13 @@ export default new Vuex.Store({
     }
   },
   actions: {
-    paging (state, currePage) {},
-    submitDialog (state, name, formDialog) {
-      var vm = this
+    paging (state, currPage) {
+      console.log(currPage)
+    },
+    submitDialogForm (state, payload) {
       // 成功后重置表单
-      vm.dialogShow = false
-      vm.resetDialogForm(name)
+      state.dialogShow = false
+      payload.vm.resetDialogForm(payload.name)
     },
     submitSearch (state, name) {},
     delRow (state, payload) {

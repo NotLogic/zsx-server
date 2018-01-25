@@ -16,7 +16,7 @@
       </FormItem>
     </Form>
     <mainTable :columns="columns" :data="pager.data"></mainTable>
-    <paging :total="pager.total" :pageSize="pageSize" :page-size-opts="pageSizeOpts"></paging>
+    <paging :page-size-opts="pageSizeOpts"></paging>
     <Modal v-model="dialogShow" :title="label[currDialog]" :mask-closable="false" @on-cancel="resetDialogForm('formDialog')">
       <i-form :model="formDialog" ref="formDialog" :rules="rules" :label-width="80">
         <Row>
@@ -48,26 +48,15 @@
     },
     data () {
       return {
-        label: {
-          'edit': '编辑',
-          'add': '添加',
-          'clear': '清空',
-          'submit': '提交',
-          'delete': '删除'
-        },
         currDialog: 'edit',
         dialogShow: false,
         dialogSubmitLoading: false,
-        pager: {
-          data: [
-            {
-              id: '12324',
-              word: 'asd'
-            }
-          ],
-          total: 1200
-        },
-        pageSize: 50,
+        data: [
+          {
+            id: '12324',
+            word: 'asd'
+          }
+        ],
         pageSizeOpts: [50, 100, 150, 200],
         formDialog: {
           id: '',
@@ -98,7 +87,8 @@
                     click: function () {
                       vm.$store.commit('editRow', {
                         'vm': vm,
-                        'params': params
+                        'data': params.row,
+                        'initDialog': vm.initDialog(params.row)
                       })
                     }
                   }
@@ -123,6 +113,14 @@
         }
       }
     },
+    computed: {
+      pager () {
+        return this.$store.state.pager
+      },
+      label () {
+        return this.$store.state.label
+      }
+    },
     methods: {
       addRow () {
         this.$store.commit('addRow', this)
@@ -134,7 +132,18 @@
         vm.formDialog.id = '0'
         vm.$refs[name].resetFields()
       },
-      submitDialogForm (name) {}
+      submitDialogForm (name) {
+        let vm = this
+        vm.$store.dispatch('submitDialogForm', {
+          'vm': this,
+          'name': name
+        })
+      },
+      initDialog (data) {}
+    },
+    mounted () {
+      this.$store.state.pager.pagesize = 50
+      this.$store.state.pager.data = this.data
     }
   }
 </script>

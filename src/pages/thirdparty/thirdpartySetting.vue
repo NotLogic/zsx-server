@@ -128,34 +128,24 @@
     },
     data () {
       return {
-        label: {
-          'edit': '编辑',
-          'add': '添加',
-          'clear': '清空',
-          'submit': '提交',
-          'delete': '删除'
-        },
         currDialog: 'edit',
         dialogShow: false,
         dialogSubmitLoading: false,
-        pager: {
-          data: [
-            {
-              id: '213213213',
-              thirdpartyClassid: 'asdsadasd',
-              thirdpartyType: '2',
-              apiName: 'sdfsdaf',
-              apiUrl: 'sdfdsag',
-              apiIcon: 'dfgdfg',
-              apiDesc: 'dfgdsfg',
-              apiKey: 'dfgdfgfdg',
-              apiSecret: 'dfgdfg',
-              apiCode: 'dfgfdg',
-              apiStatus: '1'
-            }
-          ],
-          total: 100
-        },
+        data: [
+          {
+            id: '213213213',
+            thirdpartyClassid: 'asdsadasd',
+            thirdpartyType: '2',
+            apiName: 'sdfsdaf',
+            apiUrl: 'sdfdsag',
+            apiIcon: 'dfgdfg',
+            apiDesc: 'dfgdsfg',
+            apiKey: 'dfgdfgfdg',
+            apiSecret: 'dfgdfg',
+            apiCode: 'dfgfdg',
+            apiStatus: '1'
+          }
+        ],
         showApiIcon: false,
         isComm: false,
         onOffDisabled: false,
@@ -265,11 +255,11 @@
               }
             }
           }, {
-            title: "操作",
-            key: "action",
-            width: 200,
-            align: "center",
-            fixed: "right",
+            title: '操作',
+            key: 'action',
+            width: 100,
+            align: 'center',
+            fixed: 'right',
             render: (create, params) => {
               var vm = this
               return create('Button', {
@@ -279,7 +269,8 @@
                   click: function () {
                     vm.$store.commit('editRow', {
                       'vm': vm,
-                      'params': params
+                      'data': params.row,
+                      'initDialog': vm.initDialog(params.row)
                     })
                   }
                 }
@@ -288,6 +279,14 @@
           }
         ],
         rules: {}
+      }
+    },
+    computed: {
+      label () {
+        return this.$store.state.label
+      },
+      pager () {
+        return this.$store.state.pager
       }
     },
     methods: {
@@ -310,7 +309,11 @@
       },
       submitSearch (name) {
         console.log('搜索')
-      }
+      },
+      initDialog (data) {}
+    },
+    mounted () {
+      this.$store.state.pager.data = this.data
     }
   }
 </script>

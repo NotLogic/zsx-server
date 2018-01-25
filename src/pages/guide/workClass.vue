@@ -100,6 +100,15 @@
         url: {
           paging: 'workClass/dataGrid.do'
         },
+        data: [{
+          id: '123213',
+          className: 'qweqwe',
+          classIcon: 'sdfdsf',
+          classType: 'sdfdsf',
+          cityCode: 'sdfdsfd',
+          classStatus: '1'
+        }],
+        currDialog: 'add',
         dialogShow: false,
         dialogSubmitLoading: false,
         derail_address_obj_s: [],
@@ -249,6 +258,7 @@
             align: 'center',
             fixed: 'right',
             render: (create, params) => {
+              let vm = this
               return create('div', [
                 create('Button', {
                   props: {
@@ -260,10 +270,10 @@
                   },
                   on: {
                     click: () => {
-                      this.$store.commit('editRow', {
-                        'vm': this,
-                        'params': params,
-                        'initDialog': this.initDialog(params.row)
+                      vm.$store.commit('editRow', {
+                        'vm': vm,
+                        'data': params.row,
+                        'initDialog': vm.initDialog(params.row)
                       })
                     }
                   }
@@ -277,7 +287,6 @@
                     click: () => {
                       this.$store.dispatch('delRow', {
                         'vm': this,
-                        'create': create,
                         'params': params
                       })
                     }
@@ -341,15 +350,12 @@
       },
       label () {
         return this.$store.state.label
-      },
-      currDialog () {
-        return this.$store.state.currDialog
       }
     },
     watch: {},
     // 生命周期钩子函数VNode替换原始dom时触发，钩子函数函数
     mounted () {
-      // console.log('原始DOM被VNode替换')
+      this.$store.state.pager.data = this.data
       this.initData()
     }
   }

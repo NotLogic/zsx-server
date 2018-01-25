@@ -117,6 +117,17 @@ const util = {
       chinaJson[areaId.toString().slice(0, 4) + '00'],
       chinaJson.areaId
     ]
+  },
+  pagingFiltData (obj) {
+    for (let key in obj) {
+      if (typeof obj[key] === 'string' && obj[key].trim() === '') {
+        delete obj[key]
+      }
+    }
+    if (obj.data !== 'undefined') {
+      delete obj.data
+    }
+    return obj
   }
 }
 export default util

@@ -37,7 +37,7 @@
       <Button type="primary" :disabled="batchOprArr.length==0" style="margin: 5px 8px 24px 0;" @click="batchPublish" size="small">批量发布</Button>
     </Form>
     <mainTable :columns="columns" :data="pager.data"></mainTable>
-    <paging :total="pager.total"></paging>
+    <paging></paging>
     <Modal v-model="dialogShow" :title="label[currDialog]" :mask-closable="false" width="750" @on-cancel="resetDialogForm('formDialog')">
       <Form :model="formDialog" ref="formDialog" :rules="rules" :label-width="80">
         <Row>
@@ -95,36 +95,26 @@
     },
     data: function () {
       return {
-        label: {
-          'edit': '编辑',
-          'add': '添加',
-          'clear': '清空',
-          'submit': '提交',
-          'delete': '删除'
-        },
         currDialog: 'edit',
         dialogShow: false,
         dialogSubmitLoading: false,
-        pager: {
-          data: [
-            {
-              id: '2131240',
-              areaId: '112233',
-              url: 'www.baidu.com',
-              title: 'qweqwe',
-              newsSrc: 'asdasd',
-              content: 'asdasdsa',
-              date: 'asdasd',
-              image: 'asdasd',
-              commentNum: 'asd',
-              upvoteNum: 'xcv',
-              shareNum: 'xcvb',
-              status: 'bnm,',
-              detailAddress: 'hjkhjk'
-            }
-          ],
-          total: 100
-        },
+        data: [
+          {
+            id: '2131240',
+            areaId: '112233',
+            url: 'www.baidu.com',
+            title: 'qweqwe',
+            newsSrc: 'asdasd',
+            content: 'asdasdsa',
+            date: 'asdasd',
+            image: 'asdasd',
+            commentNum: 'asd',
+            upvoteNum: 'xcv',
+            shareNum: 'xcvb',
+            status: 'bnm,',
+            detailAddress: 'hjkhjk'
+          }
+        ],
         derail_address_arr: [],
         derail_address_arr_s: [],
         derail_address_obj_s: [],
@@ -253,6 +243,7 @@
             align: 'center',
             fixed: 'right',
             render: (create, params) => {
+              let vm = this
               return create('div', [
                 create('Button', {
                   props: {
@@ -264,10 +255,10 @@
                   },
                   on: {
                     click: () => {
-                      this.$store.commit('editRow', {
-                        'vm': this,
-                        'params': params,
-                        'initDialog': this.initDialog(params.row)
+                      vm.$store.commit('editRow', {
+                        'vm': vm,
+                        'data': params.row,
+                        'initDialog': vm.initDialog(params.row)
                       })
                     }
                   }
@@ -321,6 +312,14 @@
         rules: {}
       }
     },
+    computed: {
+      label () {
+        return this.$store.state.label
+      },
+      pager () {
+        return this.$store.state.pager
+      }
+    },
     methods: {
       resetSearch (name) {
         var vm = this
@@ -341,6 +340,9 @@
         vm.$refs[name].resetFields()
       },
       initDialog (data) {}
+    },
+    mounted () {
+      this.$store.state.pager.data = this.data
     }
   }
 </script>

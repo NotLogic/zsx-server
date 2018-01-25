@@ -23,7 +23,7 @@
       <Button type="primary" style="margin-top: 5px;" @click="submitSearch('formSearch')" size="small">搜索</Button>
     </Form>
     <mainTable :columns="columns" :data="pager.data"></mainTable>
-    <paging :total="pager.total"></paging>
+    <paging></paging>
     <!-- 弹出框 -->
     <Modal v-model="dialogShow" :title="label[currDialog]" :mask-closable="false" width="750" @on-cancel="resetDialogForm('formDialog')">
       <Form :model="formDialog" ref="formDialog" :rules="rules" :label-width="90">
@@ -112,33 +112,23 @@
     },
     data: function () {
       return {
-        label: {
-          'edit': '编辑',
-          'add': '添加',
-          'clear': '清空',
-          'submit': '提交',
-          'delete': '删除'
-        },
         currDialog: 'edit',
         dialogShow: false,
         dialogSubmitLoading: false,
-        pager: {
-          data: [
-            {
-              title: '阿斯顿',
-              image: '',
-              cityId: '',
-              areaId: '',
-              content: '手动阀手动阀',
-              sourceUrl: 'http://localhost:8090/policy/index',
-              policySoucre: 'sdf',
-              policyDate: 'sdffgh',
-              dateRule: 'fghghj',
-              status: '1'
-            }
-          ],
-          total: 100
-        },
+        data: [
+          {
+            title: '阿斯顿',
+            image: '',
+            cityId: '',
+            areaId: '',
+            content: '手动阀手动阀',
+            sourceUrl: 'http://localhost:8090/policy/index',
+            policySoucre: 'sdf',
+            policyDate: 'sdffgh',
+            dateRule: 'fghghj',
+            status: '1'
+          }
+        ],
         derail_address_arr: [],
         derail_address_obj_sub: [],
         derail_address_obj_s: [],
@@ -337,8 +327,17 @@
       handleSuccess () {},
       handleFormatError () {}
     },
-    computed: {},
-    mounted () {},
+    computed: {
+      label () {
+        return this.$store.state.label
+      },
+      pager () {
+        return this.$store.state.pager
+      }
+    },
+    mounted () {
+      this.$store.state.pager.data = this.data
+    },
     watch: {}
   }
 </script>
