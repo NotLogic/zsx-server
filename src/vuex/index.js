@@ -2,11 +2,12 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import {mainRoutes, appRoutes} from '@/router/routes'
 import util from '@/libs/util'
+import http from '@/libs/http'
 // import state from './state'
 // import * as getters from './getters'
 // import * as mutations from './mutations'
 
-window.Vuex || Vue.use(Vuex)
+Vue.use(Vuex)
 export default new Vuex.Store({
   state: {
     label: {
@@ -58,6 +59,16 @@ export default new Vuex.Store({
   },
   getters: {},
   mutations: {
+    exitToLogin (state, vm) {
+      if (sessionStorage.user) {
+        sessionStorage.removeItem('user')
+      } else if (localStorage.user) {
+        localStorage.removeItem('user')
+      }
+      vm.$router.push({
+        name: 'login'
+      })
+    },
     resetSearch (state, name) {
       this.resetForm(name)
       // 搜索dispatch
@@ -83,6 +94,12 @@ export default new Vuex.Store({
     // 重置提交表单 预处理 + reset，公共的只有reset只有一行，就不放到vuex中了吧； 提交成功后要调用，从vuex中调用组件中的函数这样好吗？
     resetDialogForm (state, payload) {
       payload.vm.$refs[payload.name].resetFields()
+    },
+    // 获取用户权限数据
+    getAccessData (state) {
+      // http.get('').then(res => {
+      //   console.log('res: ', res)
+      // })
     },
     // 从路由中初始化左侧菜单数据
     updateMenulist (state) {

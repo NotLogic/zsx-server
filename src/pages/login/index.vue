@@ -36,8 +36,6 @@
 </template>
 
 <script>
-  // import Cookies from 'cookie'
-  import axios from 'axios'
   export default {
     name: 'login',
     data () {
@@ -46,9 +44,9 @@
         loginUrl2: '/api/login2Index.do',
         rememberMe: true,
         loginForm: {
-          username: '',
-          password: '',
-          rememberMe: 1
+          "username": "",
+          "password": "",
+          "rememberMe": 1
         },
         rules: {
           username: [
@@ -66,27 +64,22 @@
         let vm = this
         vm.$refs.loginForm.validate((valid) => {
           if (valid) {
-            vm.$http({
-              url: vm.loginUrl,
-              method: 'POST',
-              data: vm.loginForm
-            }).then(function (res) {
-                console.log(res)
-            })
-            return
-            // if (vm.rememberMe) {
-            //   // 或者存后台返回的用户信息
-            //   localStorage.user = JSON.stringify(vm.loginForm)
-            // } else {
-            //   sessionStorage.user = vm.loginForm.username
-            //   if (localStorage.user) {
-            //     localStorage.user = ''
-            //   }
-            // }
-            return
-            vm.$Message.success('登陆成功')
-            vm.$router.push({
-              name: 'home'
+            vm.$http.post(vm.loginUrl, vm.loginForm).then(function (res) {
+              if (res.code == 1) {
+                if (vm.rememberMe) {
+                  // 或者存后台返回的用户信息
+                  localStorage.user = JSON.stringify(vm.loginForm)
+                } else {
+                  sessionStorage.user = vm.loginForm.username
+                  if (localStorage.user) {
+                    localStorage.removeItem('user')
+                  }
+                }
+                vm.$Message.success('登陆成功')
+                vm.$router.push({
+                  name: 'home'
+                })
+              }
             })
           }
         })

@@ -88,7 +88,7 @@
 <script>
   import mainTable from '@/components/mainTable'
   import paging from '@/components/paging'
-  // import util from '@/libs/util'
+  import util from '@/libs/util'
   export default {
     name: 'workClass',
     components: {
@@ -334,12 +334,21 @@
       },
       initData () {
         let vm = this
-        vm.$http({
-          url: vm.url.paging,
-          method: 'POST',
-          data: {}
-        }).then(function (res) {
+        vm.$http.post(vm.url.paging, {}).then(function (res) {
             console.log(res)
+        })
+      },
+      getWorkClassId (state) {
+        let vm = this
+        vm.$http.post('workClass/dataGrid.do', {}).then(res => {
+          let data = util.extend(res.data)
+          let workClassId = []
+          for (let i = 0; i < data.length; i++) {
+            workClassId.push({
+              'value': data[i].id,
+              'label': data[i].className
+            })
+          }
         })
       }
     },

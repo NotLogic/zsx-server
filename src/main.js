@@ -24,7 +24,11 @@ new Vue({
   },
   computed: {},
   mounted () {
-    this.$store.commit('updateMenulist')
+    let vm = this
+    this.$store.commit('getAccessData')
+    setTimeout(function () {
+      vm.$store.commit('updateMenulist')
+    }, 100)
   },
   created () {},
   methods: {}
