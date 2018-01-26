@@ -128,6 +128,16 @@ const util = {
       delete obj.data
     }
     return obj
-  }
+  },
+  setCurrentPath (vm, name) {
+    console.log('setCurrentPath vm: ', vm)
+    console.log('setCurrentPath name: ', name)
+    console.log(vm.$store.state.tagsList)
+  },
+  openNewPage (vm, name) {
+    console.log('openNewPage vm: ', vm)
+    console.log('openNewPage name: ', name)
+  },
+  toDefaultPage () {}
 }
 export default util

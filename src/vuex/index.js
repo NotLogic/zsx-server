@@ -37,7 +37,8 @@ export default new Vuex.Store({
       ...appRoutes
     ],
     menuList: [],
-    tagsList: [...mainRoutes.children], // 标签（点击跳转的）路由都在里边 ，左侧菜单中的路由在main.vue中push进去
+    // mainRoutes 所有用户都有的  +  当前根据当前用户权限可以访问的
+    tagsList: [...mainRoutes.children], // 标签（点击跳转的）路由都在里边 ，左侧菜单中的路由在main.js中created时 push进去
     pageTagsList: [{
       title: '首页',
       path: '/',
@@ -63,10 +64,9 @@ export default new Vuex.Store({
   getters: {},
   mutations: {
     exitToLogin (state, vm) {
+      // localStorage的用户信息只有再用户不保存时删除
       if (sessionStorage.user) {
         sessionStorage.removeItem('user')
-      } else if (localStorage.user) {
-        localStorage.removeItem('user')
       }
       vm.$router.push({
         name: 'login'
@@ -146,6 +146,22 @@ export default new Vuex.Store({
         }
       })
       state.menuList = menuList
+    },
+    // 更新面包屑数组
+    setCurrentPath (state, pathArr) {
+      state.currentPath = pathArr
+    },
+    // 新增标签（缓存页面的name）
+    increateTag (state, tagObj) {
+      state.cachePage.push(tagObj.name)
+      state.pageOpenedList.push(tagObj)
+    },
+    // 设置当前页name
+    setCurrentPageName (state, name) {
+      state.currentPageName = name
+    },
+    setTagsList (state, list) {
+      state.tagsList.push(...list)
     }
   },
   actions: {

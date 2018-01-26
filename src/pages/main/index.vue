@@ -19,9 +19,7 @@
           </div>
         </div>
         <div class="header-avator-con">
-          <Button type="text" class="btn-logout" icon="log-out" size="large" @click="exitToLogin">
-            注销
-          </Button>
+          <Button type="text" class="btn-logout" icon="log-out" size="large" @click="exitToLogin">注销</Button>
         </div>
       </div>
       <!-- 已打开过页面的快捷导航 -->
@@ -42,7 +40,6 @@
 </template>
 
 <script>
-  // import Cookies from 'js-cookie'
   import sidebar from '@/components/sidebar'
   import tagsPageOpened from '@/components/tagsPageOpened'
   import breadcrumbNav from '@/components/breadcrumbNav'
@@ -56,11 +53,9 @@
     data () {
       return {
         hideMenuText: false
-        // pageTagsList: [],
-        // currentPath: [],
-        // sidebarData: []
       }
     },
+    // 计算属性 引入vuex进行状态管理，从store实例中读取状态最简单的方法就是在计算属性中返回某个状态
     computed: {
       menuList () {
         return this.$store.state.menuList
@@ -74,12 +69,7 @@
       cachePage () {
         return this.$store.state.cachePage
       }
-    },
-    // 计算属性 引入vuex进行状态管理，从store实例中读取状态最简单的方法就是在计算属性中返回某个状态
-    // computed: {},
-    mounted () {
-      // console.log(this.$route)
-    },
+    },        
     methods: {
       exitToLogin () {
         let vm = this
@@ -91,13 +81,13 @@
           }
         })
       },
-      delCookie () {
-        // Cookies.remove('userName')
-        // Cookies.remove('password')
-      },
       toggleClick () {
         this.hideMenuText = !this.hideMenuText
-      }
+      },
+      init () {}
+    },
+    mounted () {
+      this.init()
     }
   }
 </script>

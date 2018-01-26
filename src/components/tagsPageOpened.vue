@@ -5,9 +5,10 @@
       :key="item.name"
       type="dot"
       :closable="item.name==='home' ? true : false"
-      color="blue"
+      color="default"
       @click.native="openPage(item.name)"
       @on-close="closePage">{{item.title}}</Tag>
+      <!-- 选中的菜单color值改为blue -->
   </div>
 </template>
 
@@ -33,9 +34,10 @@
 
 <style scoped>
   .tags-page-opened{
-    padding: 0 15px;
+    margin: 0 15px;
     overflow: hidden;
     height: 40px;
     line-height: 40px;
+    background: aqua;
   }
 </style>

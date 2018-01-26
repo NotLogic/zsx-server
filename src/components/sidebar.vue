@@ -25,6 +25,7 @@
 </template>
 
 <script>
+  import util from '@/libs/util'
   export default {
     name: 'sidebar',
     props: {
@@ -42,8 +43,12 @@
     computed: { },
     methods: {
       menuSelect (name) {
-        // name和路由绑定好不好？是不是太死板了
-        this.$router.push({name: name})
+        let vm = this
+        // 更新面包屑
+        util.setCurrentPath(vm, name)
+        // 更新快捷导航
+        util.openNewPage(vm, name)
+        vm.$router.push({name: name})
       }
     },
     watch: {

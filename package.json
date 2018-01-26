@@ -15,7 +15,6 @@
   },
   "dependencies": {
     "axios": "^0.17.1",
-    "cookie": "^0.3.1",
     "iview": "^2.7.4",
     "jquery": "^3.2.1",
     "localstorage": "^0.1.0",
