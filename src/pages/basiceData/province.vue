@@ -1,30 +1,30 @@
 <template>
   <div class="province">
     <div style="padding: 10px 0">
-      <Button type="primary" size="small" style="margin-right: 10px;" @click="addRow('province')">添加</Button>
+      <Button type="primary" size="small" style="margin-right: 10px;" @click="addRow('province')">{{label.add}}</Button>
       <Button type="primary" size="small" @click="checkData">校验所有数据</Button>
     </div>
-    <main-table :columns="provinceColumns" :data="provinceData"></main-table>
+    <main-table :columns="provinceColumns" :data="provinceData" :height="685"></main-table>
 
     <!-- 市弹窗 -->
     <Modal v-model="cityDialogShow" title="市" :mask-closable="false" width="750">
       <div style="margin-bottom: 10px;">
         <Button type="primary" @click="addRow('city')" size="small">{{label.add}}</Button>
       </div>
-      <main-table :columns="cityColumns" :data="cityData" size="small"></main-table>
+      <main-table :columns="cityColumns" :data="cityData" :height="500" :size="'small'"></main-table>
       <div slot="footer">
-        <Button type="primary" @click="closeModal('cityDialogShow')">确定</Button>
+        <Button type="primary" @click="closeModal('cityDialogShow')">{{label.sure}}</Button>
       </div>
     </Modal>
 
     <!-- 区弹窗 -->
     <Modal v-model="areaDialogShow" title="区" :mask-closable="false" width="750">
       <div style="margin-bottom: 10px;">
-        <Button type="primary" @click="addRow('area')" size="small">{{label.add}}</Button>
+        <Button type="primary" @click="addRow('area')" :size="'small'">{{label.add}}</Button>
       </div>
-      <main-table :columns="areaColumns" :data="areaData" size="small"></main-table>
+      <main-table :columns="areaColumns" :data="areaData" size="small" :height="500"></main-table>
       <div slot="footer">
-        <Button type="primary" @click="closeModal('areaDialogShow')">确定</Button>
+        <Button type="primary" @click="closeModal('areaDialogShow')">{{label.sure}}</Button>
       </div>
     </Modal>
 
@@ -47,9 +47,7 @@
       </Form>
       <div slot="footer">
         <Button @click="resetDialog">{{label.clear}}</Button>
-        <Button type="primary" @click="submitDialogForm('formDialog')" :loading="dialogSubmitLoading">
-          {{label.submit}}
-        </Button>
+        <Button type="primary" @click="submitDialogForm('formDialog')" :loading="dialogSubmitLoading">{{label.submit}}</Button>
       </div>
     </Modal>
   </div>
@@ -58,6 +56,7 @@
 <script>
   import util from '@/libs/util'
   import mainTable from '@/components/mainTable'
+  import axios from 'axios'
   export default {
     name: 'province',
     components: {
@@ -336,6 +335,7 @@
       checkData () {}
     },
     mounted () {
+      let vm = this
       this.$http.get('/static/data/address.json').then(res => {
         this.chinaJson = util.extend(res.data)
         this.chinaData = util.getChinaDataByJson(util.extend(res.data))
@@ -348,6 +348,12 @@
         })
         this.provinceData = provinceData
       })
+      // 为什么全局的axios不行， vm.$http.all   not a function
+      // vm.$http.all([vm.$http.get('/static/data/address.json'), vm.$http.get('/static/data/accessData.json')]).then(vm.$http.spread(function(acct, perms){
+      axios.all([vm.$http.get('/static/data/address.json'), vm.$http.get('/static/data/accessData.json')]).then(axios.spread(function(res1, res2){
+        console.log('res1: ', res1)
+        console.log('res2: ', res2)
+      }))
     },
     watch: {}
   }

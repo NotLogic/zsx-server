@@ -1,10 +1,5 @@
 <template>
   <div class="ad">
-    <Form inline>
-      <FormItem>
-        <Button type="primary" @click="addRow" size="small">添加</Button>
-      </FormItem>
-    </Form>
     <!-- 高级搜索 -->
     <Form :model="formSearch" ref="formSearch" inline :label-width="60">
       <FormItem label="关键字" prop="title">
@@ -46,10 +41,11 @@
                        :clearable="false"></DatePicker>
         </FormItem>
       </FormItem>
-      <Button type="ghost" style="margin:5px 8px 24px 0;" @click="resetSearch('formSearch')" size="small">清空</Button>
-      <Button type="primary" style="margin: 5px 8px 24px 0;" @click="submitSearch('formSearch')" size="small">查找</Button>
+      <Button type="ghost" style="margin:5px 8px 24px 0;" @click="resetSearch('formSearch')" size="small">{{label.clear}}</Button>
+      <Button type="primary" style="margin: 5px 8px 24px 0;" @click="submitSearch('formSearch')" size="small">{{label.search}}</Button>
+      <Button type="primary" style="margin: 5px 8px 24px 0;" @click="addRow" size="small">{{label.add}}</Button>
     </Form>
-    <mainTable :columns="columns" :data="pager.data"></mainTable>
+    <mainTable :columns="columns" :data="pager.data" :height="610"></mainTable>
     <!-- 分页 -->
     <paging></paging>
     <Modal v-model="dialogShow" :title="label[currDialog]" :mask-closable="false" width="750" @on-cancel="resetDialogForm('formDialog')">
@@ -157,7 +153,7 @@
       </Form>
       <div slot="footer">
         <Button @click="resetDialogForm('formDialog')">{{label.clear}}</Button>
-        <Button type="primary" @click="submitDialogForm('formDialog')" :loading="dialogSubmitLoading">提交</Button>
+        <Button type="primary" @click="submitDialogForm('formDialog')" :loading="dialogSubmitLoading">{{label.submit}}</Button>
       </div>
     </Modal>
   </div>

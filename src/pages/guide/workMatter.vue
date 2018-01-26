@@ -1,20 +1,5 @@
 <template>
   <div class="work-matter">
-    <Form inline>
-      <FormItem>
-        <Button type="primary" @click="addRow" size="small">添加</Button>
-      </FormItem>
-      <FormItem>
-        <Upload name="execlFile"
-                action="workMatter/execl.do"
-                :on-success="upExeclSuccess"
-                :format="['xlsx']"
-                :on-format-error="handleFormatError"
-                :show-upload-list="false">
-          <Button type="primary" size="small">导入事项Excel</Button>
-        </Upload>
-      </FormItem>
-    </Form>
     <!-- 高级搜索 -->
     <Form :model="formSearch" ref="formSearch" inline :label-width="80">
       <FormItem label="事项名称" prop="matterName">
@@ -35,10 +20,20 @@
             <Option value="1">有效</Option>
           </Select>
       </FormItem>
-      <Button type="ghost" style="margin-right: 8px;margin-top: 5px;" @click="resetSearch('formSearch')" size="small">清空</Button>
-      <Button type="primary" style="margin-top: 5px;" @click="submitSearch('formSearch')" size="small">查找</Button>
+      <Button type="ghost" style="margin-right: 8px;margin-top: 5px;" @click="resetSearch('formSearch')" size="small">{{label.clear}}</Button>
+      <Button type="primary" style="margin-right: 8px;margin-top: 5px;" @click="submitSearch('formSearch')" size="small">{{label.search}}</Button>
+      <Button type="primary" style="margin-right: 8px;margin-top: 5px;" @click="addRow" size="small">{{label.add}}</Button>
+      <Upload name="execlFile"
+                action="workMatter/execl.do"
+                :on-success="upExeclSuccess"
+                :format="['xlsx']"
+                :on-format-error="handleFormatError"
+                :show-upload-list="false"
+                style="display:inline-block;">
+          <Button type="primary" size="small" style="margin-top:5px;">导入事项Excel</Button>
+        </Upload>
     </Form>
-    <mainTable :columns="columns" :data="pager.data"></mainTable>
+    <mainTable :columns="columns" :data="pager.data" :height="610"></mainTable>
     <paging></paging>
     <!-- 弹出框 -->
     <Modal v-model="dialogShow" :title="label[currDialog]" :mask-closable="false" width="750" @on-cancel="resetDialogForm('formDialog')">
@@ -179,8 +174,8 @@
         </Row>
       </Form>
       <div slot="footer">
-        <Button @click="resetDialogForm('formDialog')">清空</Button>
-        <Button type="primary" @click="submitDialogForm('formDialog')" :loading="dialogSubmitLoading">提交</Button>
+        <Button @click="resetDialog">{{label.clear}}</Button>
+        <Button type="primary" @click="submitDialogForm('formDialog')" :loading="dialogSubmitLoading">{{label.submit}}</Button>
       </div>
     </Modal>
   </div>

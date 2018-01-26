@@ -5,7 +5,7 @@ import store from '@/vuex'
 // console.log(qs)
 const TIME_OUT = 5000
 let http = axios.create({
-  baseURL: config.api,
+  // baseURL: config.api,
   timeout: TIME_OUT
 })
 // http.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded; charset=UTF-8'
@@ -18,7 +18,6 @@ http.interceptors.request.use(function (config) {
     // config.data 提交的数据
     config.data = qs.stringify(config.data)
   }
-  console.log(config.data)
   return config
 }, function (error) {
   // 对请求错误做些什么

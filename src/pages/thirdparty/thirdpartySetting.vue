@@ -1,13 +1,5 @@
 <template>
   <div class="thirdparty-setting">
-    <Form inline>
-      <FormItem>
-        <Button type="primary" @click="addRow" size="small">添加</Button>
-      </FormItem>
-      <FormItem>
-        <Button type="primary" @click="debugging" size="small">调试</Button>
-      </FormItem>
-    </Form>
     <!-- 高级搜索 -->
     <Form :model="formSearch" ref="formSearch" inline :label-width="60">
       <FormItem label="接口名称" prop="apiName">
@@ -24,10 +16,12 @@
           <Option value="2">API</Option>
         </Select>
       </FormItem>
-      <Button type="ghost" style="margin-right: 8px;margin-top: 5px;" @click="resetSearch('formSearch')" size="small">清空</Button>
-      <Button type="primary" style="margin-top: 5px;" @click="submitSearch('formSearch')" size="small">搜索</Button>
+      <Button type="ghost" style="margin:5px 8px 24px 0;" @click="resetSearch('formSearch')" size="small">{{label.clear}}</Button>
+      <Button type="primary" style="margin: 5px 8px 24px 0;" @click="submitSearch('formSearch')" size="small">{{label.search}}</Button>
+      <Button type="primary" style="margin: 5px 8px 24px 0;" @click="addRow" size="small">{{label.add}}</Button>
+      <Button type="primary" style="margin: 5px 8px 24px 0;" @click="debugging" size="small">{{label.debugging}}</Button>
     </Form>
-    <mainTable :columns="columns" :data="pager.data"></mainTable>
+    <mainTable :columns="columns" :data="pager.data" :height="610"></mainTable>
     <paging :total="pager.total"></paging>
     <Modal v-model="dialogShow" :title="label[currDialog]" :mask-closable="false" width="750" @on-cancel="resetDialogForm('formDialog')">
       <Form :model="formDialog" ref="formDialog" :rules="rules" :label-width="90">

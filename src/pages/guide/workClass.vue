@@ -1,10 +1,5 @@
 <template>
   <div class="work-class">
-    <Form inline>
-      <FormItem>
-        <Button type="primary" @click="addRow" size="small">添加</Button>
-      </FormItem>
-    </Form>
     <Form :model="formSearch" ref="formSearch" :rules="rules" inline :label-width="80">
         <FormItem label="分类名称" prop="className">
             <Input v-model="formSearch.className" placeholder="分类名称" size="small" style="width: 120px"></Input>
@@ -24,10 +19,11 @@
               <Option value="1">企业</Option>
             </Select>
         </FormItem>
-        <Button type="primary" style="margin-top: 5px;" @click="submitSearch('formSearch')" size="small">查找</Button>
-        <Button type="ghost" style="margin-left: 8px;margin-top: 5px;" @click="resetSearch('formSearch')" size="small">清空</Button>
+        <Button type="ghost" style="margin:5px 8px 24px 0;" @click="resetSearch('formSearch')" size="small">{{label.clear}}</Button>
+        <Button type="primary" style="margin: 5px 8px 24px 0;" @click="submitSearch('formSearch')" size="small">{{label.search}}</Button>
+        <Button type="primary" style="margin: 5px 8px 24px 0;" @click="addRow" size="small">{{label.add}}</Button>
     </Form>
-    <mainTable :columns="columns" :data="pager.data"></mainTable>
+    <mainTable :columns="columns" :data="pager.data" :height="610"></mainTable>
     <paging :total="pager.total"></paging>
     <!-- 弹出框 -->
     <Modal v-model="dialogShow" :title="label[currDialog]" :mask-closable="false" width="750" @on-cancel="resetDialogForm('formDialog')">
@@ -78,8 +74,8 @@
         </Row>
       </Form>
       <div slot="footer">
-        <Button @click="resetDialogForm('formDialog')">清空</Button>
-        <Button type="primary" @click="submitDialogForm('formDialog')" :loading="dialogSubmitLoading">提交</Button>
+        <Button @click="resetDialog">{{label.clear}}</Button>
+        <Button type="primary" @click="submitDialogForm('formDialog')" :loading="dialogSubmitLoading">{{label.submit}}</Button>
       </div>
     </Modal>
   </div>
@@ -317,7 +313,6 @@
       },
       resetSearch (name) {
         // 重置一些this.$refs[name].resetFields()无法重置的内容
-        // vm.$store.commit('reserForm', name)
         this.derail_address_obj_s = []
         this.$refs[name].resetFields()
       },
@@ -330,7 +325,7 @@
       handleSuccess () {},
       handleFormatError () {},
       getAddrByCityId (cityId) {
-        return '数据成功'
+        return cityId
       },
       initData () {
         let vm = this

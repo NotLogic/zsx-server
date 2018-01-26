@@ -1,8 +1,6 @@
 <template>
-  <div class="role">
-    <div style="padding: 15px 0;">
-      <Button type="primary" @click="addRow" size="small">添加</Button>
-    </div>
+  <div class="role">    
+    <Button type="primary" style="margin: 5px 8px 24px 0;" @click="addRow" size="small">{{label.add}}</Button>
     <mainTable :columns="columns" :data="pager.data"></mainTable>
     <Modal v-model="dialogShow" :title="label[currDialog]" :mask-closable="false" width="750" @on-cancel="resetDialogForm('formDialog')">
       <Form :model="formDialog" ref="formDialog" :rules="rules" :label-width="80">

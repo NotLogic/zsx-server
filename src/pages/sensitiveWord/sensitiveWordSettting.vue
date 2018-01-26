@@ -2,7 +2,7 @@
   <div class="sensitive-word-settting">
     <Form inline>
       <FormItem>
-        <Button type="primary" @click="addRow" size="small">添加规则</Button>
+        <Button type="primary" @click="addRow" size="small">{{label.add}}</Button>
       </FormItem>
     </Form>
     <mainTable :columns="columns" :data="pager.data"></mainTable>

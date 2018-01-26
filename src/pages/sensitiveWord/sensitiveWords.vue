@@ -2,7 +2,7 @@
   <div class="sensitiveWords">
     <Form inline>
       <FormItem>
-        <Button type="primary" @click="addRow" size="small">添加</Button>
+        <Button type="primary" @click="addRow" size="small">{{label.add}}</Button>
       </FormItem>
       <FormItem>
         <Upload name="execlFile"
@@ -15,7 +15,7 @@
         </Upload>
       </FormItem>
     </Form>
-    <mainTable :columns="columns" :data="pager.data"></mainTable>
+    <mainTable :columns="columns" :data="pager.data" :height="610"></mainTable>
     <paging :page-size-opts="pageSizeOpts"></paging>
     <Modal v-model="dialogShow" :title="label[currDialog]" :mask-closable="false" @on-cancel="resetDialogForm('formDialog')">
       <i-form :model="formDialog" ref="formDialog" :rules="rules" :label-width="80">

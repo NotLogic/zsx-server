@@ -1,6 +1,6 @@
 <template>
   <!-- <div class="wrapper-pagination"> -->
-    <Table :columns='columns' :data='data'></Table>
+    <Table :columns='columns' :data='data' :height='height' :size='size'></Table>
   <!-- </div>   -->
 </template>
 
@@ -9,7 +9,9 @@ export default {
   name: 'mainTable',
   props: {
     columns: Array,
-    data: Array
+    data: Array,
+    height: [Number, String],
+    size: String
   }
 }
 </script>

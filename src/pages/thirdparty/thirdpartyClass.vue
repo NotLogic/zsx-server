@@ -2,7 +2,7 @@
   <div class="thirdparty-class">
     <Form inline>
       <FormItem>
-        <Button type="primary" @click="addRow" size="small">添加</Button>
+        <Button type="primary" @click="addRow" size="small">{{label.add}}</Button>
       </FormItem>
     </Form>
     <mainTable :columns="columns" :data="pager.data"></mainTable>

@@ -16,7 +16,10 @@ export default new Vuex.Store({
       'clear': '清空',
       'submit': '提交',
       'delete': '删除',
-      'search': '搜索'
+      'search': '搜索',
+      'debugging': '调试',
+      'sure': '确定',
+      'cancle': '取消'
     },
     currDialog: 'add',
     pager: {
