@@ -1,6 +1,9 @@
 <template>
   <Breadcrumb >
-    <BreadcrumbItem v-for="item in currentPath" :to="{name: item.name}" :key="item.name">{{item.title}}</BreadcrumbItem>    
+    <template v-for="(item, index) in currentPath">
+      <BreadcrumbItem v-if="currentPath.length === 3 && index === 1" :key="item.name">{{item.title}}</BreadcrumbItem>
+      <BreadcrumbItem v-else :to="{name: item.name}" :key="item.name">{{item.title}}</BreadcrumbItem>
+    </template>
   </Breadcrumb>
 </template>
 

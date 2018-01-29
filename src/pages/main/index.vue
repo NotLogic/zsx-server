@@ -19,10 +19,11 @@
           </div>
         </div>
         <div class="header-avator-con">
+          <Button type="text" class="btn-logout" icon="log-out" size="large" @click="goUser">用户</Button>
           <Button type="text" class="btn-logout" icon="log-out" size="large" @click="exitToLogin">注销</Button>
         </div>
       </div>
-      <!-- 已打开过页面的快捷导航 -->
+      <!-- 已打开过页面的快捷导航 -->      
       <tags-page-opened :pageTagsList="pageTagsList"></tags-page-opened>
       <!-- 单页内容展示区域 -->
       <div class="single-page" :style="{left:hideMenuText?0:'200px'}">
@@ -40,10 +41,10 @@
 </template>
 
 <script>
+  import util from '@/libs/util'
   import sidebar from '@/components/sidebar'
   import tagsPageOpened from '@/components/tagsPageOpened'
   import breadcrumbNav from '@/components/breadcrumbNav'
-  // import sidebarData from '@/assets/data/sidebar.js'
   export default {
     components: {
       sidebar,
@@ -60,17 +61,24 @@
       menuList () {
         return this.$store.state.menuList
       },
+      // 所有打开的页面
       pageTagsList () {
-        return this.$store.state.pageOpenedList  // 所有打开的页面
+        return this.$store.state.pageOpenedList
       },
+      // 面包屑数组
       currentPath () {
-        return this.$store.state.currentPath  // 当前面包屑数组
+        return this.$store.state.currentPath
       },
       cachePage () {
         return this.$store.state.cachePage
       }
     },        
     methods: {
+      goUser () {
+        let name = 'userPage'
+        let vm = this
+        util.setCurrentPath(vm, name)
+      },
       exitToLogin () {
         let vm = this
         vm.$Modal.confirm({

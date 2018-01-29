@@ -53,8 +53,10 @@
     },
     watch: {
       $route (to) {
-        this.currentPageName = to.name
+        let vm = this
+        vm.currentPageName = to.name
         sessionStorage.currentPageName = to.name
+        util.setCurrentPath(vm, to.name)
       },
       currentPageName () {
         this.openedSubmenuArr = this.$store.state.openedSubmenuArr

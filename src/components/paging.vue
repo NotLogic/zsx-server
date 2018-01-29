@@ -10,6 +10,10 @@
   export default {
     name: 'paging',
     props: {
+      pagesize: {
+        type: Number,
+        default: 10
+      },
       pageSizeOpts: {
         type: Array,
         default: function () {
@@ -17,10 +21,7 @@
         }
       }
     },
-    computed: {
-      pagesize () {
-        return this.$store.state.pager.pagesize
-      },
+    computed: {      
       total () {
         return this.$store.state.pager.total
       },

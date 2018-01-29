@@ -31,6 +31,16 @@ export const mainRoutes = {
         icon: ''
       },
       component: resolve => { require(['@/pages/home'], resolve) }
+    },
+    {
+      path: 'userPage',
+      name: 'userPage',
+      meta: {
+        title: '用户',
+        access: 1,
+        icon: ''
+      },
+      component: resolve => { require(['@/pages/user'], resolve) }
     }
   ]
 }

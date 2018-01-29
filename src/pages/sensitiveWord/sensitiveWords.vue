@@ -16,9 +16,9 @@
       </FormItem>
     </Form>
     <mainTable :columns="columns" :data="pager.data" :height="610"></mainTable>
-    <paging :page-size-opts="pageSizeOpts"></paging>
+    <paging :pagesize="50" :page-size-opts="pageSizeOpts"></paging>
     <Modal v-model="dialogShow" :title="label[currDialog]" :mask-closable="false" @on-cancel="resetDialogForm('formDialog')">
-      <i-form :model="formDialog" ref="formDialog" :rules="rules" :label-width="80">
+      <Form :model="formDialog" ref="formDialog" :rules="rules" :label-width="80">
         <Row>
           <Col span="12">
             <FormItem label="敏感词" prop="word">
@@ -26,12 +26,12 @@
             </FormItem>
           </Col>
         </Row>
-      </i-form>
+      </Form>
       <div slot="footer">
-        <i-button @click="resetDialogForm('formDialog')">{{label.clear}}</i-button>
-        <i-button type="primary" @click="submitDialogForm('formDialog')" :loading="dialogSubmitLoading">
+        <Button @click="resetDialogForm('formDialog')">{{label.clear}}</Button>
+        <Button type="primary" @click="submitDialogForm('formDialog')" :loading="dialogSubmitLoading">
           {{label.submit}}
-        </i-button>
+        </Button>
       </div>
     </Modal>
   </div>

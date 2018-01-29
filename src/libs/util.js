@@ -124,16 +124,89 @@ const util = {
         delete obj[key]
       }
     }
-    if (obj.data !== 'undefined') {
+    if (typeof obj.data !== 'undefined') {
       delete obj.data
     }
     return obj
   },
+  // 更新面包屑
   setCurrentPath (vm, name) {
-    console.log('setCurrentPath vm: ', vm)
-    console.log('setCurrentPath name: ', name)
-    console.log(vm.$store.state.tagsList)
+    let currentPathArr = []
+    console.log(name)
+    if (name === 'home' || name === 'main') {
+      currentPathArr = [{
+        title: '首页',
+        path: '/',
+        name: 'home'
+      }]
+    } else {
+      // 默认属于mainRoutes
+      let isMainRoutes = true
+      vm.$store.state.routers.forEach(item => {
+        if (item.name === 'main') {
+          // mainRoutes
+          item.children.forEach(child => {
+            if (child.name === name) {
+              isMainRoutes = true
+            }
+          })
+        } else {
+          // appRoutes
+          item.children.forEach(child => {
+            if (child.name === name) {
+              isMainRoutes = false
+            }
+          })
+        }
+      })
+      if (isMainRoutes) {
+        // mainRoutes
+        vm.$store.state.routers.forEach(item => {
+          if (item.name === 'main') {
+            item.children.forEach(child => {
+              if (child.name === name) {
+                currentPathArr = [{
+                  title: '首页',
+                  path: '/',
+                  name: 'home'
+                }, {
+                  title: child.meta.title,
+                  path: child.path,
+                  name: child.name
+                }]
+              }
+            })
+          }
+        })
+      } else {
+        // appRoutes
+        vm.$store.state.routers.forEach(item => {
+          if (item.name !== 'main') {
+            item.children.forEach(child => {
+              if (child.name === name) {
+                currentPathArr = [{
+                  title: '首页',
+                  path: '/',
+                  name: 'home'
+                }, {
+                  title: item.meta.title,
+                  path: item.path,
+                  name: item.name
+                }, {
+                  title: child.meta.title,
+                  path: child.path,
+                  name: child.name
+                }]
+              }
+            })
+          }
+        })
+      }
+    }
+    console.log(currentPathArr)
+    vm.$store.commit('setCurrentPath', currentPathArr)
   },
+  // 更新快捷导航
   openNewPage (vm, name) {
     console.log('openNewPage vm: ', vm)
     console.log('openNewPage name: ', name)
