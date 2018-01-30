@@ -132,7 +132,6 @@ const util = {
   // 更新面包屑
   setCurrentPath (vm, name) {
     let currentPathArr = []
-    console.log(name)
     if (name === 'home' || name === 'main') {
       currentPathArr = [{
         title: '首页',
@@ -203,13 +202,27 @@ const util = {
         })
       }
     }
-    console.log(currentPathArr)
     vm.$store.commit('setCurrentPath', currentPathArr)
   },
   // 更新快捷导航
   openNewPage (vm, name) {
-    console.log('openNewPage vm: ', vm)
-    console.log('openNewPage name: ', name)
+    let isOpened = false
+    for (let i = 0; i < vm.$store.state.pageOpenedList.length; i++) {
+      if (vm.$store.state.pageOpenedList[i].name === name) {
+        isOpened = true
+        break
+      }
+    }
+    if (isOpened) {
+      // 打开过了
+    } else {
+      // 未打开: 创建一个标签
+      let tag = vm.$store.state.tagsList.filter(item => {
+        return item.name === name
+      })[0]
+      vm.$store.commit('increateTag', tag)
+    }
+    vm.$store.commit('setCurrentPageName', name)
   },
   toDefaultPage () {}
 }

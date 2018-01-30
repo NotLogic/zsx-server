@@ -33,14 +33,20 @@
     },
     data () {
       return {
-        currentPageName: this.$route.name,
-        openedSubmenuArr: this.$store.state.openedSubmenuArr,
-        // openedSubmenuArr: [],
+        // currentPageName: this.$route.name,
+        // openedSubmenuArr: this.$store.state.openedSubmenuArr,
         theme: 'dark',
         accordion: false // 是否开启手风琴模式
       }
     },
-    computed: { },
+    computed: {
+      currentPageName () {
+        return this.$route.name
+      },
+      openedSubmenuArr () {
+        return this.$store.state.openedSubmenuArr
+      }
+    },
     methods: {
       menuSelect (name) {
         let vm = this
@@ -54,12 +60,12 @@
     watch: {
       $route (to) {
         let vm = this
-        vm.currentPageName = to.name
+        // vm.currentPageName = to.name
         sessionStorage.currentPageName = to.name
         util.setCurrentPath(vm, to.name)
       },
       currentPageName () {
-        this.openedSubmenuArr = this.$store.state.openedSubmenuArr
+        // this.openedSubmenuArr = this.$store.state.openedSubmenuArr
         this.$nextTick(() => {
           this.$refs.sideMenu.updateOpened()
         })

@@ -440,17 +440,16 @@ export const appRoutes = [
     ]
   }
 ]
-const errorRoutes = [
-  {
-    path: '/*',
-    name: 'error_404',
-    component: require('@/pages/error/404.vue')
-  }
-]
+const errorRoutes = {
+  path: '*',
+  name: 'error_404',
+  component: require('@/pages/error/404.vue')
+}
+
 const routes = [
   loginRoute,
   mainRoutes,
   ...appRoutes,
-  ...errorRoutes
+  errorRoutes
 ]
 export default routes

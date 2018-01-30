@@ -38,14 +38,11 @@ export default {
   // 已经打开的页面列表数据
   pageOpenedList: [
     {
-      title: '首页',
+      meta: {
+        title: '首页'
+      },
       path: '/',
       name: 'home'
-    },
-    {
-      title: '资源管理',
-      path: '/',
-      name: 'resource'
     }
   ],
   // 带有页面权限数据的数组 实例： [{pageName: 'main', access: 1}, {pageName: 'member_index', access: 0}]  数组中的 pageName 可以改为其他，改过之后mutations中的updateMenulist函数中也要改也要相应的去改

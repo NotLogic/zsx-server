@@ -21,7 +21,7 @@
         :color="currentPageName===item.name ? 'blue' : 'default'"
         :name="item.name"
         @click.native="openPage(item.name)"
-        @on-close="closeTag">{{item.title}}</Tag>
+        @on-close="closeTag">{{item.meta.title}}</Tag>
         <!-- 选中的菜单color值改为blue -->
     </div>
   </div>
@@ -35,22 +35,30 @@
     },
     data () {
       return {
-        currentPageName: this.$route.name
+        // currentPageName: this.$route.name
+      }
+    },
+    computed: {
+      currentPageName () {
+        return this.$route.name
       }
     },
     methods: {
       closeTag (event, name) {
         this.$store.commit('removeTag', name)
         this.$store.commit('closePage', name)
+        // 如果关闭的是当前页，需要额外的操作
       },
       openPage (name) {        
         this.$store.commit('openPage', name)
+        this.$router.push({name: name})
       },
       closeAllPage () {
-        console.log('关闭所有')
+        this.$store.commit('closeAllPage')
+        this.$router.push({name: 'home'})
       },
       closeOtherPage () {
-        console.log('关闭其他')
+        this.$store.commit('closeOtherPage', sessionStorage.currentPageName)
       },
       clickDropdown (name) {
         let vm = this

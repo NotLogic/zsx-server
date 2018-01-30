@@ -93,6 +93,7 @@ export default {
   increateTag (state, tagObj) {
     state.cachePage.push(tagObj.name)
     state.pageOpenedList.push(tagObj)
+    // sessionStorage.pageOpenedList = JSON.stringify(state.pageOpenedList)
   },
   // 移除标签
   removeTag (state, name) {
@@ -109,7 +110,7 @@ export default {
   setTagsList (state, list) {
     state.tagsList.push(...list)
   },
-  // 关闭页面，该页面不再缓存
+  // 关闭一个页面，该页面不再缓存
   closePage (state, name) {
     // console.log('closePage name: ', name)
     for (let i = 0; i < state.cachePage.length; i++) {
@@ -117,6 +118,27 @@ export default {
         state.cachePage.splice(i, 1)
       }
     }
+  },
+  // 关闭所有（除主页home）
+  closeAllPage (state) {
+    state.pageOpenedList.splice(1)
+    state.cachePage = []
+  },
+  // 关闭其他页
+  closeOtherPage (state, currentPageName) {
+    let arr = [
+      {
+        meta: {
+          title: '首页'
+        },
+        path: '/',
+        name: 'home'
+      }
+    ]
+    state.pageOpenedList = arr.concat(state.pageOpenedList.filter(item => {
+      return item.name === currentPageName
+    }))
+    state.cachePage = [currentPageName]
   },
   // 打开页面，缓存该页面
   openPage (state, name) {

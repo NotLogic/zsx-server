@@ -19,7 +19,6 @@
           </div>
         </div>
         <div class="header-avator-con">
-          <Button type="text" class="btn-logout" icon="log-out" size="large" @click="goUser">用户</Button>
           <Button type="text" class="btn-logout" icon="log-out" size="large" @click="exitToLogin">注销</Button>
         </div>
       </div>
@@ -74,11 +73,6 @@
       }
     },        
     methods: {
-      goUser () {
-        let name = 'userPage'
-        let vm = this
-        util.setCurrentPath(vm, name)
-      },
       exitToLogin () {
         let vm = this
         vm.$Modal.confirm({
