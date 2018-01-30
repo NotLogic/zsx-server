@@ -68,6 +68,15 @@
           vm.closeOtherPage()
         }
       }
+    },
+    beforeCreate () {
+      if (sessionStorage.pageOpenedList && sessionStorage.currentPageName) {
+        let homeObj = JSON.parse(sessionStorage.pageOpenedList)[0]
+        let currPageArr = JSON.parse(sessionStorage.pageOpenedList).filter(item => {
+          return item.name === sessionStorage.currentPageName
+        })
+        this.$store.commit('updatePageOpenedList', [homeObj].concat(currPageArr))
+      }
     }
   }
 </script>
