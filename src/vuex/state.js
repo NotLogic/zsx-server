@@ -11,17 +11,34 @@ export default {
     'sure': '确定',
     'cancle': '取消'
   },
-  currDialog: 'add',
   pager: {
-    url: '',
-    currPage: 1,
-    order: '',
-    pagesize: 10,
-    sort: '',
-    total: 100,
-    data: []
+    'url': '',
+    'currPage': 1,
+    'order': '',
+    'pagesize': 10,
+    'sort': '',
+    'total': 100,
+    'data': []
   },
-  // 1
+  map: {
+    'sex': {
+      '1': '男',
+      '2': '女',
+      '3': '保密'
+    },
+    'userType': {
+      '1': '管理员',
+      '2': '用户'
+    },
+    'status': {
+      '1': '正常',
+      '2': '停用'
+    },
+    'openClose': {
+      '1': '打开',
+      '2': '关闭'
+    }
+  },
   routers: [
     mainRoutes,
     ...appRoutes

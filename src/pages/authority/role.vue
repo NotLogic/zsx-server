@@ -59,24 +59,22 @@
     },
     data () {
       return {
+        currDialog: 'add',
         treeCheckNodeArr: [],
         treeData: [],
-        pager: {
-          data: [
-            {
-              id: '1',
-              name: '超管',
-              seq: 0,
-              description: '我是超管'
-            }, {
-              id: '3',
-              name: '哈哈',
-              seq: 2,
-              description: '哈哈哈'
-            }
-          ],
-          total: 100
-        },
+        data: [
+          {
+            id: '1',
+            name: '超管',
+            seq: 0,
+            description: '我是超管'
+          }, {
+            id: '3',
+            name: '哈哈',
+            seq: 2,
+            description: '哈哈哈'
+          }
+        ],
         opened: false,
         selectAll: false,
         dialogShow: false,
@@ -172,7 +170,7 @@
                     },
                     on: {
                       click: () => {
-                        console.log(this)
+                        console.log(vm)
                       }
                     }
                   }, '删除')
@@ -313,18 +311,16 @@
       }
     },
     computed: {
-      // pager () {
-      //   return this.$store.state.pager
-      // },
+      pager () {
+        return this.$store.state.pager
+      },
       label () {
         return this.$store.state.label
-      },
-      currDialog () {
-        return this.$store.state.currDialog
       }
     },
     mounted () {
       // this.getTreeDataByAppRoutes()
+      this.$store.state.pager.data = this.data
     },
     watch: {}
   }
