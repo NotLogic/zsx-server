@@ -100,10 +100,15 @@
       // 解决刷新时已打开快捷导航状态丢失
       if (sessionStorage.pageOpenedList) {
         let arr = [].concat(JSON.parse(sessionStorage.pageOpenedList))
-        let arr2 = arr.filter(item => {
-          return item.name === sessionStorage.currentPageName
-        })
-        let myArr = [arr[0]].concat(arr2)
+        let myArr = []
+        if (sessionStorage.currentPageName !== 'home') {
+          let arr2 = arr.filter(item => {
+            return item.name === sessionStorage.currentPageName
+          })
+          myArr = [arr[0]].concat(arr2)
+        } else {
+          myArr = [arr[0]]
+        }
         vm.$store.commit('setPageOpenedList', myArr)
       }
       // 刷新更新面包屑

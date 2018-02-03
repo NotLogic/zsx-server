@@ -45,16 +45,24 @@
     },
     methods: {
       closeTag (event, name) {
-        this.$store.commit('removeTag', name)
-        // 如果关闭的是当前页
-        if (name === sessionStorage.currentPageName) {
-          this.$store.commit('closeCurrPage', name)
-        } else {
-          this.$store.commit('closePage', name)
+        let vm = this
+        // 移除标签  会修改 pageOpenedList 
+        vm.$store.commit('removeTag', name)
+        // 从缓存中移除
+        vm.$store.commit('closePage', name)
+        // 如果关闭的是当前页 展示最先打开的那个页面
+        if (name === vm.currentPageName) {
+          let lastPageName = ''
+          if (vm.$store.state.pageOpenedList.length > 1) {
+            lastPageName = vm.$store.state.pageOpenedList[1].name
+          } else {
+            lastPageName = vm.$store.state.pageOpenedList[0].name
+          }
+          vm.$router.push({name: lastPageName})
         }
       },
-      openPage (name) {        
-        this.$store.commit('openPage', name)
+      openPage (name) {
+        // this.$store.commit('openPage', name)
         this.$router.push({name: name})
       },
       closeAllPage () {

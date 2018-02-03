@@ -110,17 +110,13 @@ export default {
   setTagsList (state, list) {
     state.tagsList.push(...list)
   },
-  // 关闭非当前页   关闭一个页面，该页面不再缓存
+  // 关闭一个页面，该页面不再缓存
   closePage (state, name) {
     for (let i = 0; i < state.cachePage.length; i++) {
       if (state.cachePage[i].name === name) {
         state.cachePage.splice(i, 1)
       }
     }
-  },
-  // 关闭当前页
-  closeCurrPage (state, name) {
-    // 关闭标签时操作了已经打开的快捷导航数组
   },
   // 关闭所有（除主页home）
   closeAllPage (state) {
@@ -139,9 +135,9 @@ export default {
     }
     state.cachePage = [currentPageName]
   },
-  // 打开页面，缓存该页面
+  // 打开页面，缓存该页面 只在新增标签时才缓存页面
   openPage (state, name) {
-    state.cachePage.push(name)
+    // state.cachePage.push(name)
   },
   // 解决刷新时已经打开的页面数组状态丢失问题
   updatePageOpenedList (state, arrList) {
