@@ -120,7 +120,7 @@ export default {
   },
   // 关闭当前页
   closeCurrPage (state, name) {
-
+    // 关闭标签时操作了已经打开的快捷导航数组
   },
   // 关闭所有（除主页home）
   closeAllPage (state) {
@@ -154,8 +154,15 @@ export default {
   // 清空快捷导航菜单数组
   clearPageOpenedList (state) {
     state.pageOpenedList.splice(1)
-    if (sessionStorage.pageOpenedList) {
-      sessionStorage.pageOpenedList = JSON.stringify(JSON.parse(sessionStorage.pageOpenedList).splice(1))
-    }
+    sessionStorage.pageOpenedList = JSON.stringify(state.pageOpenedList)
+  },
+  // 清空面包屑
+  clearCurrentPath (state) {
+    state.currentPath.splice(1)
+    sessionStorage.currentPath = JSON.stringify(state.currentPath)
+  },
+  // 在main.vue中初始化pageOpenedList，解决刷新时状态丢失问题
+  setPageOpenedList (state, arr) {
+    state.pageOpenedList = arr
   }
 }

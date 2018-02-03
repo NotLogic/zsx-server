@@ -203,6 +203,7 @@ const util = {
       }
     }
     vm.$store.commit('setCurrentPath', currentPathArr)
+    sessionStorage.currentPath = JSON.stringify(currentPathArr)
   },
   // 更新快捷导航
   openNewPage (vm, name) {

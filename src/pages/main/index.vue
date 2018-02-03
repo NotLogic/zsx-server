@@ -84,7 +84,8 @@
             vm.$store.commit('clearOpenedSubmenu')
             // 清空快捷导航菜单数组
             vm.$store.commit('clearPageOpenedList')
-            // sessionStorage.clear()
+            // 清空面包屑
+            vm.$store.commit('clearCurrentPath')
           }
         })
       },
@@ -94,7 +95,21 @@
       init () {}
     },
     mounted () {
-      this.init()
+      let vm = this
+      vm.init()
+      // 解决刷新时已打开快捷导航状态丢失
+      if (sessionStorage.pageOpenedList) {
+        let arr = [].concat(JSON.parse(sessionStorage.pageOpenedList))
+        let arr2 = arr.filter(item => {
+          return item.name === sessionStorage.currentPageName
+        })
+        let myArr = [arr[0]].concat(arr2)
+        vm.$store.commit('setPageOpenedList', myArr)
+      }
+      // 刷新更新面包屑
+      if (sessionStorage.currentPath) {
+        vm.$store.commit('setCurrentPath', JSON.parse(sessionStorage.currentPath))
+      }
     }
   }
 </script>

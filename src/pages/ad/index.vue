@@ -68,9 +68,9 @@
           <Col span="12">
             <Col span="12">
               <FormItem label="主图" prop="imagePath">
-                <div class="image_upload_list">
+                <div class="image_upload_list" style="width:100px;height:100px;">
                   <img v-if="formDialog.imagePath!=null && formDialog.imagePath!=''" :src="formDialog.imagePath"/>
-                  <img v-else src="static/img/img-upload-default.png"/>
+                  <img v-else src="static/images/img-upload-default.png" style="max-width: 100%;max-height:100%;"/>
                 </div>
               </FormItem>
             </Col>
