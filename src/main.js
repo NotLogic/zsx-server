@@ -12,8 +12,6 @@ import './styles/common.css'
 Vue.config.productionTip = false
 Vue.use(iView)
 Vue.prototype.$http = http
-// router.beforeEach((to, from, next) => {})
-// router.afterEach(() => {})
 /* eslint-disable no-new */
 new Vue({
   el: '#app',

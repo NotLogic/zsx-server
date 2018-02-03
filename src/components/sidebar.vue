@@ -73,7 +73,9 @@
     },
     updated () {
       this.$nextTick(() => {
-        this.$refs.sideMenu.updateOpened()
+        if (this.$refs.sideMenu) {
+          this.$refs.sideMenu.updateOpened()
+        }
       })
     }
   }

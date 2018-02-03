@@ -110,13 +110,17 @@ export default {
   setTagsList (state, list) {
     state.tagsList.push(...list)
   },
-  // 关闭一个页面，该页面不再缓存
+  // 关闭非当前页   关闭一个页面，该页面不再缓存
   closePage (state, name) {
     for (let i = 0; i < state.cachePage.length; i++) {
       if (state.cachePage[i].name === name) {
         state.cachePage.splice(i, 1)
       }
     }
+  },
+  // 关闭当前页
+  closeCurrPage (state, name) {
+
   },
   // 关闭所有（除主页home）
   closeAllPage (state) {
@@ -125,15 +129,7 @@ export default {
   },
   // 关闭其他页
   closeOtherPage (state, currentPageName) {
-    let arr = [
-      {
-        meta: {
-          title: '首页'
-        },
-        path: '/',
-        name: 'home'
-      }
-    ]
+    let arr = [[].concat(state.pageOpenedList)[0]]
     if (currentPageName === 'home') {
       state.pageOpenedList = arr
     } else {
@@ -150,5 +146,16 @@ export default {
   // 解决刷新时已经打开的页面数组状态丢失问题
   updatePageOpenedList (state, arrList) {
     state.pageOpenedList = arrList
+  },
+  // 清空已打开的左侧菜单
+  clearOpenedSubmenu (state) {
+    state.openedSubmenuArr = []
+  },
+  // 清空快捷导航菜单数组
+  clearPageOpenedList (state) {
+    state.pageOpenedList.splice(1)
+    if (sessionStorage.pageOpenedList) {
+      sessionStorage.pageOpenedList = JSON.stringify(JSON.parse(sessionStorage.pageOpenedList).splice(1))
+    }
   }
 }

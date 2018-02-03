@@ -46,8 +46,12 @@
     methods: {
       closeTag (event, name) {
         this.$store.commit('removeTag', name)
-        this.$store.commit('closePage', name)
-        // 如果关闭的是当前页，需要额外的操作
+        // 如果关闭的是当前页
+        if (name === sessionStorage.currentPageName) {
+          this.$store.commit('closeCurrPage', name)
+        } else {
+          this.$store.commit('closePage', name)
+        }
       },
       openPage (name) {        
         this.$store.commit('openPage', name)
@@ -70,13 +74,17 @@
       }
     },
     beforeCreate () {
-      if (sessionStorage.pageOpenedList && sessionStorage.currentPageName) {
-        let homeObj = JSON.parse(sessionStorage.pageOpenedList)[0]
-        let currPageArr = JSON.parse(sessionStorage.pageOpenedList).filter(item => {
-          return item.name === sessionStorage.currentPageName
-        })
-        this.$store.commit('updatePageOpenedList', [homeObj].concat(currPageArr))
-      }
+      // if (sessionStorage.pageOpenedList && sessionStorage.currentPageName) {
+      //   let homeObj = JSON.parse(sessionStorage.pageOpenedList)[0]
+      //   console.log(sessionStorage.pageOpenedList)
+      //   let currPageArr = JSON.parse(sessionStorage.pageOpenedList).filter(item => {
+      //     if (sessionStorage.currentPageName === 'home') {
+      //       return []
+      //     }
+      //     return item.name === sessionStorage.currentPageName
+      //   })
+      //   this.$store.commit('updatePageOpenedList', [homeObj].concat(currPageArr))
+      // }
     }
   }
 </script>
