@@ -160,5 +160,23 @@ export default {
   // 在main.vue中初始化pageOpenedList，解决刷新时状态丢失问题
   setPageOpenedList (state, arr) {
     state.pageOpenedList = arr
+  },
+  // 将指定父级展开
+  setOpenedSubmenuArr (state, name) {
+    state.openedSubmenuArr.push(name)
+  },
+  // 只展开一个
+  oneOpenedSubmenuArr (state, name) {
+    state.openedSubmenuArr = [name]
+  },
+  // 关闭所有时清空左侧展开数组
+  clearAllOpenedSubmenuArr (state) {
+    state.openedSubmenuArr = []
+  },
+  // 关闭其他时只剩一个
+  clearOtherOpenedSubmenuArr (state, name) {
+    state.openedSubmenuArr = state.openedSubmenuArr.filter(item => {
+      return item === name
+    })
   }
 }

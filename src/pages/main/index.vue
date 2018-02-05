@@ -86,6 +86,8 @@
             vm.$store.commit('clearPageOpenedList')
             // 清空面包屑
             vm.$store.commit('clearCurrentPath')
+            // 清空左侧展开菜单数据
+            sessionStorage.clear('openedSubmenuArr')
           }
         })
       },

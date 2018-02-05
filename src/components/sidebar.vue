@@ -33,8 +33,6 @@
     },
     data () {
       return {
-        // currentPageName: this.$route.name,
-        // openedSubmenuArr: this.$store.state.openedSubmenuArr,
         theme: 'dark',
         accordion: false // 是否开启手风琴模式
       }
@@ -60,12 +58,15 @@
     watch: {
       $route (to) {
         let vm = this
-        // vm.currentPageName = to.name
         sessionStorage.currentPageName = to.name
         util.setCurrentPath(vm, to.name)
       },
+      // openedSubmenuArr () {
+      //   this.$nextTick(() => {
+      //     this.$refs.sideMenu.updateOpened()
+      //   })
+      // },
       currentPageName () {
-        // this.openedSubmenuArr = this.$store.state.openedSubmenuArr
         this.$nextTick(() => {
           this.$refs.sideMenu.updateOpened()
         })
@@ -77,6 +78,13 @@
           this.$refs.sideMenu.updateOpened()
         }
       })
+    },
+    mounted () {
+      if (sessionStorage.currentPageName) {
+        let parentName = util.getParentRouterNameByName(sessionStorage.currentPageName)
+        // 只展开一个
+        this.$store.commit('oneOpenedSubmenuArr', parentName)
+      }
     }
   }
 </script>

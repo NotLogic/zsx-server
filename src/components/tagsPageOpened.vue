@@ -28,6 +28,7 @@
 </template>
 
 <script>
+  import util from '@/libs/util'
   export default {
     name: 'tagsPageOpened',
     props: {
@@ -62,22 +63,37 @@
         }
       },
       openPage (name) {
-        // this.$store.commit('openPage', name)
-        this.$router.push({name: name})
+        let vm = this
+        let parentName = util.getParentRouterNameByName(name)
+        if (parentName) {
+          let parentNameInOpenedSubmenuArr = false
+          vm.$store.state.openedSubmenuArr.forEach((item, index) => {
+            if (item === parentName) {
+              parentNameInOpenedSubmenuArr = true
+            }
+          })
+          if (!parentNameInOpenedSubmenuArr) {
+            vm.$store.commit('setOpenedSubmenuArr', parentName)
+          }
+        }
+        vm.$router.push({name: name})
       },
-      closeAllPage () {
-        this.$store.commit('closeAllPage')
-        this.$router.push({name: 'home'})
-      },
-      closeOtherPage () {
-        this.$store.commit('closeOtherPage', sessionStorage.currentPageName)
-      },
+      // 菜单选项
       clickDropdown (name) {
         let vm = this
         if (name ==='closeAll') {
-          vm.closeAllPage()
+          // 清空标签
+          vm.$store.commit('closeAllPage')
+          // 清空左侧展开的菜单（效果暂未实现）    这个效果会操控侧边栏组件，形成耦合
+          // vm.$store.commit('clearAllOpenedSubmenuArr')
+          vm.$router.push({name: 'home'})
         } else if (name === 'closeOther') {
-          vm.closeOtherPage()
+          vm.$store.commit('closeOtherPage', vm.currentPageName)
+          // 清空其他，只剩一个展开（效果暂未实现）  这个效果会操控侧边栏组件，形成耦合
+          // let parentName = util.getParentRouterNameByName(vm.currentPageName)
+          // if (parentName) {
+          //   vm.$store.commit('clearOtherOpenedSubmenuArr', parentName)
+          // }
         }
       }
     },

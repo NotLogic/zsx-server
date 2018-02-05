@@ -1,3 +1,4 @@
+import { appRoutes } from '@/router/routes'
 const util = {
   extend (data) {
     if (data.length && typeof data !== 'string') {
@@ -225,6 +226,20 @@ const util = {
     }
     vm.$store.commit('setCurrentPageName', name)
   },
-  toDefaultPage () {}
+  toDefaultPage () {},
+  // 通过子路由name获取父路由name
+  getParentRouterNameByName (childName) {
+    let parentName = ''
+    if (childName !== 'home') {
+      appRoutes.forEach(item => {
+        item.children.forEach(child => {
+          if (child.name === childName) {
+            parentName = item.name
+          }
+        })
+      })
+    }
+    return parentName
+  }
 }
 export default util
