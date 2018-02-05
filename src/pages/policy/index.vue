@@ -90,7 +90,7 @@
         </Row>
       </Form>
       <div slot="footer">
-        <Button @click="resetDialog">{{label.clear}}</Button>
+        <Button @click="resetDialogForm('formDialog')">{{label.clear}}</Button>
         <Button type="primary" @click="submitDialogForm('formDialog')" :loading="dialogSubmitLoading">{{label.submit}}</Button>
       </div>
     </Modal>
@@ -108,6 +108,12 @@
     },
     data: function () {
       return {
+        url: {
+          add: 'policy/add.do',
+          edit: 'policy/edit.do',
+          delete: 'policy/delete.do',
+          paging: 'policy/dataGrid.do'
+        },
         currDialog: 'add',
         dialogShow: false,
         dialogSubmitLoading: false,

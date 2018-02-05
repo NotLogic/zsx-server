@@ -174,7 +174,7 @@
         </Row>
       </Form>
       <div slot="footer">
-        <Button @click="resetDialog">{{label.clear}}</Button>
+        <Button @click="resetDialogForm('formDialog')">{{label.clear}}</Button>
         <Button type="primary" @click="submitDialogForm('formDialog')" :loading="dialogSubmitLoading">{{label.submit}}</Button>
       </div>
     </Modal>
@@ -193,6 +193,13 @@
     },
     data () {
       return {
+        url: {
+          add: 'workMatter/add.do',
+          edit: 'workMatter/edit.do',
+          delete: 'workMatter/delete.do',
+          check: 'workMatter/checkName.do',
+          paging: 'workMatter/dataGrid.do'
+        },
         currDialog: 'add',
         dialogShow: false,
         dialogSubmitLoading: false,

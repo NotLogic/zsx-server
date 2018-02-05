@@ -74,7 +74,7 @@
         </Row>
       </Form>
       <div slot="footer">
-        <Button @click="resetDialog">{{label.clear}}</Button>
+        <Button @click="resetDialogForm('formDialog')">{{label.clear}}</Button>
         <Button type="primary" @click="submitDialogForm('formDialog')" :loading="dialogSubmitLoading">{{label.submit}}</Button>
       </div>
     </Modal>
@@ -94,6 +94,9 @@
     data: function () {
       return {
         url: {
+          add: 'workClass/add.do',
+          edit: 'workClass/edit.do',
+          delete: 'workClass/delete.do',
           paging: 'workClass/dataGrid.do'
         },
         data: [{
@@ -338,12 +341,12 @@
         vm.$http.post('workClass/dataGrid.do', {}).then(res => {
           let data = util.extend(res.data)
           let workClassId = []
-          for (let i = 0; i < data.length; i++) {
+          data.forEach(item => {
             workClassId.push({
-              'value': data[i].id,
-              'label': data[i].className
+              'value': item.id,
+              'label': item.className
             })
-          }
+          })
         })
       }
     },

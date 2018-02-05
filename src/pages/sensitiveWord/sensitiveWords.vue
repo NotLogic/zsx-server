@@ -48,6 +48,13 @@
     },
     data () {
       return {
+        url: {
+          add: 'sensitiveWord/add.do',
+          edit: 'sensitiveWord/edit.do',
+          delete: 'sensitiveWord/delete.do',
+          paging: 'sensitiveWord/dataGrid.do',
+          refurbish: 'sensitiveWord/refurbish.do' //词库立即生效
+        },
         currDialog: 'edit',
         dialogShow: false,
         dialogSubmitLoading: false,

@@ -90,7 +90,7 @@
         </Row>
       </Form>
       <div slot="footer">
-        <Button @click="resetDialog">{{label.clear}}</Button>
+        <Button @click="resetDialogForm('formDialog')">{{label.clear}}</Button>
         <Button type="primary" @click="submitDialogForm('formDialog')" :loading="dialogSubmitLoading">{{label.submit}}</Button>
       </div>
     </Modal>
@@ -108,6 +108,12 @@
     },
     data: function () {
       return {
+        url: {
+          add: 'gover/add.do',
+          edit: 'gover/edit.do',
+          delete: 'gover/delete.do',
+          paging: 'gover/dataGrid.do'
+        },
         currDialog: 'edit',
         dialogShow: false,
         dialogSubmitLoading: false,

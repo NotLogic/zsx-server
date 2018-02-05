@@ -122,6 +122,13 @@
     },
     data () {
       return {
+        url: {
+          add: 'thirdpartySetting/add.do',
+          edit: 'thirdpartySetting/edit.do',
+          delete: 'thirdpartySetting/delete.do',
+          paging: 'thirdpartySetting/dataGrid.do',
+          debugger: 'thirdpartySetting/debug.do'
+        },
         currDialog: 'edit',
         dialogShow: false,
         dialogSubmitLoading: false,

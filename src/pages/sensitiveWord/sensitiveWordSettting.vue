@@ -43,6 +43,13 @@
     },
     data: function () {
       return {
+        url: {
+          add: 'sensitiveWordSettting/add.do',
+          edit: 'sensitiveWordSettting/edit.do',
+          delete: 'sensitiveWordSettting/delete.do',
+          paging: 'sensitiveWordSettting/dataGrid.do',
+          defaultRule: 'sensitiveWordSettting/setting.do' //设置默认规则
+        },
         currDialog: 'edit',
         dialogShow: false,
         dialogSubmitLoading: false,

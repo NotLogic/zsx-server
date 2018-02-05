@@ -42,6 +42,7 @@
       return {
         loginUrl: 'login2Index.do',
         loginUrl2: '/api/login2Index.do',
+        test: true,
         rememberMe: true,
         loginForm: {
           "username": "",
@@ -64,29 +65,35 @@
         let vm = this
         vm.$refs.loginForm.validate((valid) => {
           if (valid) {
-            // 登陆成功操作
-            if (vm.rememberMe) {
-              // 或者存后台返回的用户信息
-              localStorage.user = JSON.stringify(vm.loginForm)
+            vm.test = false
+            if (!vm.test) {
+              vm.$http.post(vm.loginUrl, vm.loginForm).then(function (res) {
+                if (res.code == 1) {
+                  vm.fn()
+                }
+              })
             } else {
-              if (localStorage.user) {
-                localStorage.removeItem('user')
-              }
+              vm.fn()
             }
-            // 登陆之后保存用户信息到sessionStorage
-            sessionStorage.user = JSON.stringify(vm.loginForm)
-            vm.$Message.success('登陆成功')
-            vm.$router.push({
-              name: 'home'
-            })
-            // 登陆成功操作 end
-            return
-            vm.$http.post(vm.loginUrl, vm.loginForm).then(function (res) {
-              if (res.code == 1) {
-                // 如果登陆成功
-              }
-            })
+            
           }
+        })
+      },
+      fn () {
+        let vm = this
+        if (vm.rememberMe) {
+          // 或者存后台返回的用户信息
+          localStorage.user = JSON.stringify(vm.loginForm)
+        } else {
+          if (localStorage.user) {
+            localStorage.removeItem('user')
+          }
+        }
+        // 登陆之后保存用户信息到sessionStorage
+        sessionStorage.user = JSON.stringify(vm.loginForm)
+        vm.$Message.success('登陆成功')
+        vm.$router.push({
+          name: 'home'
         })
       }
     },
@@ -101,7 +108,10 @@
     },
     mounted () {
       if (localStorage.user) {
-        this.loginForm = JSON.parse(localStorage.user)
+        let obj = JSON.parse(localStorage.user)
+        for (let key in this.loginForm) {
+          this.loginForm[key] = obj[key]
+        }
       }
     }
   }

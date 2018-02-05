@@ -86,6 +86,12 @@
     },
     data () {
       return {
+        url: {
+          add: 'thirdpartyClass/add.do',
+          edit: 'thirdpartyClass/edit.do',
+          delete: 'thirdpartyClass/delete.do',
+          paging: 'thirdpartyClass/dataGrid.do'
+        },
         currDialog: 'edit',
         dialogShow: false,
         dialogSubmitLoading: false,
