@@ -65,7 +65,6 @@
         let vm = this
         vm.$refs.loginForm.validate((valid) => {
           if (valid) {
-            vm.test = false
             if (!vm.test) {
               vm.$http.post(vm.loginUrl, vm.loginForm).then(function (res) {
                 if (res.code == 1) {

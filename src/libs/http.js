@@ -1,7 +1,6 @@
 import axios from 'axios'
 import config from '@/config'
 import qs from 'querystring'
-import store from '@/vuex'
 const TIME_OUT = 5000
 let http = axios.create({
   baseURL: config.api,
@@ -13,6 +12,7 @@ let http = axios.create({
 http.interceptors.request.use(function (config) {
   // 在发送请求之前做些什么
   console.log('config: ', config)
+  config.method = config.method.toUpperCase()
   if (config.method === 'post') {
     // config.data 提交的数据
     config.data = qs.stringify(config.data)
@@ -28,9 +28,6 @@ http.interceptors.request.use(function (config) {
 http.interceptors.response.use(function (response) {
   // 对响应数据做点什么
   console.log('response: ', response)
-  if (typeof response.data === 'string' && response.data.indexOf('pageLogin') > -1) {
-    store.commit('exitToLogin')
-  }
   return response
 }, function (error) {
   // 对响应错误做点什么

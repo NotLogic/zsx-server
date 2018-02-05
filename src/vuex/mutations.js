@@ -178,5 +178,10 @@ export default {
     state.openedSubmenuArr = state.openedSubmenuArr.filter(item => {
       return item === name
     })
+  },
+  // -----------------------  action 提交的mutation  -------------------------------
+  // 更新每页显示的数据
+  paging (state, payload) {
+    state.pager.data = payload
   }
 }

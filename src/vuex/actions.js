@@ -1,15 +1,41 @@
-// import http from '@/libs/http'
+import http from '@/libs/http'
+import util from '@/libs/util'
 export default {
-  paging (state, currPage) {
-    console.log(currPage)
+  paging ({commit, state}, payload) {
+    if (typeof payload === 'string') {
+      state.pager.url = payload
+    }
+    let ajaxType = 'post'
+    if (typeof payload === 'object') {
+      for (let key in payload) {
+        if (key === 'method' || key === 'type') {
+          ajaxType = payload[key]
+          continue
+        }
+        state.pager[key] = payload[key]
+      }
+    }
+    // console.log('paging state.pager: ', state.pager)
+    http({
+      url: state.pager.url,
+      method: ajaxType,
+      data: util.pagingFiltData(util.extend(state.pager))
+    }).then(res => {
+      // console.log('workClass dataGrid res: ', res)
+      if (res.data) {
+        commit('paging', util.extend(res.data))
+      }
+    })
   },
-  submitDialogForm (state, payload) {
+  submitDialogForm (context, payload) {
     // 成功后重置表单
-    state.dialogShow = false
+    payload.vm.dialogShow = false
     payload.vm.resetDialogForm(payload.name)
   },
-  submitSearch (state, name) { },
-  delRow (state, payload) {
+  submitSearch (context, payload) {
+    console.log(payload)
+  },
+  delRow (context, payload) {
     console.log(payload)
   }
 }

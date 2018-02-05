@@ -1,7 +1,7 @@
 <template>
   <div class="wrapper-pagination">
     <Button shape="circle" icon="ios-refresh-empty" style="margin-right: 10px;" @click="paging"></Button>
-    <Page :total="total" show-sizer show-elevator :current="currPage" :page-size="pagesize" :page-size-opts="pageSizeOpts" @on-change="pagingNumChange" @on-page-size-change="pagingSizeChange"></Page>
+    <Page :total="pager.total" show-sizer show-elevator :current="pager.currPage" :page-size="pagesize" :page-size-opts="pageSizeOpts" @on-change="pagingNumChange" @on-page-size-change="pagingSizeChange"></Page>
   </div>
 </template>
 
@@ -21,28 +21,26 @@
         }
       }
     },
-    computed: {      
-      total () {
-        return this.$store.state.pager.total
-      },
-      currPage () {
-        return this.$store.state.pager.currPage
+    computed: {
+      pager () {
+        return this.$store.state.pager
       }
     },
     methods: {
       pagingNumChange (currPage) {
         console.log('当前页： ', currPage)
-        this.paging(currPage)
+        this.paging('currPage', currPage)
       },
       pagingSizeChange (pageSize) {
         console.log('每页几个： ', pageSize)
+        this.paging('pageSize', pageSize)
       },
-      paging (currPage) {
+      paging (key, value) {
         let vm = this
-        vm.$store.dispatch('paging', {
-          'vm': vm,
-          'currPage': currPage
-        })
+        let payload = {}
+        let payloadKey = '"' + key + '"'
+        payload[payloadKey] = value
+        vm.$store.dispatch('paging', payload)
       }
     },
     mounted () {}

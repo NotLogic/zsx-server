@@ -125,7 +125,7 @@ const util = {
         delete obj[key]
       }
     }
-    if (typeof obj.data !== 'undefined') {
+    if (obj.data) {
       delete obj.data
     }
     return obj

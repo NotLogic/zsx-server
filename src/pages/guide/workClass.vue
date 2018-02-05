@@ -1,6 +1,6 @@
 <template>
   <div class="work-class">
-    <Form :model="formSearch" ref="formSearch" :rules="rules" inline :label-width="80">
+    <Form :model="formSearch" ref="formSearch" :rules="searchRules" inline :label-width="80">
         <FormItem label="分类名称" prop="className">
             <Input v-model="formSearch.className" placeholder="分类名称" size="small" style="width: 120px"></Input>
         </FormItem>
@@ -302,7 +302,8 @@
           classType: [
             {required: true, message: '分类类别不能为空', trigger: 'change'}
           ]
-        }
+        },
+        searchRules: {}
       }
     },
     methods: {
@@ -318,6 +319,13 @@
         // 重置一些this.$refs[name].resetFields()无法重置的内容
         this.derail_address_obj_s = []
         this.$refs[name].resetFields()
+      },
+      submitSearch (name) {
+        let vm = this
+        vm.$store.dispatch('submitSearch', {
+          'vm': vm,
+          'name': name
+        })
       },
       resetDialogForm (name) {
         this.provinceCity = []
@@ -362,8 +370,11 @@
     watch: {},
     // 生命周期钩子函数VNode替换原始dom时触发，钩子函数函数
     mounted () {
-      this.$store.state.pager.data = this.data
-      this.initData()
+      let vm = this
+      vm.$store.state.pager.data = this.data
+      vm.initData()
+      // 传url字符串或对象格式的参数
+      vm.$store.dispatch('paging', vm.url.paging)
     }
   }
 </script>
