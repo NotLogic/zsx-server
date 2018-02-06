@@ -30,51 +30,61 @@
             </FormItem>
           </Col>
           <Col span="12">
-            <FormItem label="图片" prop="images">
-              <Upload name="upfile"
-                      action="ueditor/upload.do"
-                      :on-success="handleSuccess"
-                      :show-upload-list="false"
-                      :format="['jpg','jpeg','png']"
-                      :on-format-error="handleFormatError">
-                <Button type="ghost" icon="ios-cloud-upload-outline">上传文件</Button>
-              </Upload>
-            </FormItem>
-          </Col>
-        </Row>
-        <Row>
-          <Col span="12">
             <FormItem label="所属地区" prop="aa">
               <Cascader :data="derail_address_arr" v-model="derail_address_obj_sub" @on-change="subAddrChange" filterable style="margin-top: 5px"></Cascader>
             </FormItem>
           </Col>
+        </Row>
+        <Row>
           <Col span="12">
             <FormItem label="政务来源" prop="governmentSource">
               <Input v-model="formDialog.governmentSource" placeholder="请输入政务来源"></Input>
             </FormItem>
           </Col>
-        </Row>
-        <Row>
           <Col span="12">
             <FormItem label="来源Url" prop="sourceUrl">
               <Input v-model="formDialog.sourceUrl" placeholder="请输入来源Url"></Input>
             </FormItem>
           </Col>
+        </Row>
+        <Row>
           <Col span="12">
             <FormItem label="政务发布时间" prop="governmentDate">
               <Date-picker type="date" v-model="formDialog.governmentDate" :editable="false" placeholder="请选择日期"></Date-picker>
             </FormItem>
           </Col>
-        </Row>
-        <Row>
           <Col span="12">
             <FormItem label="政务时间规则" prop="dateRule">
               <Input v-model="formDialog.dateRule" placeholder="请输入政务时间规则"></Input>
             </FormItem>
           </Col>
+        </Row>
+        <Row>
+          <Col span="12">
+            <FormItem label="图片" prop="images">
+              <Row>
+                <Col span="12">
+                  <div style="width:130px;border:1px solid #eee;">
+                    <img v-if="formDialog.image" style="max-width:100%;" :src="formDialog.image" />
+                    <img v-else style="max-width:100%;" src="static/images/img-upload-default.png"/>
+                  </div>
+                </Col>
+                <Col span="12" style="text-align:right;">
+                  <Upload name="upfile"
+                          action="ueditor/upload.do"
+                          :on-success="handleSuccess"
+                          :show-upload-list="false"
+                          :format="['jpg','jpeg','png']"
+                          :on-format-error="handleFormatError">
+                    <Button type="ghost" icon="ios-cloud-upload-outline">{{label.uploadImg}}</Button>
+                  </Upload>
+                </Col>
+              </Row>
+            </FormItem>
+          </Col>
           <Col span="12">
             <FormItem label="状态" prop="status">
-              <Select v-model="formDialog.status" placeholder="请选择政务状态" clearable>
+              <Select v-model="formDialog.status" placeholder="请选择政务状态" clearable style="width: 150px;">
                 <Option value="0">未发布</Option>
                 <Option value="1">已发布</Option>
               </Select>
@@ -119,15 +129,17 @@
         dialogSubmitLoading: false,
         data: [
           {
-            title: '阿斯顿',
-            image: '',
-            cityId: '',
-            areaId: '',
-            content: '手动阀手动阀',
-            sourceUrl: 'http://localhost:8090/policy/index',
-            policySoucre: 'sdf',
-            policyDate: 'sdffgh',
-            dateRule: 'fghghj',
+            id: '123123123123',
+            title: '请问',
+            provinceId: '210000',
+            cityId: '211000',
+            areaId: '211012',
+            image: 'http://res1.age06.com/FileStore/PortalIPSForQX/V3/d6cedf78-a699-4322-8d8b-af976fc94bc1/c3d432b8-290d-4a4c-9598-187342ae4d9d/c77ab157-e2d3-4c79-b92b-167e30b76d0c.jpg',
+            content: '阿斯加卡山东科技',
+            governmentSource: '电饭锅地方个',
+            sourceUrl: '去问问二翁热热无',
+            governmentDate: '阿萨德',
+            dateRule: '额外若翁人',
             status: '1'
           }
         ],
@@ -291,7 +303,8 @@
                     click: function () {
                       vm.$store.commit('editRow', {
                         'vm': vm,
-                        'params': params
+                        'data': params.row,
+                        'initDialog': vm.initDialog(params.row)
                       })
                     }
                   }
@@ -321,13 +334,15 @@
       resetDialogForm (name) {
         let vm = this
         vm.formDialog.id = '0'
+        vm.formDialog.image = ''
         vm.$refs[name].resetFields()
       },
       getProvinceCityArea () {},
       searchAddrChange () {},
       subAddrChange () {},
       handleSuccess () {},
-      handleFormatError () {}
+      handleFormatError () {},
+      initDialog (data) {}
     },
     computed: {
       label () {

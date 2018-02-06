@@ -30,7 +30,7 @@
                 :on-format-error="handleFormatError"
                 :show-upload-list="false"
                 style="display:inline-block;">
-          <Button type="primary" size="small" style="margin-top:5px;">导入事项Excel</Button>
+          <Button type="primary" size="small" style="margin-top:5px;">{{label.uploadExcel}}</Button>
         </Upload>
     </Form>
     <mainTable :columns="columns" :data="pager.data" :height="610"></mainTable>
@@ -57,32 +57,19 @@
             </FormItem>
           </Col>
           <Col span="12">
-            <FormItem label="事项图标" prop="matterIcon">
-              <Upload name="upfile"
-                      action="ueditor/upload.do"
-                      :on-success="handleSuccess"
-                      :show-upload-list="false"
-                      :format="['jpg','jpeg','png']"
-                      :on-format-error="handleImageFormatError"
-                      :max-size="2048">
-                <Button type="ghost" icon="ios-cloud-upload-outline">上传文件</Button>
-              </Upload>
-            </FormItem>
-          </Col>
-        </Row>
-        <Row>
-          <Col span="12">
-            <FormItem label="所属分类" prop="workClassId">
-              <Input v-model="formDialog.workClassId" placeholder="请输入事项来源"></Input>
-            </FormItem>
-          </Col>
-          <Col span="12">
             <FormItem label="发布时间" prop="matterCreateTime">
               <DatePicker type="date" v-model="formDialog.matterCreateTime" :editable="false" placeholder="请选择日期"></DatePicker>
             </FormItem>
           </Col>
         </Row>
         <Row>
+          <Col span="12">
+            <FormItem label="所属分类" prop="workClassId">
+              <Select v-model="formDialog.workClassId" placeholder="请选择所属分类" style="width: 150px;">
+                <Option v-for="item in workClassId" :value="item.value" :key="item.value">{{ item.label }}</Option>
+              </Select>
+            </FormItem>
+          </Col>
           <Col span="12">
             <FormItem label="办理条件" prop="requiredConditions">
               <Row>
@@ -95,6 +82,8 @@
               </Row>
             </FormItem>
           </Col>
+        </Row>
+        <Row>
           <Col span="12">
             <FormItem label="所需材料" prop="materialRequested">
               <Row>
@@ -103,6 +92,18 @@
                 </Col>
                 <Col span="6" style="text-align: right;">
                   <i-button size="small" type="primary" @click="showHandleDialog('handleModal','materialRequested')">{{label[currDialog]}}</i-button>
+                </Col>
+              </Row>
+            </FormItem>
+          </Col>
+          <Col span="12">
+            <FormItem label="网上流程" prop="onlineManagement">
+              <Row>
+                <Col span="18">
+                  <Input v-model="formDialog.onlineManagement" disabled placeholder="请添加网上流程"></Input>
+                </Col>
+                <Col span="6" style="text-align: right;">
+                  <i-button size="small" type="primary" @click="showHandleDialog('handleModal','onlineManagement')">{{label[currDialog]}}</i-button>
                 </Col>
               </Row>
             </FormItem>
@@ -117,27 +118,6 @@
           <Col span="12">
             <FormItem label="收费标准" prop="chargingStandard">
               <Input v-model="formDialog.chargingStandard" placeholder="请输入收费标准"></Input>
-            </FormItem>
-          </Col>
-        </Row>
-        <Row>
-          <Col span="12">
-            <FormItem label="网上流程" prop="onlineManagement">
-              <Row>
-                <Col span="18">
-                  <Input v-model="formDialog.onlineManagement" disabled placeholder="请添加网上流程"></Input>
-                </Col>
-                <Col span="6" style="text-align: right;">
-                  <i-button size="small" type="primary" @click="showHandleDialog('handleModal','onlineManagement')">{{label[currDialog]}}</i-button>
-                </Col>
-              </Row>
-            </FormItem>
-          </Col>
-          <Col span="12">
-            <FormItem label="事件状态">
-              <Select v-model="formDialog.matterStatus" placeholder="请选择事件状态">
-                <Option v-for="item in matterStatus" :value="item.value" :key="item">{{ item.label }}</Option>
-              </Select>
             </FormItem>
           </Col>
         </Row>
@@ -162,8 +142,39 @@
         </Row>
         <Row>
           <Col span="12">
+            <FormItem label="事项图标">
+              <Row>
+                <Col span="12">
+                  <div style="width:130px;border:1px solid #eee;">
+                    <img v-if="formDialog.matterIcon" style="max-width:100%;" :src="formDialog.matterIcon" />
+                    <img v-else style="max-width:100%;" src="static/images/img-upload-default.png"/>
+                  </div>
+                </Col>
+                <Col span="12" style="text-align:right;">
+                  <Upload name="upfile"
+                          action="ueditor/upload.do"
+                          :on-success="handleSuccess"
+                          :show-upload-list="false"
+                          :format="['jpg','jpeg','png']"
+                          :on-format-error="handleFormatError">
+                    <Button type="ghost" icon="ios-cloud-upload-outline">{{label.uploadImg}}</Button>
+                  </Upload>
+                </Col>
+              </Row>
+            </FormItem>
+          </Col>
+          <Col span="12">
+            <FormItem label="事件状态">
+              <Select v-model="formDialog.matterStatus" placeholder="请选择事件状态" style="width:150px;">
+                <Option v-for="item in matterStatus" :value="item.value" :key="item.value">{{ item.label }}</Option>
+              </Select>
+            </FormItem>
+          </Col>
+        </Row>
+        <Row>
+          <Col span="12">
             <FormItem label="省市" prop="derail_address_obj">
-              <Cascader :data="derail_address_arr" @on-change="addrChange" v-model="addrDialog.derail_address_obj" placeholder="请选择地址" clearabled="false"></Cascader>
+              <Cascader :data="derail_address_arr" @on-change="addrChange" v-model="addrDialog.derail_address_obj" placeholder="请选择地址" clearabled="false" style="width: 150px;"></Cascader>
             </FormItem>
           </Col>
           <Col span="12">
@@ -209,7 +220,7 @@
             'matterName': '广东省计划生育服务证',
             'serviceObject': '具备《广东省计划生育服务证》核发申请条件的个人',
             'matterSoucreName': '深圳市卫生和计划生育局',
-            'matterIcon': '',
+            'matterIcon': 'http://res1.age06.com/FileStore/PortalIPSForQX/V3/d6cedf78-a699-4322-8d8b-af976fc94bc1/c3d432b8-290d-4a4c-9598-187342ae4d9d/c77ab157-e2d3-4c79-b92b-167e30b76d0c.jpg',
             'workMatterClassName': '生育收养',
             'matterCreateTime': '2017-11-17 00:00:00',
             'requiredConditions': '户籍地在广东省内的育龄妇女（含未婚收养、未婚已生育、离婚及丧偶者）男方户籍地在广东省内，女方非广东省户籍但随夫居住在广东省内的育龄妇女',
@@ -224,7 +235,17 @@
             'workAddress': '事项地址'
           }
         ],
-        matterStatus: [],
+        workClassId: [],
+        matterStatus: [
+          {
+            value: '0',
+            label: '无效'
+          },
+          {
+            value: '1',
+            label: '有效'
+          }
+        ],
         derail_address_arr: [],
         addrDialog: {},
         derail_address_obj_s: [],
@@ -450,6 +471,7 @@
       },
       resetDialogForm (name) {
         let vm = this
+        vm.formDialog.matterIcon = ''
         vm.$refs[name].resetFields()
       },
       resetSearch (name) {
@@ -467,7 +489,20 @@
         return '数据成功'
       },
       addAddrBtn () {},
-      initData () {}
+      initData () {
+        let vm = this
+        // 初始化所属分类
+        vm.$http.post('workClass/dataGrid.do', {}).then(res => {
+          let workClassId = []
+          res.data.forEach(item => {
+            workClassId.push({
+              'value': item.id,
+              'label': item.className
+            })
+          })
+          vm.workClassId = workClassId
+        })
+      }
     },
     // 计算属性
     computed: {

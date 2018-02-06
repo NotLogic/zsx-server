@@ -11,7 +11,7 @@
                 :format="['xlsx']"
                 :on-format-error="handleFormatError"
                 :show-upload-list="false">
-          <Button type="primary" size="small">导入敏感词Excel</Button>
+          <Button type="primary" size="small">{{label.uploadExcel}}</Button>
         </Upload>
       </FormItem>
     </Form>

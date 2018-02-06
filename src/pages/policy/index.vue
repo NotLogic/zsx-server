@@ -30,46 +30,56 @@
             </FormItem>
           </Col>
           <Col span="12">
-            <FormItem label="图片" prop="images">
-              <Upload name="upfile"
-                      action="ueditor/upload.do"
-                      :on-success="handleSuccess"
-                      :show-upload-list="false"
-                      :format="['jpg','jpeg','png']"
-                      :on-format-error="handleFormatError">
-                <Button type="ghost" icon="ios-cloud-upload-outline">上传文件</Button>
-              </Upload>
-            </FormItem>
-          </Col>
-        </Row>
-        <Row>
-          <Col span="12">
             <FormItem label="来源地址" prop="sourceUrl">
               <Input v-model="formDialog.sourceUrl" placeholder="请输入来源地址"></Input>
             </FormItem>
           </Col>
+        </Row>
+        <Row>
           <Col span="12">
             <FormItem label="所属地区">
               <Cascader :data="derail_address_arr" v-model="derail_address_obj_sub" @on-change="subAddrChange" filterable style="margin-top: 5px"></Cascader>
             </FormItem>
           </Col>
-        </Row>
-        <Row>
           <Col span="12">
             <FormItem label="政策来源" prop="policySoucre">
               <Input v-model="formDialog.policySoucre" placeholder="请输入政策来源"></Input>
             </FormItem>
           </Col>
+        </Row>
+        <Row>
           <Col span="12">
             <FormItem label="政策时间" prop="policyDate">
               <Date-picker type="date" v-model="formDialog.policyDate" :editable="false" placeholder="请选择日期"></Date-picker>
             </FormItem>
           </Col>
-        </Row>
-        <Row>
           <Col span="12">
             <FormItem label="时间规则" prop="dateRule">
               <Input v-model="formDialog.dateRule" placeholder="请输入时间规则"></Input>
+            </FormItem>
+          </Col>
+        </Row>
+        <Row>
+          <Col span="12">
+            <FormItem label="图片" prop="images">
+              <Row>
+                <Col span="12">
+                  <div style="width:130px;border:1px solid #eee;">
+                    <img v-if="formDialog.image" style="max-width:100%;" :src="formDialog.image" />
+                    <img v-else style="max-width:100%;" src="static/images/img-upload-default.png"/>
+                  </div>
+                </Col>
+                <Col span="12" style="text-align:right;">
+                  <Upload name="upfile"
+                          action="ueditor/upload.do"
+                          :on-success="handleSuccess"
+                          :show-upload-list="false"
+                          :format="['jpg','jpeg','png']"
+                          :on-format-error="handleFormatError">
+                    <Button type="ghost" icon="ios-cloud-upload-outline">{{label.uploadImg}}</Button>
+                  </Upload>
+                </Col>
+              </Row>
             </FormItem>
           </Col>
           <Col span="12">
@@ -84,7 +94,7 @@
         <Row>
           <Col span="24">
             <FormItem label="内容" prop="content">
-              <Input v-model="formDialog.content" placeholder="富文本"></Input>
+              <ueditor :id="'policyUeditor'" :content="formDialog.content"></ueditor> 
             </FormItem>
           </Col>
         </Row>
@@ -100,11 +110,13 @@
 <script>
   import mainTable from '@/components/mainTable'
   import paging from '@/components/paging'
+  import ueditor from '@/components/ueditor'
   export default {
     name: 'policy',
     components: {
       mainTable,
-      paging
+      paging,
+      ueditor
     },
     data: function () {
       return {
@@ -120,7 +132,7 @@
         data: [
           {
             title: '阿斯顿',
-            image: '',
+            image: 'http://res1.age06.com/FileStore/PortalIPSForQX/V3/d6cedf78-a699-4322-8d8b-af976fc94bc1/c3d432b8-290d-4a4c-9598-187342ae4d9d/c77ab157-e2d3-4c79-b92b-167e30b76d0c.jpg',
             cityId: '',
             areaId: '',
             content: '手动阀手动阀',
@@ -321,6 +333,7 @@
       resetDialogForm (name) {
         let vm = this
         vm.formDialog.id = '0'
+        vm.formDialog.image = ''
         vm.$refs[name].resetFields()
       },
       getProvinceCityArea () {},

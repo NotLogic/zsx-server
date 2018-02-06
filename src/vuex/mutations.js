@@ -19,12 +19,6 @@ export default {
   },
   editRow (state, payload) {
     for (let key in payload.vm.formDialog) {
-      // 有些值需要number类型，数据类型不要转换
-      // if (typeof payload.data[key] === 'number') {
-      //   payload.vm.formDialog[key] = payload.data[key].toString()
-      // } else {
-      //   payload.vm.formDialog[key] = payload.data[key]
-      // }
       payload.vm.formDialog[key] = payload.data[key]
     }
     if (typeof payload.initDialog === 'function') {
@@ -181,7 +175,7 @@ export default {
   },
   // -----------------------  action 提交的mutation  -------------------------------
   // 更新每页显示的数据
-  paging (state, payload) {
-    state.pager.data = payload
+  paging (state, data) {
+    state.pager.data = data
   }
 }

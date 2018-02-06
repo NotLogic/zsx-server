@@ -62,7 +62,7 @@
                 </Col>
                 <Col span="12">
                   <Upload name="upfile" action="ueditor/upload.do" :show-upload-list="false" :on-success="handleSuccess">
-                    <i-button type="ghost" icon="ios-cloud-upload-outline">上传</i-button>
+                    <i-button type="ghost" icon="ios-cloud-upload-outline">{{label.uploadImg}}</i-button>
                   </Upload>
                 </Col>
               </Row>

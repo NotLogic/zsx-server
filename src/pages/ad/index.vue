@@ -81,7 +81,7 @@
                        action="ueditor/upload.do"
                        :show-upload-list="false"
                        :on-success="handleSuccess">
-                <Button type="ghost" icon="ios-cloud-upload-outline">上传</Button>
+                <Button type="ghost" icon="ios-cloud-upload-outline">{{label.uploadImg}}</Button>
               </Upload>
             </FormItem>
           </Col>

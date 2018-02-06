@@ -61,15 +61,21 @@
         <Row>
           <Col span="12">
             <FormItem label="分类图标" prop="classIcon">
-              <Upload name="upfile"
-                      action="ueditor/upload.do"
-                      :on-success="handleSuccess"
-                      :show-upload-list="false"
-                      :format="['jpg','jpeg','png']"
-                      :on-format-error="handleFormatError">
-                <Button type="ghost" icon="ios-cloud-upload-outline">上传文件</Button>
-              </Upload>
+              <div style="width:140px;">
+                <img v-if="formDialog.classIcon" style="max-width:100%;" :src="formDialog.classIcon" />
+                <img v-else style="max-width:100%;" src="static/images/img-upload-default.png"/>
+              </div>
             </FormItem>
+          </Col>
+          <Col span="12">    
+            <Upload name="upfile"
+                    action="ueditor/upload.do"
+                    :on-success="handleSuccess"
+                    :show-upload-list="false"
+                    :format="['jpg','jpeg','png']"
+                    :on-format-error="handleFormatError">
+              <Button type="ghost" icon="ios-cloud-upload-outline">{{label.uploadImg}}</Button>
+            </Upload>
           </Col>
         </Row>
       </Form>
@@ -102,9 +108,9 @@
         data: [{
           id: '123213',
           className: 'qweqwe',
-          classIcon: 'sdfdsf',
-          classType: 'sdfdsf',
-          cityCode: 'sdfdsfd',
+          classIcon: 'http://res1.age06.com/FileStore/PortalIPSForQX/V3/d6cedf78-a699-4322-8d8b-af976fc94bc1/c3d432b8-290d-4a4c-9598-187342ae4d9d/c77ab157-e2d3-4c79-b92b-167e30b76d0c.jpg',
+          classType: '0',
+          cityCode: '221100',
           classStatus: '1'
         }],
         currDialog: 'add',
@@ -118,28 +124,10 @@
             children: [
               {
                 label: '东区',
-                value: '111100',
-                children: [
-                  {
-                    label: '东门',
-                    value: '111111'
-                  }, {
-                    label: '西门',
-                    value: '111112'
-                  }
-                ]
+                value: '111100'
               }, {
                 label: '西区',
-                value: '111200',
-                children: [
-                  {
-                    label: '南门',
-                    value: '111113'
-                  }, {
-                    label: '北门',
-                    value: '111114'
-                  }
-                ]
+                value: '111200'
               }
             ]
           }, {
@@ -148,28 +136,10 @@
             children: [
               {
                 label: '郑州',
-                value: '221100',
-                children: [
-                  {
-                    label: '这区',
-                    value: '221111'
-                  }, {
-                    label: '那区',
-                    value: '221112'
-                  }
-                ]
+                value: '221100'
               }, {
                 label: '许昌',
-                value: '221200',
-                children: [
-                  {
-                    label: '许昌县',
-                    value: '221211'
-                  }, {
-                    label: '襄城县',
-                    value: '221212'
-                  }
-                ]
+                value: '221200'
               }
             ]
           }
@@ -340,22 +310,6 @@
       },
       initData () {
         let vm = this
-        vm.$http.post(vm.url.paging, {}).then(function (res) {
-            console.log(res)
-        })
-      },
-      getWorkClassId (state) {
-        let vm = this
-        vm.$http.post('workClass/dataGrid.do', {}).then(res => {
-          let data = util.extend(res.data)
-          let workClassId = []
-          data.forEach(item => {
-            workClassId.push({
-              'value': item.id,
-              'label': item.className
-            })
-          })
-        })
       }
     },
     // 计算属性
@@ -372,9 +326,19 @@
     mounted () {
       let vm = this
       vm.$store.state.pager.data = this.data
+      // 初始化其他数据
       vm.initData()
-      // 传url字符串或对象格式的参数
-      vm.$store.dispatch('paging', vm.url.paging)
+      // 初始化页面数据
+      let onOffAjax = true
+      vm.$store.state.cachePage.forEach(item => {
+        if (sessionStorage.currentPageName && item === sessionStorage.currentPageName) {
+          onOffAjax = false
+        }
+      });
+      if (onOffAjax) {
+        // 传url字符串或对象格式的参数
+        vm.$store.dispatch('paging', vm.url.paging)
+      }
     }
   }
 </script>
