@@ -111,6 +111,8 @@
   import mainTable from '@/components/mainTable'
   import paging from '@/components/paging'
   import ueditor from '@/components/ueditor'
+  // 为什么下边的会提示模块找不到
+  // import ueditor from '@/components/ueditor/text-editor'
   export default {
     name: 'policy',
     components: {
