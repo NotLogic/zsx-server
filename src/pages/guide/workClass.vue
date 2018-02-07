@@ -330,11 +330,11 @@
       vm.initData()
       // 初始化页面数据
       let onOffAjax = true
-      vm.$store.state.cachePage.forEach(item => {
-        if (sessionStorage.currentPageName && item === sessionStorage.currentPageName) {
-          onOffAjax = false
-        }
-      });
+      // vm.$store.state.cachePage.forEach(item => {
+      //   if (sessionStorage.currentPageName && item === sessionStorage.currentPageName) {
+      //     onOffAjax = false
+      //   }
+      // })
       if (onOffAjax) {
         // 传url字符串或对象格式的参数
         vm.$store.dispatch('paging', vm.url.paging)

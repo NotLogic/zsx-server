@@ -41,8 +41,6 @@
     data () {
       return {
         loginUrl: 'login2Index.do',
-        loginUrl2: '/api/login2Index.do',
-        test: true,
         rememberMe: true,
         loginForm: {
           "username": "",
@@ -65,16 +63,11 @@
         let vm = this
         vm.$refs.loginForm.validate((valid) => {
           if (valid) {
-            if (!vm.test) {
-              vm.$http.post(vm.loginUrl, vm.loginForm).then(function (res) {
-                if (res.code == 1) {
-                  vm.fn()
-                }
-              })
-            } else {
-              vm.fn()
-            }
-            
+            vm.$http.post(vm.loginUrl, vm.loginForm).then(function (res) {
+              if (res.data.code == 1) {
+                vm.fn()
+              }
+            })
           }
         })
       },

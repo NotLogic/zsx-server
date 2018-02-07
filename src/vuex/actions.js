@@ -15,13 +15,11 @@ export default {
         state.pager[key] = payload[key]
       }
     }
-    // console.log('paging state.pager: ', state.pager)
     http({
       url: state.pager.url,
       method: ajaxType,
       data: util.pagingFiltData(util.extend(state.pager))
     }).then(res => {
-      // console.log('workClass dataGrid res: ', res)
       if (res.data) {
         commit('paging', util.extend(res.data))
       }
