@@ -105,45 +105,11 @@
           delete: 'workClass/delete.do',
           paging: 'workClass/dataGrid.do'
         },
-        data: [{
-          id: '123213',
-          className: 'qweqwe',
-          classIcon: 'http://res1.age06.com/FileStore/PortalIPSForQX/V3/d6cedf78-a699-4322-8d8b-af976fc94bc1/c3d432b8-290d-4a4c-9598-187342ae4d9d/c77ab157-e2d3-4c79-b92b-167e30b76d0c.jpg',
-          classType: '0',
-          cityCode: '221100',
-          classStatus: '1'
-        }],
         currDialog: 'add',
         dialogShow: false,
         dialogSubmitLoading: false,
         derail_address_obj_s: [],
-        provinceCityData: [
-          {
-            label: '北京',
-            value: '110000',
-            children: [
-              {
-                label: '东区',
-                value: '111100'
-              }, {
-                label: '西区',
-                value: '111200'
-              }
-            ]
-          }, {
-            label: '河南',
-            value: '220000',
-            children: [
-              {
-                label: '郑州',
-                value: '221100'
-              }, {
-                label: '许昌',
-                value: '221200'
-              }
-            ]
-          }
-        ],
+        provinceCityData: [],
         provinceCity: [],
         formSearch: {
           input: '',
@@ -174,7 +140,10 @@
             title: '关联区域',
             key: 'cityCode',
             render: (create, params) => {
-              var txt = this.getAddrByCityId(params.row.cityCode)
+              var txt = '无cityCode'
+              if (params.row.cityCode) {
+                txt = this.getAddrByCityId(params.row.cityCode)
+              }
               return create('span', txt)
             }
           },
@@ -193,9 +162,7 @@
             title: '分类图标',
             key: 'classIcon',
             render: function (create, params) {
-              if (params.row.classIcon === '' || params.row.classIcon === 'null') {
-                return create('span', '暂无图标')
-              } else {
+              if (params.row.classIcon) {
                 return create('img', {
                   style: {
                     margin: '5px 0',
@@ -206,6 +173,8 @@
                     src: params.row.classIcon
                   }
                 })
+              } else {
+                return create('span', '暂无图标')
               }
             }
           },
@@ -281,9 +250,10 @@
         this.$store.commit('addRow', this)
       },
       initDialog (data) {
-        this.formDialog.cityCode = data.cityCode
-        this.provinceCity = [data.cityCode.toString().slice(0, 2) + '0000', data.cityCode.toString().slice(0, 4) + '00', data.cityCode.toString()]
-        this.formDialog.classStatus = data.classStatus
+        let _data = util.extend(data)
+        this.formDialog.cityCode = _data.cityCode
+        this.provinceCity = [_data.cityCode.toString().slice(0, 2) + '0000', _data.cityCode.toString().slice(0, 4) + '00', _data.cityCode.toString()]
+        this.formDialog.classStatus = _data.classStatus
       },
       resetSearch (name) {
         // 重置一些this.$refs[name].resetFields()无法重置的内容
@@ -325,7 +295,6 @@
     // 生命周期钩子函数VNode替换原始dom时触发，钩子函数函数
     mounted () {
       let vm = this
-      vm.$store.state.pager.data = this.data
       // 初始化其他数据
       vm.initData()
       // 初始化页面数据
@@ -337,7 +306,7 @@
       // })
       if (onOffAjax) {
         // 传url字符串或对象格式的参数
-        vm.$store.dispatch('paging', vm.url.paging)
+        // vm.$store.dispatch('paging', vm.url.paging)
       }
     }
   }

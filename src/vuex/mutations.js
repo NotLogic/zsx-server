@@ -177,5 +177,14 @@ export default {
   // 更新每页显示的数据
   paging (state, data) {
     state.pager.data = data
+  },
+  submitDialogForm (state) {
+
+  },
+  submitSearch (state) {
+
+  },
+  delRow (state) {
+    
   }
 }

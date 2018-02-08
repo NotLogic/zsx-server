@@ -1,7 +1,7 @@
 <template>
   <div class="wrapper-pagination">
     <Button shape="circle" icon="ios-refresh-empty" style="margin-right: 10px;" @click="paging"></Button>
-    <Page :total="pager.total" show-sizer show-elevator :current="pager.currPage" :page-size="pagesize" :page-size-opts="pageSizeOpts" @on-change="pagingNumChange" @on-page-size-change="pagingSizeChange"></Page>
+    <Page :total="pager.total" show-sizer show-elevator :current="pager.currPage" :page-size="pagesize" placement="top" :page-size-opts="pageSizeOpts" @on-change="pagingNumChange" @on-page-size-change="pagingSizeChange"></Page>
   </div>
 </template>
 

@@ -15,6 +15,7 @@ export default {
         state.pager[key] = payload[key]
       }
     }
+    console.log(util.pagingFiltData(util.extend(state.pager)))
     http({
       url: state.pager.url,
       method: ajaxType,
@@ -25,15 +26,18 @@ export default {
       }
     })
   },
-  submitDialogForm (context, payload) {
+  submitDialogForm ({ commit, state }, payload) {
     // 成功后重置表单
     payload.vm.dialogShow = false
     payload.vm.resetDialogForm(payload.name)
+    commit('submitDialogForm')
   },
-  submitSearch (context, payload) {
+  submitSearch ({ commit, state }, payload) {
     console.log(payload)
+    commit('submitSearch')
   },
-  delRow (context, payload) {
+  delRow ({ commit, state }, payload) {
     console.log(payload)
+    commit('delRow')
   }
 }

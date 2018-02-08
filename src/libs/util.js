@@ -128,6 +128,12 @@ const util = {
     if (obj.data) {
       delete obj.data
     }
+    if (obj.url || obj.url === '') {
+      delete obj.url
+    }
+    if (obj.total) {
+      delete obj.total
+    }
     return obj
   },
   // 更新面包屑

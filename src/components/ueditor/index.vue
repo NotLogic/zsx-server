@@ -28,7 +28,7 @@ export default {
       tinymce.init({
         mode: 'textarea',
         // selector: el,
-        selector: '#asdsaasdad',
+        selector: '#tinymceEditer',
         theme : 'advanced',
         branding: false,
         elementpath: false,

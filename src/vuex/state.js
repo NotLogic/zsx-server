@@ -19,7 +19,7 @@ export default {
     'order': '',
     'pagesize': 10,
     'sort': '',
-    'total': 1,
+    'total': 40,
     'data': []
   },
   map: {
