@@ -258,8 +258,10 @@ const util = {
       method: vm.pager.method,
       data: util.pagingFiltData(util.extend(vm.pager))
     }).then(res => {
-      if (res.data) {
-        vm.pager.data = util.extend(res.data.data)
+      if (res.data.code == 1) {
+        let _data = util.extend(res.data.data)
+        vm.pager.data = _data.data
+        vm.pager.total = _data.total
       }
     })
   },

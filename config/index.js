@@ -69,9 +69,11 @@ module.exports = {
      * Source Maps
      */
 
-    productionSourceMap: true,
+    // productionSourceMap: true,
+    productionSourceMap: false, // 打包不产生js map文件
     // https://webpack.js.org/configuration/devtool/#production
-    devtool: '#source-map',
+    // devtool: '#source-map',
+    devtool: false, // 打包不产生css map文件
 
     // Gzip off by default as many popular static hosts such as
     // Surge or Netlify already gzip all static assets for you.
