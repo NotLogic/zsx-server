@@ -47,17 +47,10 @@
           add: 'sensitiveWordSettting/add.do',
           edit: 'sensitiveWordSettting/edit.do',
           delete: 'sensitiveWordSettting/delete.do',
-          paging: 'sensitiveWordSettting/dataGrid.do',
           defaultRule: 'sensitiveWordSettting/setting.do' //设置默认规则
         },
         pager: {
-          'url': '',
-          'currPage': 1,
-          'order': '',
-          'pagesize': 10,
-          'sort': '',
-          'total': 40,
-          'data': []
+          url: 'sensitiveWordSettting/dataGrid.do'
         },
         currDialog: 'add',
         dialogShow: false,
@@ -165,9 +158,14 @@
         vm.$refs[name].resetFields()
       },
       submitDialogForm (name) {},
-      initDialog () {}
+      initDialog () {},
+      initData () {}
     },
     mounted () {
+      let vm = this
+      vm.initData()
+      vm.$store.commit('initPager', vm)
+      vm.util.paging(vm)
     }
   }
 </script>

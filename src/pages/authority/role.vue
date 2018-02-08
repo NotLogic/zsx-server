@@ -59,14 +59,13 @@
     },
     data () {
       return {
+        url: {
+          add: 'role/add.do',
+          edit: 'role/edit.do',
+          delete: 'role/delete.do'
+        },
         pager: {
-          'url': '',
-          'currPage': 1,
-          'order': '',
-          'pagesize': 10,
-          'sort': '',
-          'total': 40,
-          'data': []
+          url: 'role/dataGrid.do'
         },
         currDialog: 'add',
         treeCheckNodeArr: [],
@@ -313,7 +312,10 @@
       }
     },
     mounted () {
+      let vm = this
       // this.getTreeDataByAppRoutes()
+      vm.$store.commit('initPager', vm)
+      vm.util.paging(vm)
     },
     watch: {}
   }

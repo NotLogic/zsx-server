@@ -13,6 +13,16 @@ export default {
     'uploadImg': '上传图片',
     'uploadExcel': '导入Excel'
   },
+  pager: {
+    'url': '',
+    'currPage': 1,
+    'method': 'post',
+    'order': '',
+    'pagesize': 10,
+    'sort': '',
+    'total': 40,
+    'data': []
+  },
   map: {
     'sex': {
       '1': '男',

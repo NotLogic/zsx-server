@@ -96,14 +96,15 @@
     },
     data: function () {
       return {
+        url: {
+          add: 'news/add.do',
+          edit: 'news/edit.do',
+          delete: 'news/delete.do'
+        },
         pager: {
-          'url': '',
-          'currPage': 1,
-          'order': '',
-          'pagesize': 10,
-          'sort': '',
-          'total': 40,
-          'data': []
+          url: 'news/dataGrid.do',
+          sort: 'createTime',
+          order: 'desc'
         },
         currDialog: 'add',
         dialogShow: false,
@@ -329,9 +330,14 @@
         let vm = this
         vm.$refs[name].resetFields()
       },
-      initDialog (data) {}
+      initDialog (data) {},
+      initData () {}
     },
     mounted () {
+      let vm = this
+      vm.initData()
+      vm.$store.commit('initPager', vm)
+      vm.util.paging(vm)
     }
   }
 </script>

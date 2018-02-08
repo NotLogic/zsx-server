@@ -127,17 +127,10 @@
           add: 'thirdpartySetting/add.do',
           edit: 'thirdpartySetting/edit.do',
           delete: 'thirdpartySetting/delete.do',
-          paging: 'thirdpartySetting/dataGrid.do',
           debugger: 'thirdpartySetting/debug.do'
         },
         pager: {
-          'url': '',
-          'currPage': 1,
-          'order': '',
-          'pagesize': 10,
-          'sort': '',
-          'total': 40,
-          'data': []
+          url: 'thirdpartySetting/dataGrid.do'
         },
         currDialog: 'add',
         dialogShow: false,
@@ -303,9 +296,14 @@
       submitSearch (name) {
         console.log('搜索')
       },
-      initDialog (data) {}
+      initDialog (data) {},
+      initData () {}
     },
     mounted () {
+      let vm = this
+      vm.initData()
+      vm.$store.commit('initPager', vm)
+      vm.util.paging(vm)
     }
   }
 </script>

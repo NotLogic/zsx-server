@@ -170,14 +170,15 @@
     },
     data () {
       return {
+        url: {
+          add: 'ad/add.do',
+          edit: 'ad/edit.do',
+          delete: 'ad/delete.do'
+        },
         pager: {
-          'url': '',
-          'currPage': 1,
-          'order': '',
-          'pagesize': 10,
-          'sort': '',
-          'total': 40,
-          'data': []
+          url: 'ad/dataGrid.do',
+          tSort: 'createTime',
+          order: 'desc'
         },
         currDialog: 'add',
         dialogShow: false,
@@ -476,9 +477,14 @@
       areaTypeChange_s () {},
       handleSuccess () {},
       postionChange () {},
-      initDialog () {}
+      initDialog () {},
+      initData () {}
     },
     mounted () {
+      let vm = this
+      vm.initData()
+      vm.$store.commit('initPager', vm)
+      vm.util.paging(vm)
     }
   }
 </script>

@@ -113,14 +113,15 @@
     },
     data () {
       return {
+        url: {
+          add: 'member/add.do',
+          edit: 'member/edit.do',
+          delete: 'member/delete.do'
+        },
         pager: {
-          'url': '',
-          'currPage': 1,
-          'order': '',
-          'pagesize': 10,
-          'sort': '',
-          'total': 40,
-          'data': []
+          url: 'member/dataGrid.do',
+          sort: 'createTime',
+          order: 'desc'
         },
         derail_address_arr: [],
         derail_address_obj_s_h: [],
@@ -298,7 +299,8 @@
         this.formSearch.userType = ''
         this.formSearch.status = ''
         this.$refs[name].resetFields()
-      }
+      },
+      initData () {}
     },
     computed: {
       label () {
@@ -306,6 +308,10 @@
       }
     },
     mounted () {
+      let vm = this
+      vm.initData()
+      vm.$store.commit('initPager', vm)
+      vm.util.paging(vm)
     }
   }
 </script>

@@ -6,12 +6,14 @@ import iView from 'iview'
 import 'babel-polyfill'
 import store from './vuex'
 import http from './libs/http.js' // 经过封装的axios
-// import utils from './libs/utils.js'
+import util from './libs/util.js'
 import 'iview/dist/styles/iview.css'
 import './styles/common.css'
 Vue.config.productionTip = false
 Vue.use(iView)
 Vue.prototype.$http = http
+// 将扩展方法挂在到Vue上
+Vue.prototype.util = util
 /* eslint-disable no-new */
 new Vue({
   el: '#app',

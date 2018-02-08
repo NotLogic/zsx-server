@@ -173,11 +173,15 @@ export default {
       return item === name
     })
   },
-  // -----------------------  action 提交的mutation  -------------------------------
-  // 更新每页显示的数据
-  paging (state, data) {
-    state.pager.data = data
+  // 初始化每页的pager
+  initPager (state, vm) {
+    let _data = util.extend(vm.pager)
+    vm.pager = state.pager
+    for (let key in _data) {
+      vm.pager[key] = _data[key]
+    }
   },
+  // -----------------------  action 提交的mutation  -------------------------------
   submitDialogForm (state) {
 
   },

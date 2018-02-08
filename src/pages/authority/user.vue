@@ -23,6 +23,7 @@
     </Form>
     <!-- <mainTable :columns="columns" :data="pager.data" :height="672"></mainTable> -->
     <mainTable :columns="columns" :data="pager.data"></mainTable>
+    <paging :total="pager.total" :currPage="pager.currPage"></paging>
     <Modal v-model="dialogShow" :title="label[currDialog]" :mask-closable="false" width="750" @on-cancel="resetDialogForm('formDialog')">
       <Form :model="formDialog" ref="formDialog" :rules="rules" :label-width="80">
         <Row>
@@ -85,21 +86,24 @@
 
 <script>
   import mainTable from '@/components/mainTable'
+  import paging from '@/components/paging'
   export default {
     name: 'user',
     components: {
-      mainTable
+      mainTable,
+      paging
     },
     data () {
       return {
+        url: {
+          add: 'user/add.do',
+          edit: 'user/edit.do',
+          delete: 'user/delete.do'
+        },
         pager: {
-          'url': '',
-          'currPage': 1,
-          'order': '',
-          'pagesize': 10,
-          'sort': '',
-          'total': 40,
-          'data': []
+          url: 'user/dataGrid.do',
+          sort: 'createTime',
+          order: 'desc'
         },
         currDialog: 'add',
         dialogShow: false,

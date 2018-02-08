@@ -100,17 +100,10 @@
         url: {
           add: 'workClass/add.do',
           edit: 'workClass/edit.do',
-          delete: 'workClass/delete.do',
-          paging: 'workClass/dataGrid.do'
+          delete: 'workClass/delete.do'
         },
         pager: {
-          'url': '',
-          'currPage': 1,
-          'order': '',
-          'pagesize': 10,
-          'sort': '',
-          'total': 40,
-          'data': []
+          url: 'workClass/dataGrid.do'
         },
         currDialog: 'add',
         dialogShow: false,
@@ -300,19 +293,9 @@
     // 生命周期钩子函数VNode替换原始dom时触发，钩子函数函数
     mounted () {
       let vm = this
-      // 初始化其他数据
       vm.initData()
-      // 初始化页面数据
-      let onOffAjax = true
-      // vm.$store.state.cachePage.forEach(item => {
-      //   if (sessionStorage.currentPageName && item === sessionStorage.currentPageName) {
-      //     onOffAjax = false
-      //   }
-      // })
-      if (onOffAjax) {
-        // 传url字符串或对象格式的参数
-        // vm.$store.dispatch('paging', vm.url.paging)
-      }
+      vm.$store.commit('initPager', vm)
+      vm.util.paging(vm)
     }
   }
 </script>

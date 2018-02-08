@@ -17,7 +17,7 @@
     </Form>
     <!-- <mainTable :columns="columns" :data="pager.data" :height="610"></mainTable> -->
     <mainTable :columns="columns" :data="pager.data"></mainTable>
-    <paging :total="pager.total" :currPage="pager.currPage" :pagesize="50" :page-size-opts="pageSizeOpts"></paging>
+    <paging :total="pager.total" :currPage="pager.currPage" :pagesize="pager.pagesize" :page-size-opts="pageSizeOpts"></paging>
     <Modal v-model="dialogShow" :title="label[currDialog]" :mask-closable="false" @on-cancel="resetDialogForm('formDialog')">
       <Form :model="formDialog" ref="formDialog" :rules="rules" :label-width="80">
         <Row>
@@ -53,17 +53,12 @@
           add: 'sensitiveWord/add.do',
           edit: 'sensitiveWord/edit.do',
           delete: 'sensitiveWord/delete.do',
-          paging: 'sensitiveWord/dataGrid.do',
+          paging: '',
           refurbish: 'sensitiveWord/refurbish.do' //词库立即生效
         },
         pager: {
-          'url': '',
-          'currPage': 1,
-          'order': '',
-          'pagesize': 10,
-          'sort': '',
-          'total': 40,
-          'data': []
+          url: 'sensitiveWord/dataGrid.do',
+          pagesize: 50
         },
         currDialog: 'add',
         dialogShow: false,
@@ -153,9 +148,14 @@
           'name': name
         })
       },
-      initDialog (data) {}
+      initDialog (data) {},
+      initData () {}
     },
     mounted () {
+      let vm = this
+      vm.initData()
+      vm.$store.commit('initPager', vm)
+      vm.util.paging(vm)
     }
   }
 </script>

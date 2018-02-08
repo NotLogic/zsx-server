@@ -89,17 +89,10 @@
         url: {
           add: 'thirdpartyClass/add.do',
           edit: 'thirdpartyClass/edit.do',
-          delete: 'thirdpartyClass/delete.do',
-          paging: 'thirdpartyClass/dataGrid.do'
+          delete: 'thirdpartyClass/delete.do'
         },
         pager: {
-          'url': '',
-          'currPage': 1,
-          'order': '',
-          'pagesize': 10,
-          'sort': '',
-          'total': 40,
-          'data': []
+          url: 'thirdpartyClass/dataGrid.do'
         },
         currDialog: 'add',
         dialogShow: false,
@@ -220,9 +213,14 @@
         vm.$refs[name].resetFields()
       },
       submitDialogForm (name) {},
-      initDialog (data) {}
+      initDialog (data) {},
+      initData () {}
     },
     mounted () {
+      let vm = this
+      vm.initData()
+      vm.$store.commit('initPager', vm)
+      vm.util.paging(vm)
     }
   }
 </script>

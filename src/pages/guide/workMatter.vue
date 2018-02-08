@@ -35,7 +35,7 @@
     </Form>
     <!-- <mainTable :columns="columns" :data="pager.data" :height="610"></mainTable> -->
     <mainTable :columns="columns" :data="pager.data"></mainTable>
-    <paging :total="pager.total" :currPage="pager.currPage"></paging>
+    <paging @changePager="changePager" :total="pager.total" :currPage="pager.currPage"></paging>
     <!-- 弹出框 -->
     <Modal v-model="dialogShow" :title="label[currDialog]" :mask-closable="false" width="750" @on-cancel="resetDialogForm('formDialog')">
       <Form :model="formDialog" ref="formDialog" :rules="rules" :label-width="80">
@@ -196,7 +196,6 @@
 <script>
   import mainTable from '@/components/mainTable'
   import paging from '@/components/paging'
-  // import util from '@/libs/util'
   export default {
     name: 'workMatter',
     components: {
@@ -209,17 +208,10 @@
           add: 'workMatter/add.do',
           edit: 'workMatter/edit.do',
           delete: 'workMatter/delete.do',
-          check: 'workMatter/checkName.do',
-          paging: 'workMatter/dataGrid.do'
+          check: 'workMatter/checkName.do'
         },
         pager: {
-          'url': '',
-          'currPage': 1,
-          'order': '',
-          'pagesize': 10,
-          'sort': '',
-          'total': 40,
-          'data': []
+          url: 'workMatter/dataGrid.do'
         },
         currDialog: 'add',
         dialogShow: false,
@@ -444,6 +436,10 @@
       }
     },
     methods: {
+      // 当前页或每页个数发生改变
+      changePager (data) {
+        this.util.changePager(this, data)
+      },
       upExeclSuccess (res) {
         if (res.code) {
           this.$Message.success('上传成功！')
@@ -500,9 +496,14 @@
       }
     },
     watch: {},
-    // 生命周期钩子函数VNode替换原始dom时触发，不是对象，切记
     mounted () {
-      this.initData()
+      let vm = this
+      // 初始化其他数据
+      vm.initData()
+      // 页面加载时初始化table数据
+      vm.$store.commit('initPager', vm)
+      vm.util.paging(vm)
+      // 页面加载时初始化table数据  end
     }
   }
 </script>

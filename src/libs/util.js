@@ -131,6 +131,9 @@ const util = {
     if (obj.url || obj.url === '') {
       delete obj.url
     }
+    if (obj.method) {
+      delete obj.method
+    }
     if (obj.total) {
       delete obj.total
     }
@@ -246,6 +249,28 @@ const util = {
       })
     }
     return parentName
+  },
+  // 请求页面table数据
+  paging (vm) {
+    let util = this
+    vm.$http({
+      url: vm.pager.url,
+      method: vm.pager.method,
+      data: util.pagingFiltData(util.extend(vm.pager))
+    }).then(res => {
+      if (res.data) {
+        vm.pager.data = util.extend(res.data.data)
+      }
+    })
+  },
+  // 修改 pager 请求提交的数据
+  changePager (vm, data) {
+    let util = this
+    let _data = util.extend(data)
+    for (let key in _data) {
+      vm.pager[key] = _data[key]
+    }
+    util.paging(vm)
   }
 }
 export default util

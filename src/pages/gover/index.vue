@@ -120,17 +120,10 @@
         url: {
           add: 'gover/add.do',
           edit: 'gover/edit.do',
-          delete: 'gover/delete.do',
-          paging: 'gover/dataGrid.do'
+          delete: 'gover/delete.do'
         },
         pager: {
-          'url': '',
-          'currPage': 1,
-          'order': '',
-          'pagesize': 10,
-          'sort': '',
-          'total': 40,
-          'data': []
+          url: 'gover/dataGrid.do'
         },
         currDialog: 'add',
         dialogShow: false,
@@ -334,7 +327,8 @@
       subAddrChange () {},
       handleSuccess () {},
       handleFormatError () {},
-      initDialog (data) {}
+      initDialog (data) {},
+      initData () {}
     },
     computed: {
       label () {
@@ -342,6 +336,10 @@
       }
     },
     mounted () {
+      let vm = this
+      vm.initData()
+      vm.$store.commit('initPager', vm)
+      vm.util.paging(vm)
     },
     watch: {}
   }
