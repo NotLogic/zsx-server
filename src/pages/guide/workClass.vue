@@ -23,8 +23,8 @@
         <Button type="primary" style="margin: 5px 8px 24px 0;" @click="submitSearch('formSearch')" size="small">{{label.search}}</Button>
         <Button type="primary" style="margin: 5px 8px 24px 0;" @click="addRow" size="small">{{label.add}}</Button>
     </Form>
-    <mainTable :columns="columns" :data="pager.data" :height="610"></mainTable>
-    <paging :total="pager.total"></paging>
+    <!-- <mainTable :columns="columns" :data="pager.data" :height="610"></mainTable> -->
+    <mainTable :columns="columns" :data="pager.data"></mainTable>
     <!-- 弹出框 -->
     <Modal v-model="dialogShow" :title="label[currDialog]" :mask-closable="false" width="750" @on-cancel="resetDialogForm('formDialog')">
       <Form :model="formDialog" ref="formDialog" :rules="rules" :label-width="80">
@@ -89,13 +89,11 @@
 
 <script>
   import mainTable from '@/components/mainTable'
-  import paging from '@/components/paging'
   import util from '@/libs/util'
   export default {
     name: 'workClass',
     components: {
-      mainTable,
-      paging
+      mainTable
     },
     data: function () {
       return {
@@ -104,6 +102,15 @@
           edit: 'workClass/edit.do',
           delete: 'workClass/delete.do',
           paging: 'workClass/dataGrid.do'
+        },
+        pager: {
+          'url': '',
+          'currPage': 1,
+          'order': '',
+          'pagesize': 10,
+          'sort': '',
+          'total': 40,
+          'data': []
         },
         currDialog: 'add',
         dialogShow: false,
@@ -130,7 +137,8 @@
           {
             title: '编号',
             key: 'id',
-            fixed: 'left'
+            fixed: 'left',
+            width: 200
           },
           {
             title: '分类名称',
@@ -284,9 +292,6 @@
     },
     // 计算属性
     computed: {
-      pager () {
-        return this.$store.state.pager
-      },
       label () {
         return this.$store.state.label
       }

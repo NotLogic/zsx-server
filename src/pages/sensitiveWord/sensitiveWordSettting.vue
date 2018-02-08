@@ -50,7 +50,16 @@
           paging: 'sensitiveWordSettting/dataGrid.do',
           defaultRule: 'sensitiveWordSettting/setting.do' //设置默认规则
         },
-        currDialog: 'edit',
+        pager: {
+          'url': '',
+          'currPage': 1,
+          'order': '',
+          'pagesize': 10,
+          'sort': '',
+          'total': 40,
+          'data': []
+        },
+        currDialog: 'add',
         dialogShow: false,
         dialogSubmitLoading: false,
         data: [
@@ -140,9 +149,6 @@
       }
     },
     computed: {
-      pager () {
-        return this.$store.state.pager
-      },
       label () {
         return this.$store.state.label
       }
@@ -162,7 +168,6 @@
       initDialog () {}
     },
     mounted () {
-      this.$store.state.pager.data = this.data
     }
   }
 </script>

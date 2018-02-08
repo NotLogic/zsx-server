@@ -39,8 +39,9 @@
         <Button type="primary" style="margin: 5px 8px 24px 0;" @click="submitSearch('formSearch')" size="small">{{label.search}}</Button>
         <Button type="primary" style="margin: 5px 8px 24px 0;" @click="addRow" size="small">{{label.add}}</Button>
     </i-form>
-    <mainTable :columns="columns" :data="pager.data" :height="610"></mainTable>
-    <paging></paging>
+    <!-- <mainTable :columns="columns" :data="pager.data" :height="610"></mainTable> -->
+    <mainTable :columns="columns" :data="pager.data"></mainTable>
+    <paging :total="pager.total" :currPage="pager.currPage"></paging>
     <Modal v-model="dialogShow" :title="label[currDialog]" :mask-closable="false" width="350" @on-cancel="resetDialogForm('formDialog')">
       <i-form :model="formDialog" ref="formDialog" :rules="rules" :label-width="90">
         <Row>
@@ -112,31 +113,15 @@
     },
     data () {
       return {
-        data: [
-          {
-            id:12312321,
-            homeId:'12321',
-            homeName:'asdsad',
-            currPlaceId:'123323',
-            currPlaceName:'sdsadsad',
-            account:'dfgsdfghf',
-            nickName:'fghfgh',
-            password:'qweqw',
-            salt:'sdfsd',
-            sex:'1',
-            age:'22',
-            phone:'12344112',
-            profession:'asdasd',
-            imagePath:'sdffd',
-            currentPlace:'dffdh',
-            homePlace:'werwer',
-            status:'1',
-            remark:'asdasd',
-            createTime:'',
-            modifyTime:'',
-            lastLoginTime:''
-          }
-        ],
+        pager: {
+          'url': '',
+          'currPage': 1,
+          'order': '',
+          'pagesize': 10,
+          'sort': '',
+          'total': 40,
+          'data': []
+        },
         derail_address_arr: [],
         derail_address_obj_s_h: [],
         derail_address_arr: [],
@@ -316,15 +301,11 @@
       }
     },
     computed: {
-      pager () {
-        return this.$store.state.pager
-      },
       label () {
         return this.$store.state.label
       }
     },
     mounted () {
-      this.$store.state.pager.data = this.data
     }
   }
 </script>

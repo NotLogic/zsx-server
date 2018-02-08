@@ -1,7 +1,7 @@
 <template>
   <div class="wrapper-pagination">
     <Button shape="circle" icon="ios-refresh-empty" style="margin-right: 10px;" @click="paging"></Button>
-    <Page :total="pager.total" show-sizer show-elevator :current="pager.currPage" :page-size="pagesize" placement="top" :page-size-opts="pageSizeOpts" @on-change="pagingNumChange" @on-page-size-change="pagingSizeChange"></Page>
+    <Page :total="total" show-sizer show-elevator :current="currPage" :page-size="pagesize" placement="top" :page-size-opts="pageSizeOpts" @on-change="pagingNumChange" @on-page-size-change="pagingSizeChange"></Page>
   </div>
 </template>
 
@@ -10,6 +10,8 @@
   export default {
     name: 'paging',
     props: {
+      total: [Number, String],
+      currPage: [Number, String],
       pagesize: {
         type: Number,
         default: 10
@@ -19,11 +21,6 @@
         default: function () {
           return [10, 20, 30, 40]
         }
-      }
-    },
-    computed: {
-      pager () {
-        return this.$store.state.pager
       }
     },
     methods: {
@@ -40,10 +37,9 @@
         let payload = {}
         let payloadKey = '"' + key + '"'
         payload[payloadKey] = value
-        vm.$store.dispatch('paging', payload)
+        // vm.$store.dispatch('paging', payload)
       }
-    },
-    mounted () {}
+    }
   }
 </script>
 

@@ -21,7 +21,8 @@
         <Button type="primary" style="margin: 5px 8px 24px 0;" @click="submitSearch('formSearch')" size="small">{{label.search}}</Button>
         <Button type="primary" style="margin: 5px 8px 24px 0;" @click="addRow" size="small">{{label.add}}</Button>
     </Form>
-    <mainTable :columns="columns" :data="pager.data" :height="672"></mainTable>
+    <!-- <mainTable :columns="columns" :data="pager.data" :height="672"></mainTable> -->
+    <mainTable :columns="columns" :data="pager.data"></mainTable>
     <Modal v-model="dialogShow" :title="label[currDialog]" :mask-closable="false" width="750" @on-cancel="resetDialogForm('formDialog')">
       <Form :model="formDialog" ref="formDialog" :rules="rules" :label-width="80">
         <Row>
@@ -91,18 +92,15 @@
     },
     data () {
       return {
-        data: [{
-          id: 0,
-          loginName: 'asdasd',
-          name: 'asdasdsad',
-          password: 'asdasdasdsad',
-          sex: '1',
-          age: 22,
-          roleIds: [],
-          phone: '124435645',
-          status: '2',
-          areaId:null
-        }],
+        pager: {
+          'url': '',
+          'currPage': 1,
+          'order': '',
+          'pagesize': 10,
+          'sort': '',
+          'total': 40,
+          'data': []
+        },
         currDialog: 'add',
         dialogShow: false,
         dialogSubmitLoading: false,
@@ -225,9 +223,6 @@
       }
     },
     computed: {
-      pager () {
-        return this.$store.state.pager
-      },
       label () {
         return this.$store.state.label
       }
@@ -245,7 +240,6 @@
       initDialog () {}
     },
     mounted () {
-      this.$store.state.pager.data = this.data
     }
   }
 </script>

@@ -45,9 +45,9 @@
       <Button type="primary" style="margin: 5px 8px 24px 0;" @click="submitSearch('formSearch')" size="small">{{label.search}}</Button>
       <Button type="primary" style="margin: 5px 8px 24px 0;" @click="addRow" size="small">{{label.add}}</Button>
     </Form>
-    <mainTable :columns="columns" :data="pager.data" :height="610"></mainTable>
-    <!-- 分页 -->
-    <paging></paging>
+    <!-- <mainTable :columns="columns" :data="pager.data" :height="610"></mainTable> -->
+    <mainTable :columns="columns" :data="pager.data"></mainTable>
+    <paging :total="pager.total" :currPage="pager.currPage"></paging>
     <Modal v-model="dialogShow" :title="label[currDialog]" :mask-closable="false" width="750" @on-cancel="resetDialogForm('formDialog')">
       <Form :model="formDialog" ref="formDialog" :rules="rules" :label-width="80">
         <Row>
@@ -170,28 +170,18 @@
     },
     data () {
       return {
-        currDialog: 'edit',
+        pager: {
+          'url': '',
+          'currPage': 1,
+          'order': '',
+          'pagesize': 10,
+          'sort': '',
+          'total': 40,
+          'data': []
+        },
+        currDialog: 'add',
         dialogShow: false,
         dialogSubmitLoading: false,
-        data: [
-          {
-            id: 1231232,
-            userId: 12321213,
-            title: 'asdsad',
-            imagePath: 'sdfsdfdsf',
-            lockStatus: 1,
-            postion: 1,
-            href: 'sdfsdfsdf',
-            sort: 1,
-            clickNum: 12,
-            detailAddress: 'sdfsdf',
-            startTime: '',
-            endTime: '',
-            isUp: 1,
-            areaType: 1,
-            context: 'sddsff'
-          }
-        ],
         derail_address_arr: [],
         derail_address_obj: [],
         derail_address_arr_s: [],
@@ -258,16 +248,15 @@
             'title': 'ID',
             'key': 'id',
             'width': 180,
+            'fixed': 'left',
             'sortable': true
           },
-
           {
             'title': '标题',
             'key': 'title',
             'width': 150,
             'sortable': true
           },
-
           {
             'title': '主图',
             'key': 'imagePath',
@@ -466,9 +455,6 @@
     computed: {
       label () {
         return this.$store.state.label
-      },
-      pager () {
-        return this.$store.state.pager
       }
     },
     methods: {
@@ -493,7 +479,6 @@
       initDialog () {}
     },
     mounted () {
-      this.$store.state.pager.data = this.data
     }
   }
 </script>

@@ -15,8 +15,9 @@
         </Upload>
       </FormItem>
     </Form>
-    <mainTable :columns="columns" :data="pager.data" :height="610"></mainTable>
-    <paging :pagesize="50" :page-size-opts="pageSizeOpts"></paging>
+    <!-- <mainTable :columns="columns" :data="pager.data" :height="610"></mainTable> -->
+    <mainTable :columns="columns" :data="pager.data"></mainTable>
+    <paging :total="pager.total" :currPage="pager.currPage" :pagesize="50" :page-size-opts="pageSizeOpts"></paging>
     <Modal v-model="dialogShow" :title="label[currDialog]" :mask-closable="false" @on-cancel="resetDialogForm('formDialog')">
       <Form :model="formDialog" ref="formDialog" :rules="rules" :label-width="80">
         <Row>
@@ -55,7 +56,16 @@
           paging: 'sensitiveWord/dataGrid.do',
           refurbish: 'sensitiveWord/refurbish.do' //词库立即生效
         },
-        currDialog: 'edit',
+        pager: {
+          'url': '',
+          'currPage': 1,
+          'order': '',
+          'pagesize': 10,
+          'sort': '',
+          'total': 40,
+          'data': []
+        },
+        currDialog: 'add',
         dialogShow: false,
         dialogSubmitLoading: false,
         data: [
@@ -121,9 +131,6 @@
       }
     },
     computed: {
-      pager () {
-        return this.$store.state.pager
-      },
       label () {
         return this.$store.state.label
       }
@@ -149,8 +156,6 @@
       initDialog (data) {}
     },
     mounted () {
-      this.$store.state.pager.pagesize = 50
-      this.$store.state.pager.data = this.data
     }
   }
 </script>

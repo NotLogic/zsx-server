@@ -36,8 +36,9 @@
       <Button type="ghost" :disabled="batchOprArr.length==0" style="margin: 5px 8px 24px 0;" @click="batchDelete" size="small">批量删除</Button>
       <Button type="primary" :disabled="batchOprArr.length==0" style="margin: 5px 8px 24px 0;" @click="batchPublish" size="small">批量发布</Button>
     </Form>
-    <mainTable :columns="columns" :data="pager.data" :height="610"></mainTable>
-    <paging></paging>
+    <!-- <mainTable :columns="columns" :data="pager.data" :height="610"></mainTable> -->
+    <mainTable :columns="columns" :data="pager.data"></mainTable>
+    <paging :total="pager.total" :currPage="pager.currPage"></paging>
     <Modal v-model="dialogShow" :title="label[currDialog]" :mask-closable="false" width="750" @on-cancel="resetDialogForm('formDialog')">
       <Form :model="formDialog" ref="formDialog" :rules="rules" :label-width="80">
         <Row>
@@ -95,26 +96,18 @@
     },
     data: function () {
       return {
-        currDialog: 'edit',
+        pager: {
+          'url': '',
+          'currPage': 1,
+          'order': '',
+          'pagesize': 10,
+          'sort': '',
+          'total': 40,
+          'data': []
+        },
+        currDialog: 'add',
         dialogShow: false,
         dialogSubmitLoading: false,
-        data: [
-          {
-            id: '2131240',
-            areaId: '112233',
-            url: 'www.baidu.com',
-            title: 'qweqwe',
-            newsSrc: 'asdasd',
-            content: 'asdasdsa',
-            date: 'asdasd',
-            image: 'asdasd',
-            commentNum: 'asd',
-            upvoteNum: 'xcv',
-            shareNum: 'xcvb',
-            status: 'bnm,',
-            detailAddress: 'hjkhjk'
-          }
-        ],
         derail_address_arr: [],
         derail_address_arr_s: [],
         derail_address_obj_s: [],
@@ -315,9 +308,6 @@
     computed: {
       label () {
         return this.$store.state.label
-      },
-      pager () {
-        return this.$store.state.pager
       }
     },
     methods: {
@@ -342,7 +332,6 @@
       initDialog (data) {}
     },
     mounted () {
-      this.$store.state.pager.data = this.data
     }
   }
 </script>

@@ -92,23 +92,18 @@
           delete: 'thirdpartyClass/delete.do',
           paging: 'thirdpartyClass/dataGrid.do'
         },
-        currDialog: 'edit',
+        pager: {
+          'url': '',
+          'currPage': 1,
+          'order': '',
+          'pagesize': 10,
+          'sort': '',
+          'total': 40,
+          'data': []
+        },
+        currDialog: 'add',
         dialogShow: false,
         dialogSubmitLoading: false,
-        data: [
-          {
-            id: '213',
-            name: 'ghjk',
-            thirdpartyKey: 'fgh',
-            thirdpartySecret: 'xcv',
-            thirdpartyCode: 'sdfsdf',
-            thirdpartyUser: '123w',
-            thirdpartyPass: '123',
-            orgName: '213',
-            appName: 'asd',
-            isComm: '1'
-          }
-        ],
         formDialog: {
           id: '',
           name: '',
@@ -213,9 +208,6 @@
     computed: {
       label () {
         return this.$store.state.label
-      },
-      pager () {
-        return this.$store.state.pager
       }
     },
     methods: {
@@ -231,7 +223,6 @@
       initDialog (data) {}
     },
     mounted () {
-      this.$store.state.pager.data = this.data
     }
   }
 </script>

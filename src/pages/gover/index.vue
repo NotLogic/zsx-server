@@ -19,8 +19,7 @@
       <Button type="primary" style="margin: 5px 8px 24px 0;" @click="addRow" size="small">{{label.add}}</Button>
     </Form>
     <mainTable :columns="columns" :data="pager.data"></mainTable>
-    <paging></paging>
-    <!-- 弹出框 -->
+    <paging :total="pager.total" :currPage="pager.currPage"></paging>
     <Modal v-model="dialogShow" :title="label[currDialog]" :mask-closable="false" width="750" @on-cancel="resetDialogForm('formDialog')">
       <Form :model="formDialog" ref="formDialog" :rules="rules" :label-width="90">
         <Row>
@@ -124,25 +123,18 @@
           delete: 'gover/delete.do',
           paging: 'gover/dataGrid.do'
         },
-        currDialog: 'edit',
+        pager: {
+          'url': '',
+          'currPage': 1,
+          'order': '',
+          'pagesize': 10,
+          'sort': '',
+          'total': 40,
+          'data': []
+        },
+        currDialog: 'add',
         dialogShow: false,
         dialogSubmitLoading: false,
-        data: [
-          {
-            id: '123123123123',
-            title: '请问',
-            provinceId: '210000',
-            cityId: '211000',
-            areaId: '211012',
-            image: 'http://res1.age06.com/FileStore/PortalIPSForQX/V3/d6cedf78-a699-4322-8d8b-af976fc94bc1/c3d432b8-290d-4a4c-9598-187342ae4d9d/c77ab157-e2d3-4c79-b92b-167e30b76d0c.jpg',
-            content: '阿斯加卡山东科技',
-            governmentSource: '电饭锅地方个',
-            sourceUrl: '去问问二翁热热无',
-            governmentDate: '阿萨德',
-            dateRule: '额外若翁人',
-            status: '1'
-          }
-        ],
         derail_address_arr: [],
         derail_address_obj_sub: [],
         derail_address_obj_s: [],
@@ -347,13 +339,9 @@
     computed: {
       label () {
         return this.$store.state.label
-      },
-      pager () {
-        return this.$store.state.pager
       }
     },
     mounted () {
-      this.$store.state.pager.data = this.data
     },
     watch: {}
   }

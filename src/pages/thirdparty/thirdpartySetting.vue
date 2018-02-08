@@ -21,8 +21,9 @@
       <Button type="primary" style="margin: 5px 8px 24px 0;" @click="addRow" size="small">{{label.add}}</Button>
       <Button type="primary" style="margin: 5px 8px 24px 0;" @click="debugging" size="small">{{label.debugging}}</Button>
     </Form>
-    <mainTable :columns="columns" :data="pager.data" :height="610"></mainTable>
-    <paging :total="pager.total"></paging>
+    <!-- <mainTable :columns="columns" :data="pager.data" :height="610"></mainTable> -->
+    <mainTable :columns="columns" :data="pager.data"></mainTable>
+    <paging :total="pager.total" :currPage="pager.currPage"></paging>
     <Modal v-model="dialogShow" :title="label[currDialog]" :mask-closable="false" width="750" @on-cancel="resetDialogForm('formDialog')">
       <Form :model="formDialog" ref="formDialog" :rules="rules" :label-width="90">
         <Row>
@@ -129,24 +130,18 @@
           paging: 'thirdpartySetting/dataGrid.do',
           debugger: 'thirdpartySetting/debug.do'
         },
-        currDialog: 'edit',
+        pager: {
+          'url': '',
+          'currPage': 1,
+          'order': '',
+          'pagesize': 10,
+          'sort': '',
+          'total': 40,
+          'data': []
+        },
+        currDialog: 'add',
         dialogShow: false,
         dialogSubmitLoading: false,
-        data: [
-          {
-            id: '213213213',
-            thirdpartyClassid: 'asdsadasd',
-            thirdpartyType: '2',
-            apiName: 'sdfsdaf',
-            apiUrl: 'sdfdsag',
-            apiIcon: 'dfgdfg',
-            apiDesc: 'dfgdsfg',
-            apiKey: 'dfgdfgfdg',
-            apiSecret: 'dfgdfg',
-            apiCode: 'dfgfdg',
-            apiStatus: '1'
-          }
-        ],
         showApiIcon: false,
         isComm: false,
         onOffDisabled: false,
@@ -285,9 +280,6 @@
     computed: {
       label () {
         return this.$store.state.label
-      },
-      pager () {
-        return this.$store.state.pager
       }
     },
     methods: {
@@ -314,7 +306,6 @@
       initDialog (data) {}
     },
     mounted () {
-      this.$store.state.pager.data = this.data
     }
   }
 </script>

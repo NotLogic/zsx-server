@@ -59,22 +59,18 @@
     },
     data () {
       return {
+        pager: {
+          'url': '',
+          'currPage': 1,
+          'order': '',
+          'pagesize': 10,
+          'sort': '',
+          'total': 40,
+          'data': []
+        },
         currDialog: 'add',
         treeCheckNodeArr: [],
         treeData: [],
-        data: [
-          {
-            id: '1',
-            name: '超管',
-            seq: 0,
-            description: '我是超管'
-          }, {
-            id: '3',
-            name: '哈哈',
-            seq: 2,
-            description: '哈哈哈'
-          }
-        ],
         opened: false,
         selectAll: false,
         dialogShow: false,
@@ -109,6 +105,7 @@
             'key': 'action',
             'align': 'center',
             'fixed': 'right',
+            width: 200,
             render: (create, params) => {
               let vm = this
               if (params.row.name === '超管') {
@@ -311,16 +308,12 @@
       }
     },
     computed: {
-      pager () {
-        return this.$store.state.pager
-      },
       label () {
         return this.$store.state.label
       }
     },
     mounted () {
       // this.getTreeDataByAppRoutes()
-      this.$store.state.pager.data = this.data
     },
     watch: {}
   }

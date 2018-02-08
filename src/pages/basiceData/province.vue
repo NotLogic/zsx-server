@@ -4,14 +4,16 @@
       <Button type="primary" size="small" style="margin-right: 10px;" @click="addRow('province')">{{label.add}}</Button>
       <Button type="primary" size="small" @click="checkData">校验所有数据</Button>
     </div>
-    <main-table :columns="provinceColumns" :data="provinceData" :height="685"></main-table>
+    <!-- <main-table :columns="provinceColumns" :data="provinceData" :height="685"></main-table> -->
+    <main-table :columns="provinceColumns" :data="provinceData"></main-table>
 
     <!-- 市弹窗 -->
     <Modal v-model="cityDialogShow" title="市" :mask-closable="false" width="750">
       <div style="margin-bottom: 10px;">
         <Button type="primary" @click="addRow('city')" size="small">{{label.add}}</Button>
       </div>
-      <main-table :columns="cityColumns" :data="cityData" :height="500" :size="'small'"></main-table>
+      <!-- <main-table :columns="cityColumns" :data="cityData" :height="500" :size="'small'"></main-table> -->
+      <main-table :columns="cityColumns" :data="cityData" :size="'small'"></main-table>
       <div slot="footer">
         <Button type="primary" @click="closeModal('cityDialogShow')">{{label.sure}}</Button>
       </div>
@@ -22,7 +24,8 @@
       <div style="margin-bottom: 10px;">
         <Button type="primary" @click="addRow('area')" :size="'small'">{{label.add}}</Button>
       </div>
-      <main-table :columns="areaColumns" :data="areaData" size="small" :height="500"></main-table>
+      <!-- <main-table :columns="areaColumns" :data="areaData" size="small" :height="500"></main-table> -->
+      <main-table :columns="areaColumns" :data="areaData" size="small"></main-table>
       <div slot="footer">
         <Button type="primary" @click="closeModal('areaDialogShow')">{{label.sure}}</Button>
       </div>

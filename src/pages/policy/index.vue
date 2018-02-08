@@ -19,7 +19,7 @@
       <Button type="primary" style="margin: 5px 8px 24px 0;" @click="addRow" size="small">{{label.add}}</Button>
     </Form>
     <mainTable :columns="columns" :data="pager.data"></mainTable>
-    <paging></paging>
+    <paging :total="pager.total" :currPage="pager.currPage"></paging>
     <!-- 弹出框 -->
     <Modal v-model="dialogShow" :title="label[currDialog]" :mask-closable="false" width="750" @on-cancel="resetDialogForm('formDialog')">
       <Form :model="formDialog" ref="formDialog" :rules="rules" :label-width="80">
@@ -128,23 +128,18 @@
           delete: 'policy/delete.do',
           paging: 'policy/dataGrid.do'
         },
+        pager: {
+          'url': '',
+          'currPage': 1,
+          'order': '',
+          'pagesize': 10,
+          'sort': '',
+          'total': 40,
+          'data': []
+        },
         currDialog: 'add',
         dialogShow: false,
         dialogSubmitLoading: false,
-        data: [
-          {
-            title: '阿斯顿',
-            image: 'http://res1.age06.com/FileStore/PortalIPSForQX/V3/d6cedf78-a699-4322-8d8b-af976fc94bc1/c3d432b8-290d-4a4c-9598-187342ae4d9d/c77ab157-e2d3-4c79-b92b-167e30b76d0c.jpg',
-            cityId: '',
-            areaId: '',
-            content: '手动阀手动阀',
-            sourceUrl: 'http://localhost:8090/policy/index',
-            policySoucre: 'sdf',
-            policyDate: '',
-            dateRule: 'fghghj',
-            status: '1'
-          }
-        ],
         derail_address_arr: [],
         derail_address_obj_sub: [],
         derail_address_obj_s: [],
@@ -348,13 +343,9 @@
     computed: {
       label () {
         return this.$store.state.label
-      },
-      pager () {
-        return this.$store.state.pager
       }
     },
     mounted () {
-      this.$store.state.pager.data = this.data
     },
     watch: {}
   }
