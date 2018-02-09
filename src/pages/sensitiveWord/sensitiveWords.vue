@@ -17,7 +17,7 @@
     </Form>
     <!-- <mainTable :columns="columns" :data="pager.data" :height="610"></mainTable> -->
     <mainTable :columns="columns" :data="pager.data"></mainTable>
-    <paging :total="pager.total" :currPage="pager.currPage" :pagesize="pager.pagesize" :page-size-opts="pageSizeOpts"></paging>
+    <paging @changePager="changePager" @paging="paging" :total="pager.total" :currPage="pager.currPage" :pagesize="pager.pagesize" :page-size-opts="pageSizeOpts"></paging>
     <Modal v-model="dialogShow" :title="label[currDialog]" :mask-closable="false" @on-cancel="resetDialogForm('formDialog')">
       <Form :model="formDialog" ref="formDialog" :rules="rules" :label-width="80">
         <Row>
@@ -149,13 +149,21 @@
         })
       },
       initDialog (data) {},
+      changePager (data) {
+        this.util.changePager(this, data)
+      },
+      paging () {
+        this.util.paging(this)
+      },
       initData () {}
     },
-    mounted () {
+    created () {
       let vm = this
       vm.initData()
       vm.$store.commit('initPager', vm)
-      vm.util.paging(vm)
+      vm.paging(vm)
+    },
+    mounted () {
     }
   }
 </script>

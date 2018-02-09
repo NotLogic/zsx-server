@@ -304,18 +304,25 @@
         vm.selectAll = vm.checkSelectAll() ? true : false
         console.log('treeCheckNodeArr: ', treeCheckNodeArr)
         vm.treeCheckNodeArr = treeCheckNodeArr
-      }
+      },
+      paging () {
+        this.util.paging(this)
+      },
+      initData () {}
     },
     computed: {
       label () {
         return this.$store.state.label
       }
     },
-    mounted () {
+    created () {
       let vm = this
-      // this.getTreeDataByAppRoutes()
+      vm.initData()
       vm.$store.commit('initPager', vm)
-      vm.util.paging(vm)
+      vm.paging(vm)
+    },
+    mounted () {
+      // this.getTreeDataByAppRoutes()
     },
     watch: {}
   }

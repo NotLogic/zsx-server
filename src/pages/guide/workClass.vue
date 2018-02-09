@@ -279,6 +279,9 @@
       getAddrByCityId (cityId) {
         return cityId
       },
+      paging () {
+        this.util.paging(this)
+      },
       initData () {
         let vm = this
       }
@@ -290,12 +293,15 @@
       }
     },
     watch: {},
-    // 生命周期钩子函数VNode替换原始dom时触发，钩子函数函数
-    mounted () {
+    created () {
       let vm = this
       vm.initData()
       vm.$store.commit('initPager', vm)
-      vm.util.paging(vm)
+      vm.paging(vm)
+    },
+    // 生命周期钩子函数VNode替换原始dom时触发，钩子函数函数
+    mounted () {
+      
     }
   }
 </script>

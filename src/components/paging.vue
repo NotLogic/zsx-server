@@ -39,9 +39,13 @@
       },
       paging (key, value) {
         let vm = this
-        let data = {}
-        data[key] = value
-        vm.$emit('changePager', data)
+        if (key) {
+          let data = {}
+          data[key] = value
+          vm.$emit('changePager', data)
+        } else {
+          vm.$emit('paging')
+        }
       }
     }
   }

@@ -214,13 +214,18 @@
       },
       submitDialogForm (name) {},
       initDialog (data) {},
+      paging () {
+        this.util.paging(this)
+      },
       initData () {}
     },
-    mounted () {
+    created () {
       let vm = this
       vm.initData()
       vm.$store.commit('initPager', vm)
-      vm.util.paging(vm)
+      vm.paging(vm)
+    },
+    mounted () {
     }
   }
 </script>

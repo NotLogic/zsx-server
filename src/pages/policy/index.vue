@@ -19,7 +19,7 @@
       <Button type="primary" style="margin: 5px 8px 24px 0;" @click="addRow" size="small">{{label.add}}</Button>
     </Form>
     <mainTable :columns="columns" :data="pager.data"></mainTable>
-    <paging :total="pager.total" :currPage="pager.currPage"></paging>
+    <paging @changePager="changePager" @paging="paging" :total="pager.total" :currPage="pager.currPage"></paging>
     <!-- 弹出框 -->
     <Modal v-model="dialogShow" :title="label[currDialog]" :mask-closable="false" width="750" @on-cancel="resetDialogForm('formDialog')">
       <Form :model="formDialog" ref="formDialog" :rules="rules" :label-width="80">
@@ -333,6 +333,12 @@
       handleSuccess () {},
       handleFormatError () {},
       initDialog (data) {},
+      changePager (data) {
+        this.util.changePager(this, data)
+      },
+      paging () {
+        this.util.paging(this)
+      },
       initData () {}
     },
     computed: {
@@ -340,11 +346,13 @@
         return this.$store.state.label
       }
     },
-    mounted () {
+    created () {
       let vm = this
       vm.initData()
       vm.$store.commit('initPager', vm)
-      vm.util.paging(vm)
+      vm.paging(vm)
+    },
+    mounted () {
     },
     watch: {}
   }

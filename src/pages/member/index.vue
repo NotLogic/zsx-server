@@ -41,7 +41,7 @@
     </i-form>
     <!-- <mainTable :columns="columns" :data="pager.data" :height="610"></mainTable> -->
     <mainTable :columns="columns" :data="pager.data"></mainTable>
-    <paging :total="pager.total" :currPage="pager.currPage"></paging>
+    <paging @changePager="changePager" @paging="paging" :total="pager.total" :currPage="pager.currPage"></paging>
     <Modal v-model="dialogShow" :title="label[currDialog]" :mask-closable="false" width="350" @on-cancel="resetDialogForm('formDialog')">
       <i-form :model="formDialog" ref="formDialog" :rules="rules" :label-width="90">
         <Row>
@@ -300,6 +300,12 @@
         this.formSearch.status = ''
         this.$refs[name].resetFields()
       },
+      changePager (data) {
+        this.util.changePager(this, data)
+      },
+      paging () {
+        this.util.paging(this)
+      },
       initData () {}
     },
     computed: {
@@ -307,11 +313,13 @@
         return this.$store.state.label
       }
     },
-    mounted () {
+    created () {
       let vm = this
       vm.initData()
       vm.$store.commit('initPager', vm)
-      vm.util.paging(vm)
+      vm.paging(vm)
+    },
+    mounted () {
     }
   }
 </script>

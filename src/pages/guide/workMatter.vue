@@ -35,7 +35,7 @@
     </Form>
     <!-- <mainTable :columns="columns" :data="pager.data" :height="610"></mainTable> -->
     <mainTable :columns="columns" :data="pager.data"></mainTable>
-    <paging @changePager="changePager" :total="pager.total" :currPage="pager.currPage"></paging>
+    <paging @changePager="changePager" @paging="paging" :total="pager.total" :currPage="pager.currPage"></paging>
     <!-- 弹出框 -->
     <Modal v-model="dialogShow" :title="label[currDialog]" :mask-closable="false" width="750" @on-cancel="resetDialogForm('formDialog')">
       <Form :model="formDialog" ref="formDialog" :rules="rules" :label-width="80">
@@ -436,10 +436,6 @@
       }
     },
     methods: {
-      // 当前页或每页个数发生改变
-      changePager (data) {
-        this.util.changePager(this, data)
-      },
       upExeclSuccess (res) {
         if (res.code) {
           this.$Message.success('上传成功！')
@@ -474,6 +470,13 @@
         return '数据成功'
       },
       addAddrBtn () {},
+      // 当前页或每页个数发生改变
+      changePager (data) {
+        this.util.changePager(this, data)
+      },
+      paging () {
+        this.util.paging(this)
+      },
       initData () {
         let vm = this
         // 初始化所属分类
@@ -496,14 +499,17 @@
       }
     },
     watch: {},
-    mounted () {
+    created () {
       let vm = this
       // 初始化其他数据
       vm.initData()
       // 页面加载时初始化table数据
       vm.$store.commit('initPager', vm)
-      vm.util.paging(vm)
+      vm.paging(vm)
       // 页面加载时初始化table数据  end
+    },
+    mounted () {
+      
     }
   }
 </script>

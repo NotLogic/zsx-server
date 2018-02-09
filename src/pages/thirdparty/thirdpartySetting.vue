@@ -23,7 +23,7 @@
     </Form>
     <!-- <mainTable :columns="columns" :data="pager.data" :height="610"></mainTable> -->
     <mainTable :columns="columns" :data="pager.data"></mainTable>
-    <paging :total="pager.total" :currPage="pager.currPage"></paging>
+    <paging @changePager="changePager" @paging="paging" :total="pager.total" :currPage="pager.currPage"></paging>
     <Modal v-model="dialogShow" :title="label[currDialog]" :mask-closable="false" width="750" @on-cancel="resetDialogForm('formDialog')">
       <Form :model="formDialog" ref="formDialog" :rules="rules" :label-width="90">
         <Row>
@@ -297,13 +297,21 @@
         console.log('搜索')
       },
       initDialog (data) {},
+      changePager (data) {
+        this.util.changePager(this, data)
+      },
+      paging () {
+        this.util.paging(this)
+      },
       initData () {}
     },
-    mounted () {
+    created () {
       let vm = this
       vm.initData()
       vm.$store.commit('initPager', vm)
-      vm.util.paging(vm)
+      vm.paging(vm)
+    },
+    mounted () {
     }
   }
 </script>
