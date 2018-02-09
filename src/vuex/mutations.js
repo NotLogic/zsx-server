@@ -176,7 +176,7 @@ export default {
   // 初始化每页的pager
   initPager (state, vm) {
     let _data = util.extend(vm.pager)
-    vm.pager = state.pager
+    vm.pager = util.extend(state.pager)
     for (let key in _data) {
       vm.pager[key] = _data[key]
     }
