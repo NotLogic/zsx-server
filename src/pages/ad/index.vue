@@ -163,7 +163,7 @@
   import mainTable from '@/components/mainTable'
   import paging from '@/components/paging'
   export default {
-    name: 'ad',
+    name: 'ad_index',
     components: {
       mainTable,
       paging

@@ -89,7 +89,7 @@
   import mainTable from '@/components/mainTable'
   import paging from '@/components/paging'
   export default {
-    name: 'news',
+    name: 'news_index',
     components: {
       mainTable,
       paging

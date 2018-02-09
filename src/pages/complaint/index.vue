@@ -7,7 +7,7 @@
 
 <script>
   export default {
-    name: 'complaint'
+    name: 'complaint_index'
   }
 </script>
 

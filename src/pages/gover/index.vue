@@ -110,7 +110,7 @@
   import mainTable from '@/components/mainTable'
   import paging from '@/components/paging'
   export default {
-    name: 'policy',
+    name: 'gover_index',
     components: {
       mainTable,
       paging

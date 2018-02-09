@@ -68,7 +68,7 @@ export default {
   // 带有页面权限数据的数组 实例： [{pageName: 'main', access: 1}, {pageName: 'member_index', access: 0}]  数组中的 pageName 可以改为其他，改过之后mutations中的updateMenulist函数中也要改也要相应的去改
   accessArr: [],
   // 要缓存的页面name数组
-  cachePage: [],
+  cachePage: [],  // 这里边放的是组件的name，这样的话就需要每页组件的name与路由name一致
   currentPageName: '',
   // 面包屑数组
   currentPath: [

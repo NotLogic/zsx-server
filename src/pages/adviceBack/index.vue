@@ -7,7 +7,7 @@
 
 <script>
   export default {
-    name: 'adviceBack'
+    name: 'adviceBack_index'
   }
 </script>
 

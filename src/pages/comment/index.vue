@@ -7,7 +7,7 @@
 
 <script>
   export default {
-    name: 'comment'
+    name: 'comment_index'
   }
 </script>
 

@@ -7,7 +7,7 @@
 
 <script>
   export default {
-    name: 'appGroup'
+    name: 'appGroup_index'
   }
 </script>
 

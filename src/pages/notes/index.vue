@@ -7,7 +7,7 @@
 
 <script>
   export default {
-    name: 'notes'
+    name: 'notes_index'
   }
 </script>
 

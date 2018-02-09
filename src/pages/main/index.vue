@@ -28,7 +28,7 @@
       <div class="single-page" :style="{left:hideMenuText?0:'200px'}">
         <div class="single-box">
           <!-- 不缓存分页 -->
-          <keep-alive :include="cachePage" exclude="paging">
+          <keep-alive :include="cachePage">
             <router-view></router-view>
           </keep-alive>
         </div>
@@ -46,6 +46,7 @@
   import tagsPageOpened from '@/components/tagsPageOpened'
   import breadcrumbNav from '@/components/breadcrumbNav'
   export default {
+    name: 'main',
     components: {
       sidebar,
       tagsPageOpened,

@@ -106,7 +106,7 @@
   import mainTable from '@/components/mainTable'
   import paging from '@/components/paging'
   export default {
-    name: 'member',
+    name: 'member_index',
     components: {
       mainTable,
       paging
