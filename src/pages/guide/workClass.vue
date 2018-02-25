@@ -1,6 +1,6 @@
 <template>
   <div class="work-class">
-    <Form :model="formSearch" ref="formSearch" :rules="searchRules" inline :label-width="80">
+    <Form :model="formSearch" ref="formSearch" :rules="searchRules" inline :label-width="60">
         <FormItem label="分类名称" prop="className">
             <Input v-model="formSearch.className" placeholder="分类名称" size="small" style="width: 120px"></Input>
         </FormItem>
@@ -257,9 +257,10 @@
         this.formDialog.classStatus = _data.classStatus
       },
       resetSearch (name) {
-        // 重置一些this.$refs[name].resetFields()无法重置的内容
-        this.derail_address_obj_s = []
-        this.$refs[name].resetFields()
+        let vm = this
+        vm.derail_address_obj_s = []
+        vm.$refs[name].resetFields()
+        vm.submitSearch(name)
       },
       submitSearch (name) {
         let vm = this

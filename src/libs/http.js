@@ -8,7 +8,7 @@ let http = axios.create({
   baseURL: baseUrl, // 和config/index.js下的proxyTable有关
   timeout: TIME_OUT
 })
-// http.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded; charset=UTF-8'
+http.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded; charset=UTF-8'
 // http.defaults.headers.post['Accept'] = 'application/json, text/javascript, */*; q=0.01'
 // 添加请求拦截器
 http.interceptors.request.use(function (config) {

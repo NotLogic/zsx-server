@@ -2,7 +2,7 @@
   <div class="wrapper-pagination">
     <Button shape="circle" icon="ios-refresh-empty" style="margin-right: 10px;" @click="paging"></Button>
     <div class="pager-wrapper">
-      <Page :total="total" show-sizer show-elevator :current="currPage" :page-size="pagesize" :placement="placement" :page-size-opts="pageSizeOpts" @on-change="pagingNumChange" @on-page-size-change="pagingSizeChange"></Page>
+      <Page :total="total" show-sizer show-elevator show-total :current="currPage" :page-size="pagesize" :placement="placement" :page-size-opts="pageSizeOpts" @on-change="pagingNumChange" @on-page-size-change="pagingSizeChange"></Page>
     </div>
   </div>
 </template>
@@ -34,7 +34,7 @@
         this.paging('currPage', currPage)
       },
       pagingSizeChange (pageSize) {
-        // 更改每页显示数量时会发两次请求：因为pageSize 和 currPage 都发生了变化
+        // 更改每页显示数量时会发两次请求：因为 pageSize吧变化的同时 currPage 变为1
         this.paging('pageSize', pageSize)
       },
       paging (key, value) {
