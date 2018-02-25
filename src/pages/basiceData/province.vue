@@ -339,24 +339,24 @@
     },
     mounted () {
       let vm = this
-      this.$http.get('/static/data/address.json').then(res => {
-        this.chinaJson = util.extend(res.data)
-        this.chinaData = util.getChinaDataByJson(util.extend(res.data))
+      vm.$http.get('/static/data/address.json').then(res => {
+        vm.chinaJson = util.extend(res.data)
+        vm.chinaData = util.getChinaDataByJson(util.extend(res.data))
         let provinceData = []
-        util.extend(this.chinaData).forEach(item => {
+        util.extend(vm.chinaData).forEach(item => {
           provinceData.push({
             'id': item.value,
             'provinceName': item.label
           })
         })
-        this.provinceData = provinceData
+        vm.provinceData = provinceData
       })
       // 为什么全局的axios不行， vm.$http.all   not a function
       // vm.$http.all([vm.$http.get('/static/data/address.json'), vm.$http.get('/static/data/accessData.json')]).then(vm.$http.spread(function(acct, perms){
-      axios.all([vm.$http.get('/static/data/address.json'), vm.$http.get('/static/data/accessData.json')]).then(axios.spread(function(res1, res2){
-        console.log('res1: ', res1)
-        console.log('res2: ', res2)
-      }))
+      // axios.all([vm.$http.get('/static/data/address.json'), vm.$http.get('/static/data/accessData.json')]).then(axios.spread(function(res1, res2){
+      //   console.log('res1: ', res1)
+      //   console.log('res2: ', res2)
+      // }))
     },
     watch: {}
   }

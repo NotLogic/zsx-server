@@ -189,6 +189,6 @@ export default {
 
   },
   delRow (state) {
-    
+    console.log('删除行的操作')
   }
 }

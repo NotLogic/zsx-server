@@ -13,7 +13,7 @@
                 <Option value="1">有效</Option>
             </Select>
         </FormItem>
-        <FormItem label="分类类别" prop="classType">
+        <FormItem label="分类类型" prop="classType">
             <Select v-model="formSearch.classType" size="small" style="width: 80px;">
               <Option value="0">个人</Option>
               <Option value="1">企业</Option>
@@ -60,22 +60,26 @@
         </Row>
         <Row>
           <Col span="12">
-            <FormItem label="分类图标" prop="classIcon">
-              <div style="width:140px;">
-                <img v-if="formDialog.classIcon" style="max-width:100%;" :src="formDialog.classIcon" />
-                <img v-else style="max-width:100%;" src="static/images/img-upload-default.png"/>
-              </div>
+            <FormItem label="事项图标">
+              <Row>
+                <Col span="12">
+                  <div style="width:130px;border:1px solid #eee;">
+                    <img v-if="formDialog.classIcon" style="max-width:100%;" :src="formDialog.classIcon"/>
+                    <img v-else style="max-width:100%;" src="static/images/img-upload-default.png"/>
+                  </div>
+                </Col>
+                <Col span="12" style="text-align:right;">
+                  <Upload name="upfile"
+                          action="ueditor/upload.do"
+                          :on-success="handleSuccess"
+                          :show-upload-list="false"
+                          :format="['jpg','jpeg','png']"
+                          :on-format-error="handleFormatError">
+                    <Button type="ghost" icon="ios-cloud-upload-outline">{{label.uploadImg}}</Button>
+                  </Upload>
+                </Col>
+              </Row>
             </FormItem>
-          </Col>
-          <Col span="12">    
-            <Upload name="upfile"
-                    action="ueditor/upload.do"
-                    :on-success="handleSuccess"
-                    :show-upload-list="false"
-                    :format="['jpg','jpeg','png']"
-                    :on-format-error="handleFormatError">
-              <Button type="ghost" icon="ios-cloud-upload-outline">{{label.uploadImg}}</Button>
-            </Upload>
           </Col>
         </Row>
       </Form>
@@ -103,6 +107,30 @@
           delete: 'workClass/delete.do'
         },
         pager: {
+          data: [
+            {
+              id: '215465465',
+              className: '沙发斯蒂芬',
+              classIcon: 'http://img.taopic.com/uploads/allimg/120727/201995-120HG1030762.jpg',
+              classType: '1',
+              cityCode: '410100',
+              classStatus: '1'
+            },{
+              id: '215465415',
+              className: '温热无若',
+              classIcon: 'http://img.zcool.cn/community/01690955496f930000019ae92f3a4e.jpg@2o.jpg',
+              classType: '0',
+              cityCode: '411000',
+              classStatus: '0'
+            },{
+              id: '215465462',
+              className: '沃尔沃二',
+              classIcon: 'http://img.zcool.cn/community/0142135541fe180000019ae9b8cf86.jpg@1280w_1l_2o_100sh.png',
+              classType: '1',
+              cityCode: '410500',
+              classStatus: '1'
+            }
+          ],
           url: 'workClass/dataGrid.do'
         },
         currDialog: 'add',
@@ -111,6 +139,8 @@
         derail_address_obj_s: [],
         provinceCityData: [],
         provinceCity: [],
+        detialAddressJson: {},
+        chinaJson: {},
         formSearch: {
           input: '',
           className: '',
@@ -224,9 +254,15 @@
                   },
                   on: {
                     click: () => {
-                      this.$store.dispatch('delRow', {
-                        'vm': this,
-                        'params': params
+                      vm.$Modal.confirm({
+                        title: '确认',
+                        content: '确认删除这条数据吗？',
+                        onOk: function () {
+                          vm.$store.dispatch('delRow', {
+                            'vm': vm,
+                            'params': params
+                          })
+                        }
                       })
                     }
                   }
@@ -252,9 +288,7 @@
       },
       initDialog (data) {
         let _data = util.extend(data)
-        this.formDialog.cityCode = _data.cityCode
         this.provinceCity = [_data.cityCode.toString().slice(0, 2) + '0000', _data.cityCode.toString().slice(0, 4) + '00', _data.cityCode.toString()]
-        this.formDialog.classStatus = _data.classStatus
       },
       resetSearch (name) {
         let vm = this
@@ -271,20 +305,47 @@
       },
       resetDialogForm (name) {
         this.provinceCity = []
+        this.formDialog.classIcon = ''
         this.$refs[name].resetFields()
       },
-      searchAddrChange () {},
-      addrChange () {},
-      handleSuccess () {},
-      handleFormatError () {},
+      searchAddrChange (value) {
+        this.formSearch.cityCode = value[1]
+      },
+      addrChange (value) {
+        this.formDialog.cityCode = value[1]
+      },
+      handleSuccess (res, file) {
+        if(res.state=="SUCCESS"){
+          this.$Message.success("上传成功！")
+          this.formDialog.classIcon = res.url
+        }
+      },
+      handleFormatError () {
+        this.$Message.error('文件格式错误，请选择jpg,jpeg或png格式的文件')
+      },
       getAddrByCityId (cityId) {
-        return cityId
+        let data = util.extend(this.chinaJson)
+        let provinceCode = ('' + cityId).slice(0,2) + '0000'
+        let cityCode = ('' + cityId).slice(0,4) + '00'
+        let txt = data['100000'][provinceCode] + data[provinceCode][cityCode]
+        return txt
       },
       paging () {
-        this.util.paging(this)
+        util.paging(this)
       },
       initData () {
         let vm = this
+        // 初始化省市数据
+        vm.$http.get('/static/data/address.json').then(res => {
+          vm.chinaJson = util.extend(res.data)
+          let chinaData = util.getChinaDataByJson(util.extend(res.data))
+          chinaData.forEach(item => {
+            item.children.forEach(children => {
+              children.children = []
+            })
+          })
+          vm.provinceCityData = util.extend(chinaData)
+        })
       }
     },
     // 计算属性

@@ -12,7 +12,6 @@ export default {
     commit('submitSearch')
   },
   delRow ({ commit, state }, payload) {
-    console.log(payload)
     commit('delRow')
   }
 }

@@ -16,6 +16,10 @@ http.interceptors.request.use(function (config) {
   if (config.method === 'post') {
     config.data = qs.stringify(config.data)
   }
+  // get请求请求的是本地地址json文件
+  if (config.method === 'get') {
+    config.baseURL = ''
+  }
   console.log('config: ', config)
   return config
 }, function (error) {
