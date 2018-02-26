@@ -24,6 +24,7 @@ export default {
     if (typeof payload.initDialog === 'function') {
       payload.initDialog(payload.data)
     }
+    payload.vm.currDialog = 'edit'
     payload.vm.dialogShow = true
   },
   // 重置提交表单 预处理 + reset，公共的只有reset只有一行，就不放到vuex中了吧； 提交成功后要调用，从vuex中调用组件中的函数这样好吗？
@@ -183,10 +184,10 @@ export default {
   },
   // -----------------------  action 提交的mutation  -------------------------------
   submitDialogForm (state) {
-
+    console.log('新增或编辑')
   },
   submitSearch (state) {
-
+    console.log('搜索操作')
   },
   delRow (state) {
     console.log('删除行的操作')

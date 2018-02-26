@@ -1,4 +1,5 @@
 import { appRoutes } from '@/router/routes'
+import http from './http'
 const util = {
   extend (data) {
     if (data.length && typeof data !== 'string') {
@@ -253,17 +254,17 @@ const util = {
   // 请求页面table数据
   paging (vm) {
     let util = this
-    vm.$http({
-      url: vm.pager.url,
-      method: vm.pager.method,
-      data: util.pagingFiltData(util.extend(vm.pager))
-    }).then(res => {
-      if (res.data.code == 1) {
-        let _data = util.extend(res.data.data)
-        vm.pager.data = _data.data
-        vm.pager.total = _data.total
-      }
-    })
+    // vm.$http({
+    //   url: vm.pager.url,
+    //   method: vm.pager.method,
+    //   data: util.pagingFiltData(util.extend(vm.pager))
+    // }).then(res => {
+    //   if (res.data.code == 1) {
+    //     let _data = util.extend(res.data.data)
+    //     vm.pager.data = _data.data
+    //     vm.pager.total = _data.total
+    //   }
+    // })
   },
   // 修改 pager 请求提交的数据
   changePager (vm, data) {
@@ -273,6 +274,15 @@ const util = {
       vm.pager[key] = _data[key]
     }
     util.paging(vm)
+  },
+  // ------- 将省市区数据存入sessionStorage ----------
+  initChinaDataAndJson () {
+    http.get('/static/data/address.json').then(res => {
+      let chinaJson = util.extend(res.data)
+      let chinaData = util.getChinaDataByJson(util.extend(res.data))
+      sessionStorage.chinaJson = JSON.stringify(chinaJson)
+      sessionStorage.chinaData = JSON.stringify(chinaData)
+    })
   }
 }
 export default util

@@ -45,7 +45,7 @@
         </Row>
         <Row>
           <Col span="12">
-            <FormItem label="关联区域" prop="area">
+            <FormItem label="关联区域">
               <Cascader :data="provinceCityData" v-model="provinceCity" filterable @on-change="addrChange"></Cascader>
             </FormItem>
           </Col>
@@ -306,13 +306,22 @@
       resetDialogForm (name) {
         this.provinceCity = []
         this.formDialog.classIcon = ''
+        this.formDialog.cityCode = ''
         this.$refs[name].resetFields()
+      },
+      submitDialogForm (name) {
+        let vm = this
+        vm.$refs[name].validate(function (valid) {
+          console.log(vm.formDialog)
+        })
       },
       searchAddrChange (value) {
         this.formSearch.cityCode = value[1]
       },
       addrChange (value) {
-        this.formDialog.cityCode = value[1]
+        let vm = this
+        console.log(value)
+        vm.formDialog.cityCode = value[1]
       },
       handleSuccess (res, file) {
         if(res.state=="SUCCESS"){
@@ -336,16 +345,19 @@
       initData () {
         let vm = this
         // 初始化省市数据
-        vm.$http.get('/static/data/address.json').then(res => {
-          vm.chinaJson = util.extend(res.data)
-          let chinaData = util.getChinaDataByJson(util.extend(res.data))
-          chinaData.forEach(item => {
-            item.children.forEach(children => {
-              children.children = []
-            })
+        if (!sessionStorage.chinaJson) {
+          util.initChinaDataAndJson()
+        }
+        let chinaJson = util.extend(JSON.parse(sessionStorage.chinaJson))
+        let chinaData = util.extend(JSON.parse(sessionStorage.chinaData))
+        let _chinaData = util.extend(chinaData)
+        _chinaData.forEach(item => {
+          item.children.forEach(children => {
+            children.children = []
           })
-          vm.provinceCityData = util.extend(chinaData)
         })
+        vm.provinceCityData = util.extend(_chinaData)
+        vm.chinaJson = chinaJson
       }
     },
     // 计算属性
