@@ -9,15 +9,13 @@
           <Cascader :data="derail_address_arr_ss" v-model="derail_address_obj_s" @on-change="searchAddrChange" filterable size="small" style="margin-top: 5px;"></Cascader>
       </FormItem>
       <FormItem label="所属分类" prop="workClassId">
-        <Select v-model="formSearch.workClassId" size="small" style="width: 80px;">
-          <Option value="0">个人</Option>
-          <Option value="1">企业</Option>
+        <Select v-model="formSearch.workClassId" size="small" style="width: 150px;">
+          <Option v-for="item in workClassId" :value="item.value" :key="item.value">{{ item.label }}</Option>
         </Select>
       </FormItem>
       <FormItem label="状态" prop="matterStatus">
           <Select v-model="formSearch.matterStatus" placeholder="请选择" style="width: 80px;" size="small" clearable>
-            <Option value="0">无效</Option>
-            <Option value="1">有效</Option>
+            <Option v-for="item in matterStatus" :value="item.value" :key="item.value">{{ item.label }}</Option>
           </Select>
       </FormItem>
       <Button type="ghost" style="margin-right: 8px;margin-top: 5px;" @click="resetSearch('formSearch')" size="small">{{label.clear}}</Button>
@@ -185,15 +183,15 @@
           </Col>
         </Row>
         <Row v-for="(item,index) in addrDialog.addressArr.slice(0,2)" :key="index" style="margin-bottom: 8px;">
-          <i-col span="18">
+          <Col span="18">
             办事地址{{index+1}}:  {{item}}
-          </i-col>   
-          <i-col span="6">
-            <i-button size="small" type="primary" @click="editAddrBtn(index)">编辑</i-button>
-            <i-button size="small" type="error" @click="delAddr(index)" style="margin-left:8px;">删除</i-button>
-          </i-col>
+          </Col>   
+          <Col span="6">
+            <Button size="small" type="primary" @click="editAddrBtn(index)">编辑</Button>
+            <Button size="small" type="error" @click="delAddr(index)" style="margin-left:8px;">删除</Button>
+          </Col>
         </Row>
-        <i-button v-if="addrDialog.addressArr.length>2" size="small" type="primary" @click="seeAddress">查看更多</i-button>
+        <Button v-if="addrDialog.addressArr.length>2" size="small" type="primary" @click="seeAddress">查看更多</Button>
       </Form>
       <div slot="footer">
         <Button @click="resetDialogForm('formDialog')">{{label.clear}}</Button>
@@ -204,17 +202,17 @@
     <Modal v-model="addressList" title="地址列表" :mask-closable="false" @on-cancel="closeAddrList" width="1100">
       <!-- 后期这里还要做搜索功能 -->
       <Row>
-          <i-col span="12" v-for="(item,index) in addrDialog.addressArr" :key="index" style="margin-bottom: 8px;"> 
+          <Col span="12" v-for="(item,index) in addrDialog.addressArr" :key="index" style="margin-bottom: 8px;"> 
               <Row>
-                  <i-col span="18">
+                  <Col span="18">
                       办事地址{{index+1}}:  {{item}}
-                  </i-col>   
-                  <i-col span="5" offset="1">
-                      <i-button size="small" type="primary" @click="editAddrBtn(index)">编辑</i-button>
-                      <i-button size="small" type="error" @click="delAddr(index)" style="margin-left:8px;">删除</i-button>
-                  </i-col>
+                  </Col>   
+                  <Col span="5" offset="1">
+                      <Button size="small" type="primary" @click="editAddrBtn(index)">编辑</Button>
+                      <Button size="small" type="error" @click="delAddr(index)" style="margin-left:8px;">删除</Button>
+                  </Col>
               </Row>    
-          </i-col>                
+          </Col>                
       </Row>
       <div slot="footer">
         <Button type="primary" @click="closeAddrList">{{label.sure}}</Button>
@@ -264,69 +262,101 @@
         <Button type="primary" @click="beSure('addrDialog')">确定</Button>
       </div>
     </Modal>
+    <!-- 预览 -->
     <Modal v-model="previewModal" title="预览" id="preview-modal" :mask-closable="false" width="750" @on-cancel="resetPreview">
       <Row>
-          <i-col span="24" class="title">事项基本信息:</i-col>
+          <Col span="24" class="title">事项基本信息:</Col>
       </Row>
       <Row :gutter="16" class-name="preview-row">
-          <i-col span="12">事项名称:  {{previewData.matterName}}</i-col>
-          <i-col span="12" id="service-object">服务对象:  {{previewData.serviceObject}}</i-col>
+          <Col span="12">事项名称:  {{previewData.matterName}}</Col>
+          <Col span="12" id="service-object">服务对象:  {{previewData.serviceObject}}</Col>
       </Row>
       <Row :gutter="16" class-name="preview-row">
-          <i-col span="12">事项来源:  {{previewData.matterSoucreName}}</i-col>
-          <i-col span="12">事项图标:  <img style="max-width: 100px;" :src="previewData.matterIcon" /></i-col>
+          <Col span="12">事项来源:  {{previewData.matterSoucreName}}</Col>
+          <Col span="12">事项图标:  <img style="max-width: 100px;" :src="previewData.matterIcon" /></Col>
       </Row>
       <Row :gutter="16" class-name="preview-row">
-          <i-col span="12">所属分类:  {{previewData.workClassId}}</i-col>
-          <i-col span="12">发布时间:  {{previewData.matterCreateTime}}</i-col>
+          <Col span="12">所属分类:  {{previewData.workClassId}}</Col>
+          <Col span="12">发布时间:  {{previewData.matterCreateTime}}</Col>
       </Row>
       <Row :gutter="16" class-name="preview-row">
-          <i-col span="12">限时说明:  {{previewData.timeLimitExplanation}}</i-col>
-          <i-col span="12">收费标准:  {{previewData.chargingStandard}}</i-col>
+          <Col span="12">限时说明:  {{previewData.timeLimitExplanation}}</Col>
+          <Col span="12">收费标准:  {{previewData.chargingStandard}}</Col>
       </Row>
       <Row :gutter="16" class-name="preview-row">
-          <i-col span="12">所属省市:  {{previewData.provinceCity}}</i-col>
-          <i-col span="12">事项状态:  {{previewData.matterStatus}}</i-col>
+          <Col span="12">所属省市:  {{previewData.provinceCity}}</Col>
+          <Col span="12">事项状态:  {{previewData.matterStatus}}</Col>
       </Row>        
       <Row :gutter="16" class-name="preview-row" style="border-bottom: .5px solid #e9eaec;padding-bottom: 5px;">
-          <i-col span="12">工作电话:  {{previewData.workPhone}}</i-col>
-          <i-col span="12">监督电话:  {{previewData.complaintPhone}}</i-col>
+          <Col span="12">工作电话:  {{previewData.workPhone}}</Col>
+          <Col span="12">监督电话:  {{previewData.complaintPhone}}</Col>
       </Row>        
       <Row class-name="preview-row">
-          <i-col span="24">                
+          <Col span="24">                
               <div class="title">办理条件:</div>
               <div class="preview-txt">{{previewData.requiredConditions}}</div>
-          </i-col>
+          </Col>
       </Row>
       <Row class-name="preview-row">
-          <i-col span="24">                
+          <Col span="24">                
               <div class="title">所需材料:</div>
               <div class="preview-txt">{{previewData.materialRequested}}</div>
-          </i-col>
+          </Col>
       </Row>
       <Row class-name="preview-row">
-          <i-col span="24">                
+          <Col span="24">                
               <div class="title">网上流程:</div>
               <div class="preview-txt">{{previewData.onlineManagement}}</div>
-          </i-col>
+          </Col>
       </Row>
       <Row class-name="preview-row">
-          <i-col span="24">
+          <Col span="24">
               <div class="title">办理依据:</div>
               <div class="preview-txt">{{previewData.managementBasis}}</div>
-          </i-col>
+          </Col>
       </Row>
       <div slot="footer">
         <Button type="primary" @click="resetPreview">{{label.sure}}</Button>
       </div>
     </Modal>
-    
+    <!-- 2 -->
+    <Modal v-model="handleModal" :title="label[currDialog] + handleTitleText" :mask-closable="false" @on-cancel="handleCancle">
+        <Row style="margin-bottom: 10px;">
+            <Button type="primary" @click="showHandleDialog('addHandleModal')" size="small">{{label.add}}</Button>
+        </Row>
+        <Row v-for="(item,index) in handleData" :key="index" style="margin-bottom: 10px;">
+            <Col span="18">
+                <Input :value="item" disabled size="small"></Input>
+            </Col>
+            <Col span="6">
+                <Button type="primary" @click="editHandle(index)" size="small" style="margin-left: 10px;margin-right: 10px;">{{label.edit}}</Button>
+                <Button type="error" @click="deleteHandle(index)" size="small">{{label.delete}}</Button>
+            </Col>
+        </Row>
+        <div slot="footer">
+            <Button @click="handleCancle">取消</Button>            
+            <Button type="primary" @click="handleBesure">确定</Button>
+        </div>
+    </Modal>
+    <!-- 3 -->
+    <Modal v-model="addHandleModal" :title="label[currDialog]" :mask-closable="false" @on-cancel="addHandleCancle">
+        <Form :model="addHandleDialog" ref="addHandleDialog" :rules="rules" :label-width="80">
+            <FormItem :label="handleTitleText" prop="addHandleText">                             
+                <Input v-model="addHandleDialog.addHandleText" placeholder='添加内容'></Input>
+            </FormItem>
+        </Form>
+        <div slot="footer">
+            <Button @click="addHandleCancle">取消</Button>
+            <Button type="primary" @click="addHandleBesure">确定</Button>
+        </div>
+    </Modal>
   </div>
 </template>
 
 <script>
   import mainTable from '@/components/mainTable'
   import paging from '@/components/paging'
+  import util from '@/libs/util'
   export default {
     name: 'workMatter',
     components: {
@@ -353,7 +383,7 @@
               workClassId: '', // 所属分类
               matterCreateTime: '2017-11-17 00:00:00',
               matterStatus: '0', // 事件状态
-              requiredConditions: '条件1', // 办理条件
+              requiredConditions: '1、条件1&nbsp;2、条件2', // 办理条件
               materialRequested: '材料1', // 所需材料
               onlineManagement: '流程1', // 网上流程
               timeLimitExplanation: '说明1', // 限时说明
@@ -470,8 +500,32 @@
         areasId: [],
         addrModal: false,
         previewModal: false,
+        handleModal: false,
+        addHandleModal: false,
+        handleTitleText: '',
         addEdit: true, //默认是新增
         derail_address_arr: [],
+        // 操作数据
+        handleData: [], //存储操作数据  在取消或确定时清空 例子: ["办理条件1","办理条件2","办理条件3"],属于回显数据，还需要一个用于提交的数据 needSubmitData
+        addHandleDialog: {
+          addHandleText: ""
+        },
+        handleTitle: {
+          requiredConditions: "办理条件",
+          materialRequested: "所需材料",
+          onlineManagement: "网上流程"
+        },
+        handleValue: {
+          requiredConditions: [],
+          materialRequested: [],
+          onlineManagement: []
+        },
+        handleIndex: null,
+        handleAddEdit: true,//true表示新增，false表示编辑
+        handleVar: "",//存储添加或编辑的是哪个数据 值为handleTitle的某个key
+        handleObj: '',
+        delimiter: '、',
+        // 操作数据 end
         addrDialog: {
           areasId: "",             
           workMatterId: "",//事项ID
@@ -740,6 +794,12 @@
           }
         }
         vm.addrDialog.addressArr = vm.getAddressArr(vm.util.extend(vm.formDialog.workMatterAddressesList))
+        // 对 handleValue 赋值                
+        vm.handleValue = {
+            requiredConditions: vm.formDialog.requiredConditions,
+            materialRequested: vm.formDialog.materialRequested,
+            onlineManagement: vm.formDialog.onlineManagement
+        }
         vm.currDialog = 'edit'
         vm.dialogShow = true
       },
@@ -753,6 +813,15 @@
         vm.formDialog.workMatterAddressesList = []
         vm.addrDialog.derail_address_obj = []
         vm.addrDialog.addressArr = []
+        vm.handleValue = {
+          requiredConditions: [],
+          materialRequested: [],
+          onlineManagement: []
+        };
+        if(vm.currDialog=="add"){
+          vm.formDialog.workMatterAddressesList = [];
+          vm.addrDialog.addressArr = [];
+        }
         vm.$refs[name].resetFields()
       },
       submitDialogForm (name) {
@@ -790,7 +859,13 @@
       workMatterPreview (data) {
         let vm = this
         let _data = vm.util.extend(data)
+        let status = {
+          '0': '无效',
+          '1': '有效'
+        }
+        _data.matterStatus = status[_data.matterStatus]
         vm.previewData = _data
+        vm.previewData.provinceCity = vm.util.getProvinceCityArea([_data.provincesId,_data.citiesId],vm.chinaJson,true)
         vm.previewModal = true
       },
       // 重置预览内容
@@ -916,7 +991,6 @@
       },
       // 删除地址
       delAddr (index) {
-        console.log(index)
         let vm = this
         vm.$Modal.confirm({
           title: '确定',
@@ -957,6 +1031,125 @@
       closeAddrList: function(){
         this.addressList = false
       },
+      // 操作
+      dataFilterArr: function(data,delimiter){
+        // 第一次传的是 string   之后传的是 array
+        var arr = []
+        if(typeof(data) == "string"){
+          var str = "" + data
+          if(str.trim()=="")return []
+          arr = str.split("&nbsp;")
+          if (arr.length>1){
+            for(var i =0;i<arr.length;i++){
+              arr[i] = arr[i].split(delimiter).slice(1).join("")
+            }
+          }
+        }else{
+          arr = util.extend(data)
+        }
+        return arr
+      },
+      // 将存字符串的数组转成带序号的字符串，并以&nbsp;分割（length>1）,其他时候不处理  返回序列化后的字符串            
+      formatData: function(arrData,delimiter){
+        if(delimiter=="undefined")delimiter = "、"
+        var str = ""
+        if(arrData.length==0){
+          str = ""
+        }else if(arrData.length==1){
+          str = arrData[0].trim()
+        }else{
+          for(var i=0;i<arrData.length;i++){
+            if(i==arrData.length-1){//最后一个不加&nbsp;                            
+              str += (i + 1) + delimiter + arrData[i].trim()
+            }else{
+              str += (i + 1) + delimiter + arrData[i].trim() + "&nbsp;"
+            }
+          }
+        }
+        return str
+      },
+      handleCancle () {
+        this.handleData = []
+        this.handleModal = false
+      },
+      handleBesure () {
+        var vm = this;
+        // 确认添加、编辑操作                     
+        if(vm.handleVar=="requiredConditions"){
+          // 处理的是办理条件
+          vm.formDialog.requiredConditions = vm.formatData(vm.handleData,vm.delimiter);//数据显示                    
+          vm.handleValue.requiredConditions = [].concat(vm.handleData);// 确认时保存数据，保存的是原始数据，没有进行过字符串拼接操作                    
+        }else if(vm.handleVar=="materialRequested"){
+          // 处理的是所需材料
+          vm.formDialog.materialRequested = vm.formatData(vm.handleData,vm.delimiter);
+          vm.handleValue.materialRequested = [].concat(vm.handleData);
+        }else if(vm.handleVar=="onlineManagement"){
+          // 处理的是网上流程
+          vm.formDialog.onlineManagement = vm.formatData(vm.handleData,vm.delimiter);
+          vm.handleValue.onlineManagement = [].concat(vm.handleData);
+        }                
+        vm.handleAddEdit = true;
+        vm.handleModal = false;
+      },
+      showHandleDialog (name, which) {
+        let vm = this
+        vm[name] = true
+        if(which){// 用于控制更改添加或编辑操作弹出框的title
+            vm.handleTitleText = vm.handleTitle[which];
+            // 区分变量赋值
+            vm.handleVar = which;
+        }
+        // 先处理 vm.handleValue   vm.currDialog=="edit"
+        // 新增、编辑的是哪个字段 // "requiredConditions","materialRequested","onlineManagement"                
+        // if(which=="requiredConditions"){
+        //   vm.handleData = vm.dataFilterArr(vm.handleValue.requiredConditions,vm.delimiter)
+        // }else if(which=="materialRequested"){
+        //   vm.handleData = vm.dataFilterArr(vm.handleValue.materialRequested,vm.delimiter)
+        // }else if(which=="onlineManagement"){
+        //   vm.handleData = vm.dataFilterArr(vm.handleValue.onlineManagement,vm.delimiter)
+        // }
+        vm.handleData = vm.dataFilterArr(vm.handleValue[which],vm.delimiter)
+        console.log('vm.handleValue[which]:',typeof vm.handleValue[which])
+        console.log(vm.handleData)
+      },
+      editHandle (index) {
+        var vm = this
+        vm.addHandleModal = true
+        vm.addHandleDialog.addHandleText = vm.handleData[index]
+        vm.handleAddEdit = false
+        vm.handleIndex = index
+      },
+      deleteHandle (index) {
+        var vm = this
+        vm.$Modal.confirm({
+            type: 'confirm',
+            title: '确认',
+            content: '确认删除这条数据吗？',
+            onOk: function () {
+              vm.handleData.splice(index,1)
+            }
+        })
+      },
+      addHandleCancle () {
+        var vm = this
+        vm.addHandleDialog.addHandleText = ""
+        vm.addHandleModal = false
+        vm.handleAddEdit = true
+        vm.handleIndex = null
+      },
+      addHandleBesure () {
+        var vm = this
+        var _data = vm.util.extend(vm.handleData)
+        if(vm.handleAddEdit){
+          // 新增
+          vm.handleData.push(vm.addHandleDialog.addHandleText)
+        }else{
+            // 编辑
+          vm.handleData[vm.handleIndex] = vm.addHandleDialog.addHandleText
+        }
+        vm.addHandleCancle()
+      },
+      // 操作 end
       // 当前页或每页个数发生改变
       changePager (data) {
         this.util.changePager(this, data)

@@ -2,7 +2,7 @@ import { appRoutes } from '@/router/routes'
 import http from './http'
 const util = {
   extend (data) {
-    if (data.length && typeof data !== 'string') {
+    if (data.length && typeof data !== 'string' || data.length == 0) {
       return [].concat(data)
     } else if (typeof data === 'object') {
       let obj = {}
@@ -131,12 +131,19 @@ const util = {
   },
   // 获取省市区文字
   getProvinceCityArea(addressCodeArr, chinaJson, getAll) {
-    let provinceTxt = returnTxt = ''
+    let provinceTxt = '',
+      cityTxt = '',
+      areaTxt = '',
+      returnTxt = ''
     if (addressCodeArr.length == 3) {
       provinceTxt = chinaJson['100000'][addressCodeArr[0]]
-      returnTxt = getAll ? provinceTxt + chinaJson[addressCodeArr[1]] + chinaJson[addressCodeArr[2]] : provinceTxt
+      cityTxt = chinaJson[addressCodeArr[0]][addressCodeArr[1]]
+      areaTxt = chinaJson[addressCodeArr[1]][addressCodeArr[2]]
+      returnTxt = getAll ? provinceTxt + cityTxt + areaTxt : areaTxt
     } else if (addressCodeArr.length == 2) {
-      returnTxt = chinaJson[addressCodeArr[1]]
+      provinceTxt = chinaJson['100000'][addressCodeArr[0]]
+      cityTxt = chinaJson[addressCodeArr[0]][addressCodeArr[1]]
+      returnTxt = getAll ? provinceTxt + cityTxt : cityTxt
     } else {
       returnTxt = chinaJson['100000'][addressCodeArr[0]]
     }

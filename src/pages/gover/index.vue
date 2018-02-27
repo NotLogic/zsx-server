@@ -6,7 +6,7 @@
         <Input v-model="formSearch.title" placeholder="标题" size="small" style="width: 120px"></Input>
       </FormItem>
       <FormItem label="关联地区">
-        <Cascader :data="derail_address_arr_ss" v-model="derail_address_obj_s" @on-change="searchAddrChange" filterable size="small" style="margin-top: 5px;"></Cascader>
+        <Cascader :data="derail_address_arr" v-model="derail_address_obj_s" @on-change="searchAddrChange" filterable size="small" style="margin-top: 5px;"></Cascader>
       </FormItem>
       <FormItem label="状态" prop="status">
         <Select v-model="formSearch.status" placeholder="请选择" style="width: 80px;" size="small" clearable>
@@ -123,22 +123,64 @@
           delete: 'gover/delete.do'
         },
         pager: {
+          data: [
+            {
+              id: '123456789',
+              title: '灵璧广业·凯旋门项目二期规划 批前公示',
+              provinceId: '340000',
+              cityId: '341300',
+              areaId: '341323',
+              image: 'http://www.lingbi.gov.cn/UploadFile/image/20171215/2017121516510522522.jpg',
+              content: '',
+              governmentSource: '灵璧县政府网',
+              sourceUrl: 'http://www.szns.gov.cn/xxgk/qzfxxgkml/zcwj/qjzcwj/201712/t20171208_10200040.htm',
+              governmentDate: '2017-12-15 00:00:00',
+              dateRule: '123',
+              status: '1'
+            }, {
+              id: '123456789',
+              title: '浍塘沟商贸城项目《建设工程规划许可证》批前公示',
+              provinceId: '340000',
+              cityId: '341300',
+              areaId: '341323',
+              image: 'http://www.lingbi.gov.cn/UploadFile/image/20180102/20180102085222382238.jpg',
+              content: '',
+              governmentSource: '灵璧县政府网',
+              sourceUrl: 'http://www.szns.gov.cn/xxgk/qzfxxgkml/zcwj/qjzcwj/201710/t20171012_9339847.htm',
+              governmentDate: '2017-12-15 00:00:00',
+              dateRule: '456',
+              status: '0'
+            }, {
+              id: '123456789',
+              title: '中意制丝有限责任公司2.5万吨粮食仓储库建设项目《建设工程规划许可证》批前公示',
+              provinceId: '340000',
+              cityId: '341300',
+              areaId: '341323',
+              image: 'http://www.lingbi.gov.cn/UploadFile/image/20171212/20171212161063206320.jpg',
+              content: '',
+              governmentSource: '灵璧县政府网',
+              sourceUrl: 'http://www.szns.gov.cn/xxgk/qzfxxgkml/zcwj/qjzcwj/201710/t20171012_9339848.htm',
+              governmentDate: '2017-12-15 00:00:00',
+              dateRule: '789',
+              status: '1'
+            }
+          ],
           url: 'gover/dataGrid.do'
         },
         currDialog: 'add',
         dialogShow: false,
         dialogSubmitLoading: false,
+        chinaJson: {},
         derail_address_arr: [],
         derail_address_obj_sub: [],
         derail_address_obj_s: [],
-        derail_address_arr_ss: [],
         formSearch: {
           title: '',
           status: '',
           areaId: ''
         },
         formDialog: {
-          id: '0',
+          id: '',
           title: '',
           provinceId: '',
           cityId: '',
@@ -205,7 +247,7 @@
               var vm = this
               var txt = ''
               var addrArr = [params.row.provinceId]
-              txt = vm.getProvinceCityArea(addrArr, vm.derail_address_arr)
+              txt = vm.util.getProvinceCityArea(addrArr, vm.chinaJson)
               return create('span', txt)
             }
           }, {
@@ -217,7 +259,7 @@
               var vm = this
               var txt = ''
               var addrArr = [params.row.provinceId, params.row.cityId]
-              txt = vm.getProvinceCityArea(addrArr, vm.derail_address_arr)
+              txt = vm.util.getProvinceCityArea(addrArr, vm.chinaJson)
               return create('span', txt)
             }
           }, {
@@ -229,17 +271,17 @@
               var vm = this
               var txt = ''
               var addrArr = [params.row.provinceId, params.row.cityId, params.row.areaId]
-              txt = vm.getProvinceCityArea(addrArr, vm.derail_address_arr)
+              txt = vm.util.getProvinceCityArea(addrArr, vm.chinaJson)
               return create('span', txt)
             }
           }, {
-            title: '政策来源',
-            key: 'policySoucre',
+            title: '政务来源',
+            key: 'governmentSource',
             width: 120,
             sortable: true
           }, {
-            title: '政策时间',
-            key: 'policyDate',
+            title: '政务发布时间',
+            key: 'governmentDate',
             width: 180,
             sortable: true
           }, {
@@ -320,6 +362,7 @@
         let vm = this
         vm.formDialog.id = '0'
         vm.formDialog.image = ''
+        vm.derail_address_obj_sub = []
         vm.$refs[name].resetFields()
       },
       getProvinceCityArea () {},
@@ -327,14 +370,22 @@
       subAddrChange () {},
       handleSuccess () {},
       handleFormatError () {},
-      initDialog (data) {},
+      initDialog (data) {
+        let vm = this
+        let _data = vm.util.extend(data)
+        vm.derail_address_obj_sub = [_data.provinceId, _data.cityId, _data.areaId]
+      },
       changePager (data) {
         this.util.changePager(this, data)
       },
       paging () {
         this.util.paging(this)
       },
-      initData () {}
+      initData () {
+        let vm = this
+        vm.chinaJson = JSON.parse(sessionStorage.chinaJson)
+        vm.derail_address_arr = JSON.parse(sessionStorage.chinaData)
+      }
     },
     computed: {
       label () {

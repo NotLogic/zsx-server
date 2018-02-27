@@ -6,7 +6,7 @@
         <Input v-model="formSearch.title" placeholder="标题" size="small" style="width: 120px"></Input>
       </FormItem>
       <FormItem label="关联地区">
-        <Cascader :data="derail_address_arr_ss" v-model="derail_address_obj_s" @on-change="searchAddrChange" filterable size="small" style="margin-top: 5px;"></Cascader>
+        <Cascader :data="derail_address_arr" v-model="derail_address_obj_s" @on-change="searchAddrChange" filterable size="small" style="margin-top: 5px;"></Cascader>
       </FormItem>
       <FormItem label="状态" prop="status">
         <Select v-model="formSearch.status" placeholder="请选择" style="width: 80px;" size="small" clearable>
@@ -179,10 +179,10 @@
         currDialog: 'add',
         dialogShow: false,
         dialogSubmitLoading: false,
+        chinaJson: {},
         derail_address_arr: [],
         derail_address_obj_sub: [],
         derail_address_obj_s: [],
-        derail_address_arr_ss: [],
         formSearch: {
           title: '',
           status: '',
@@ -370,20 +370,38 @@
         let vm = this
         vm.formDialog.id = '0'
         vm.formDialog.image = ''
+        vm.derail_address_obj_sub = []
         vm.$refs[name].resetFields()
+      },
+      resetSearch (name) {
+        let vm = this
+        vm.$refs[name].resetFields()
+        vm.derail_address_obj_s = []
+        vm.submitSearch(name)
+      },
+      submitSearch (name) {
+
       },
       searchAddrChange () {},
       subAddrChange () {},
       handleSuccess () {},
       handleFormatError () {},
-      initDialog (data) {},
+      initDialog (data) {
+        let vm = this
+        let _data = vm.util.extend(data)
+        vm.derail_address_obj_sub = [_data.provinceId, _data.cityId, _data.areaId]
+      },
       changePager (data) {
         this.util.changePager(this, data)
       },
       paging () {
         this.util.paging(this)
       },
-      initData () {}
+      initData () {
+        let vm = this
+        vm.chinaJson = JSON.parse(sessionStorage.chinaJson)
+        vm.derail_address_arr = JSON.parse(sessionStorage.chinaData)
+      }
     },
     computed: {
       label () {
