@@ -129,7 +129,52 @@
           paging: 'policy/dataGrid.do'
         },
         pager: {
-          url: "policy/dataGrid.do"
+          url: "policy/dataGrid.do",
+          data: [
+            {
+              id: '12345678',
+              title: '大鹏新区出台重点产业项目遴选实施办法',
+              provinceId: '440000',
+              image: 'http://www.sz.gov.cn/lhxq/qt/zsyz/tzdt/201706/W020170612595410856312.jpg',
+              cityId: '440300',
+              areaId: '440306',
+              content: '',
+              sourceUrl: 'http://www.sz.gov.cn/dpxq/qt/zsy',
+              policySoucre: '深圳市政府网',
+              policyDate: '2017-12-13 00:00:00',
+              createTime: '2017-12-13 00:00:00',
+              dateRule: '123',
+              status: '0'
+            }, {
+              id: '12345678',
+              title: '提供优质服务 助力企业做大做强',
+              provinceId: '440000',
+              image: 'http://www.sz.gov.cn/lhxq/qt/zsyz/tzdt/201706/W020170612595410856312.jpg',
+              cityId: '440100',
+              areaId: '440113',
+              content: '',
+              sourceUrl: 'http://www.sz.gov.cn/dpxq/qt/zsy',
+              policySoucre: '深圳市政府网',
+              policyDate: '2017-12-21 00:00:00',
+              createTime: '2017-12-13 00:00:00',
+              dateRule: '456',
+              status: '1'
+            }, {
+              id: '12345678',
+              title: '高交会圆满闭幕 大鹏新区亮点纷呈',
+              provinceId: '440000',
+              image: 'http://barb.sznews.com/attachment/images/201710/11/9c0a3c20-d207-4f57-9258-2a4e2a778956.jpg.1',
+              cityId: '440600',
+              areaId: '440607',
+              content: '',
+              sourceUrl: 'http://www.sz.gov.cn/dpxq/qt/zsy',
+              policySoucre: '深圳市政府网',
+              policyDate: '2017-10-16 00:00:00',
+              createTime: '2017-12-13 00:00:00',
+              dateRule: '789',
+              status: '0'
+            }
+          ]
         },
         currDialog: 'add',
         dialogShow: false,
@@ -144,13 +189,13 @@
           areaId: ''
         },
         formDialog: {
-          id: '0',
+          id: '',
           title: '',
           provinceId: '',
           image: '',
           cityId: '',
           areaId: '',
-          content: '',
+          content: '', // 富文本内容
           sourceUrl: '',
           policySoucre: '',
           policyDate: '',
@@ -196,7 +241,7 @@
               var vm = this
               var txt = ""
               var addrArr = [params.row.provinceId]
-              txt = vm.getProvinceCityArea(addrArr, vm.derail_address_arr)
+              txt = vm.util.getProvinceCityArea(addrArr, vm.chinaJson)
               return create('span', txt)
             }
           }, {
@@ -208,7 +253,7 @@
               var vm = this
               var txt = ""
               var addrArr = [params.row.provinceId, params.row.cityId];
-              txt = vm.getProvinceCityArea(addrArr, vm.derail_address_arr);
+              txt = vm.util.getProvinceCityArea(addrArr, vm.chinaJson);
               return create('span', txt)
             }
           }, {
@@ -220,12 +265,12 @@
               var vm = this
               var txt = ""
               var addrArr = [params.row.provinceId, params.row.cityId, params.row.areaId]
-              txt = vm.getProvinceCityArea(addrArr, vm.derail_address_arr)
+              txt = vm.util.getProvinceCityArea(addrArr, vm.chinaJson)
               return create('span', txt)
             }
           }, {
-            title: "政务来源",
-            key: "governmentSource",
+            title: "政策来源",
+            key: "policySoucre",
             width: 120,
             sortable: true
           }, {
@@ -243,8 +288,8 @@
               }, params.row.sourceUrl)
             }
           }, {
-            title: "政务发布时间",
-            key: "governmentDate",
+            title: "政策时间",
+            key: "policyDate",
             width: 180,
             sortable: true
           }, {
@@ -253,7 +298,7 @@
             width: 180,
             sortable: true
           }, {
-            title: "政务时间规则",
+            title: "时间规则",
             key: "dateRule",
             width: 180,
             sortable: true
@@ -327,7 +372,6 @@
         vm.formDialog.image = ''
         vm.$refs[name].resetFields()
       },
-      getProvinceCityArea () {},
       searchAddrChange () {},
       subAddrChange () {},
       handleSuccess () {},

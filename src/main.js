@@ -43,3 +43,5 @@ new Vue({
   created () {},
   methods: {}
 })
+// 初始化时将地址数据存入sessionStorage
+util.initChinaDataAndJson()

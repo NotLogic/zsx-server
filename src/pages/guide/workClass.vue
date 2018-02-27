@@ -319,9 +319,7 @@
         this.formSearch.cityCode = value[1]
       },
       addrChange (value) {
-        let vm = this
-        console.log(value)
-        vm.formDialog.cityCode = value[1]
+        this.formDialog.cityCode = value[1]
       },
       handleSuccess (res, file) {
         if(res.state=="SUCCESS"){
@@ -333,7 +331,7 @@
         this.$Message.error('文件格式错误，请选择jpg,jpeg或png格式的文件')
       },
       getAddrByCityId (cityId) {
-        let data = util.extend(this.chinaJson)
+        let data = util.extend(JSON.parse(sessionStorage.chinaJson))
         let provinceCode = ('' + cityId).slice(0,2) + '0000'
         let cityCode = ('' + cityId).slice(0,4) + '00'
         let txt = data['100000'][provinceCode] + data[provinceCode][cityCode]
@@ -343,13 +341,11 @@
         util.paging(this)
       },
       initData () {
+        // chinaJson 在main.js中初始化
         let vm = this
         // 初始化省市数据
-        if (!sessionStorage.chinaJson) {
-          util.initChinaDataAndJson()
-        }
-        let chinaJson = util.extend(JSON.parse(sessionStorage.chinaJson))
-        let chinaData = util.extend(JSON.parse(sessionStorage.chinaData))
+        let chinaJson = JSON.parse(sessionStorage.chinaJson)
+        let chinaData = JSON.parse(sessionStorage.chinaData)
         let _chinaData = util.extend(chinaData)
         _chinaData.forEach(item => {
           item.children.forEach(children => {

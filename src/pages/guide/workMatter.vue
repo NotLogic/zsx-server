@@ -200,6 +200,26 @@
         <Button type="primary" @click="submitDialogForm('formDialog')" :loading="dialogSubmitLoading">{{label.submit}}</Button>
       </div>
     </Modal>
+    <!-- 地址列表 -->
+    <Modal v-model="addressList" title="地址列表" :mask-closable="false" @on-cancel="closeAddrList" width="1100">
+      <!-- 后期这里还要做搜索功能 -->
+      <Row>
+          <i-col span="12" v-for="(item,index) in addrDialog.addressArr" :key="index" style="margin-bottom: 8px;"> 
+              <Row>
+                  <i-col span="18">
+                      办事地址{{index+1}}:  {{item}}
+                  </i-col>   
+                  <i-col span="5" offset="1">
+                      <i-button size="small" type="primary" @click="editAddrBtn(index)">编辑</i-button>
+                      <i-button size="small" type="error" @click="delAddr(index)" style="margin-left:8px;">删除</i-button>
+                  </i-col>
+              </Row>    
+          </i-col>                
+      </Row>
+      <div slot="footer">
+        <Button type="primary" @click="closeAddrList">{{label.sure}}</Button>
+      </div>
+    </Modal>
     <!-- 地址弹出框 -->
     <Modal v-model="addrModal" :title="addEdit ? label.add : label.edit" :mask-closable="false" width="750" @on-cancel="resetAddr('addrDialog')">
         <Form :model="addrDialog" ref="addrDialog" :rules="rules" :label-width="100"> 
@@ -300,6 +320,7 @@
         <Button type="primary" @click="resetPreview">{{label.sure}}</Button>
       </div>
     </Modal>
+    
   </div>
 </template>
 
@@ -330,7 +351,7 @@
               matterSoucreName: '来源1', // 事项来源
               matterIcon: 'http://img.taopic.com/uploads/allimg/120727/201995-120HG1030762.jpg',
               workClassId: '', // 所属分类
-              matterCreateTime: '',
+              matterCreateTime: '2017-11-17 00:00:00',
               matterStatus: '0', // 事件状态
               requiredConditions: '条件1', // 办理条件
               materialRequested: '材料1', // 所需材料
@@ -343,19 +364,19 @@
               complaintPhone: '0371-12345678', // 监督电话
               workMatterAddressesList: [
                 {
-                  areasId:"410502",
+                  areasId:"410103",
                   companyName:"324",
                   matterSoucreUrl:"234",
                   workAddress:"234",
                   workDate:"1324"
                 },{
-                  areasId:"410502",
+                  areasId:"410103",
                   companyName:"324",
                   matterSoucreUrl:"234",
                   workAddress:"234",
                   workDate:"1324"
                 },{
-                  areasId:"410502",
+                  areasId:"410103",
                   companyName:"324",
                   matterSoucreUrl:"234",
                   workAddress:"234",
@@ -370,7 +391,7 @@
               matterSoucreName: '来源2', // 事项来源
               matterIcon: 'http://img.zcool.cn/community/01690955496f930000019ae92f3a4e.jpg@2o.jpg',
               workClassId: '', // 所属分类
-              matterCreateTime: '',
+              matterCreateTime: '2017-11-17 00:00:00',
               matterStatus: '1', // 事件状态
               requiredConditions: '条件2', // 办理条件
               materialRequested: '材料2', // 所需材料
@@ -383,13 +404,13 @@
               complaintPhone: '0371-12345678', // 监督电话
               workMatterAddressesList: [
                 {
-                  areasId:"410502",
+                  areasId:"411023",
                   companyName:"324",
                   matterSoucreUrl:"234",
                   workAddress:"234",
                   workDate:"1324"
                 },{
-                  areasId:"410502",
+                  areasId:"411023",
                   companyName:"324",
                   matterSoucreUrl:"234",
                   workAddress:"234",
@@ -404,7 +425,7 @@
               matterSoucreName: '来源3', // 事项来源
               matterIcon: 'http://img.zcool.cn/community/0142135541fe180000019ae9b8cf86.jpg@1280w_1l_2o_100sh.png',
               workClassId: '', // 所属分类
-              matterCreateTime: '',
+              matterCreateTime: '2017-11-17 00:00:00',
               matterStatus: '1', // 事件状态
               requiredConditions: '条件3', // 办理条件
               materialRequested: '材料3', // 所需材料
@@ -430,6 +451,7 @@
         },
         currDialog: 'add',
         dialogShow: false,
+        addressList: false,
         dialogSubmitLoading: false,
         workClassId: [],
         matterStatus: [
@@ -442,6 +464,7 @@
             label: '有效'
           }
         ],
+        editIndex: 0, // 编辑地址的索引
         previewData: {},
         // 区数据
         areasId: [],
@@ -614,7 +637,13 @@
                     props: { type: 'primary', size: 'small' },
                     on: {
                       click: function () {
-                        console.log('显示地址数据')
+                        vm.addrDialog.derail_address_obj = [
+                            params.row.provincesId,
+                            params.row.citiesId
+                        ]
+                        vm.formDialog.workMatterAddressesList = params.row.workMatterAddressesList
+                        vm.addrDialog.addressArr = vm.getAddressArr(vm.util.extend(params.row.workMatterAddressesList))
+                        vm.seeAddress()
                       }
                     }
                   }, '查看地址列表')
@@ -833,22 +862,31 @@
       beSure (name) {
         var vm = this;     
         vm.$refs[name].validate(function (valid) {  
-            if(vm.addrDialog.areasId){
-              if(vm.currDialog=="edit"){
-                  vm.addAddrAjax()
-              }
-              vm.formDialog.workMatterAddressesList.push({
-                  areasId: vm.addrDialog.areasId,
-                  workAddress: vm.addrDialog.workAddress,
-                  workDate: vm.addrDialog.workDate,
-                  companyName: vm.addrDialog.companyName,
-                  matterSoucreUrl: vm.addrDialog.matterSoucreUrl
-              })
-              vm.addrDialog.addressArr = vm.getAddressArr(vm.util.extend(vm.formDialog.workMatterAddressesList))
-              vm.resetAddr(name)
-            }else{
-              vm.$Message.error("请选择区");
+          if(vm.addrDialog.areasId){
+            if(vm.currDialog=="edit"){
+                vm.addAddrAjax()
             }
+            // 确定添加、编辑地址后的显示处理
+            if (vm.addEdit) {
+              // 如果是新增时的地址新增确定
+              vm.formDialog.workMatterAddressesList.push({
+                areasId: vm.addrDialog.areasId,
+                workAddress: vm.addrDialog.workAddress,
+                workDate: vm.addrDialog.workDate,
+                companyName: vm.addrDialog.companyName,
+                matterSoucreUrl: vm.addrDialog.matterSoucreUrl
+              })
+            } else {
+              // 如果是编辑时的地址新增确定
+              for (let key in vm.formDialog.workMatterAddressesList[vm.editIndex]) {
+                vm.formDialog.workMatterAddressesList[vm.editIndex][key] = vm.addrDialog[key]
+              }
+            }
+            vm.addrDialog.addressArr = vm.getAddressArr(vm.util.extend(vm.formDialog.workMatterAddressesList))
+            vm.resetAddr(name)
+          }else{
+            vm.$Message.error("请选择区");
+          }
         })
       },
       addAddrAjax () {
@@ -868,16 +906,12 @@
       editAddrBtn (index) {
         let vm = this
         vm.addEdit = false
+        vm.editIndex = index
         vm.areasId = vm.getArea(vm.addrDialog.derail_address_obj[1])
-        console.log(vm.areasId)
         let data = vm.util.extend(vm.formDialog.workMatterAddressesList[index])
-        setTimeout(() => {
-          for (let key in data) {
-            vm.addrDialog[key] = data[key]
-          }
-          console.log(vm.addrDialog.areasId)
-        }, 0);
-        
+        for (let key in data) {
+          vm.addrDialog[key] = data[key]
+        }
         vm.addrModal = true
       },
       // 删除地址
@@ -888,17 +922,41 @@
           title: '确定',
           content: '确定删除这条数据？',
           onOk: function () {
-            if (vm.currDialog == 'add') {
-              vm.addrDialog.addressArr.splice(index,1)
-              vm.formDialog.workMatterAddressesList.splice(index,1)
-            } else if (vm.currDialog == 'edit') {
-              // 发送删除请求
+            if(vm.formDialog.workMatterAddressesList.length<=1){
+              vm.$Message.error("至少保留一个地址")
+            }else{
+              if (vm.currDialog == 'add') {
+                vm.addrDialog.addressArr.splice(index,1)
+                vm.formDialog.workMatterAddressesList.splice(index,1)
+              } else if (vm.currDialog == 'edit') {
+                // 发送删除请求
+                // 暂时没有 workMatterAddressesId 所以ajaxId未定义
+                var ajaxId = vm.formDialog.workMatterAddressesList[index].workMatterAddressesId
+                if(ajaxId){
+                  var delAddrData = {
+                      "id": ajaxId
+                  }
+                  if (true) {
+                    vm.addrDialog.addressArr.splice(index,1)
+                    vm.formDialog.workMatterAddressesList.splice(index,1)
+                    vm.paging()
+                    vm.$Message.success("操作成功")
+                  }
+                } else {
+                  vm.$Message.error("区id不存在");
+                }
+              }
             }
           }
         })
       },
       // 查看地址列表
-      seeAddress () {},
+      seeAddress () {
+        this.addressList = true
+      },
+      closeAddrList: function(){
+        this.addressList = false
+      },
       // 当前页或每页个数发生改变
       changePager (data) {
         this.util.changePager(this, data)
@@ -951,7 +1009,13 @@
         return this.$store.state.label
       }
     },
-    watch: {},
+    watch: {
+      dialogShow (val) {
+        if (!val) {
+          this.currDialog = 'add'
+        }
+      }
+    },
     created () {
       let vm = this
       // 初始化其他数据
@@ -975,6 +1039,9 @@
 #preview-modal .title{
   font-size: 15px;
   font-weight: 700;
+}
+.preview-row{
+    margin: 4px 0;
 }
 .preview-txt{
   max-height: 165px;

@@ -120,25 +120,27 @@ const util = {
       chinaJson.areaId
     ]
   },
-  pagingFiltData (obj) {
-    for (let key in obj) {
-      if (typeof obj[key] === 'string' && obj[key].trim() === '') {
-        delete obj[key]
-      }
+  // 将省市区数据存入sessionStorage
+  initChinaDataAndJson() {
+    http.get('/static/data/address.json').then(res => {
+      let chinaJson = util.extend(res.data)
+      let chinaData = util.getChinaDataByJson(util.extend(res.data))
+      sessionStorage.chinaJson = JSON.stringify(chinaJson)
+      sessionStorage.chinaData = JSON.stringify(chinaData)
+    })
+  },
+  // 获取省市区文字
+  getProvinceCityArea(addressCodeArr, chinaJson, getAll) {
+    let provinceTxt = returnTxt = ''
+    if (addressCodeArr.length == 3) {
+      provinceTxt = chinaJson['100000'][addressCodeArr[0]]
+      returnTxt = getAll ? provinceTxt + chinaJson[addressCodeArr[1]] + chinaJson[addressCodeArr[2]] : provinceTxt
+    } else if (addressCodeArr.length == 2) {
+      returnTxt = chinaJson[addressCodeArr[1]]
+    } else {
+      returnTxt = chinaJson['100000'][addressCodeArr[0]]
     }
-    if (obj.data) {
-      delete obj.data
-    }
-    if (obj.url || obj.url === '') {
-      delete obj.url
-    }
-    if (obj.method) {
-      delete obj.method
-    }
-    if (obj.total) {
-      delete obj.total
-    }
-    return obj
+    return returnTxt
   },
   // 更新面包屑
   setCurrentPath (vm, name) {
@@ -251,6 +253,27 @@ const util = {
     }
     return parentName
   },
+  // 过滤请求提交的数据
+  pagingFiltData(obj) {
+    for (let key in obj) {
+      if (typeof obj[key] === 'string' && obj[key].trim() === '') {
+        delete obj[key]
+      }
+    }
+    if (obj.data) {
+      delete obj.data
+    }
+    if (obj.url || obj.url === '') {
+      delete obj.url
+    }
+    if (obj.method) {
+      delete obj.method
+    }
+    if (obj.total) {
+      delete obj.total
+    }
+    return obj
+  },
   // 请求页面table数据
   paging (vm) {
     let util = this
@@ -275,14 +298,6 @@ const util = {
     }
     util.paging(vm)
   },
-  // ------- 将省市区数据存入sessionStorage ----------
-  initChinaDataAndJson () {
-    http.get('/static/data/address.json').then(res => {
-      let chinaJson = util.extend(res.data)
-      let chinaData = util.getChinaDataByJson(util.extend(res.data))
-      sessionStorage.chinaJson = JSON.stringify(chinaJson)
-      sessionStorage.chinaData = JSON.stringify(chinaData)
-    })
-  }
+  
 }
 export default util
