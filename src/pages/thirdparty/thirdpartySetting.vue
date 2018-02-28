@@ -36,7 +36,8 @@
           </Col>
           <Col span="12">
             <FormItem label="接口名称" prop="apiName">
-              <Input v-model="formDialog.apiName" placeholder="请输入接口名称" :disabled="onOffDisabled"></Input>
+              <Input v-if="currDialog=='add'" v-model="formDialog.apiName" placeholder="请输入接口名称"></Input>
+              <Input v-else v-model="formDialog.apiName" placeholder="请输入接口名称" disabled></Input>
             </FormItem>
           </Col>
         </Row>
@@ -80,14 +81,24 @@
               </Select>
             </FormItem>
           </Col>
-          <Col span="12" v-show="showApiIcon">
+          <Col v-if="formDialog.thirdpartyType=='1'" span="12">
             <FormItem label="工具图标" prop="apiIcon">
-              <Upload name=""
-                      action=""
-                      :on-success="uploadSuccess"
-                      :show-upload-list="false">
-                <Button type="primary" size="small">工具图标</Button>
-              </Upload>
+              <Row>
+                <Col span="12">
+                  <div style="width:130px;height:130px;border:1px solid #eee;">
+                    <img v-if="formDialog.classIcon" style="max-width:100%;" :src="formDialog.classIcon"/>
+                    <img v-else style="max-width:100%;" src="static/images/img-upload-default.png"/>
+                  </div>
+                </Col>
+                <Col span="12" style="text-align:right;">
+                  <Upload name=""
+                          action=""
+                          :on-success="uploadSuccess"
+                          :show-upload-list="false">
+                    <Button type="primary" size="small">工具图标</Button>
+                  </Upload>
+                </Col>
+              </Row>
             </FormItem>
           </Col>
         </Row>
@@ -107,6 +118,131 @@
         <Button type="primary" @click="submitDialogForm('formDialog')" :loading="dialogSubmitLoading">
           {{label.submit}}
         </Button>
+      </div>
+    </Modal>
+    <!-- 调试 -->
+    <Modal v-model="debuggerDialogShow" title="调试" :mask-closable="false" width="750" @on-cancel="resetDubberForm('debuggerFormDialog')">
+      <Form :model="debuggerFormDialog" ref="debuggerFormDialog" :rules="rules" :label-width="90">
+        <Row>
+          <Col span="12">
+            <FormItem label="调试接口名称">
+              <Select v-model="debuggerFormDialog.settingId" filterable placeholder="请选择或输入调试接口名称">
+                <Option v-for="item in debuggingApiNameMap" :value="item.value" :key="item.value">{{item.label}}</Option>
+              </Select>
+            </FormItem>
+          </Col>
+          <Col span="12">
+            <FormItem label="请求方式" prop="httpMethod">
+              <Select v-model="debuggerFormDialog.httpMethod" placeholder="请选择请求方式" style="width: 140px;">
+                <Option v-for="item in httpMethod" :value="item.value" :key="item.value">{{item.label}}</Option>
+              </Select>
+            </FormItem>
+          </Col>
+        </Row>
+        <Row>
+          <Col span="12">
+            <FormItem label="是否加密" prop="isEncrypt">
+              <Select v-model="debuggerFormDialog.isEncrypt" placeholder="请选择是否加密" style="width: 140px;">
+                <Option value="0">否</Option>
+                <Option value="1">是</Option>
+              </Select>
+            </FormItem>
+          </Col>
+          <Col span="12">
+            <FormItem label="编码格式" prop="charSet">
+              <Select v-model="debuggerFormDialog.charSet" placeholder="请选择编码格式" style="width: 140px;">
+                <Option v-for="item in charSet" :value="item.value" :key="item.value">{{item.label}}</Option>
+              </Select>
+            </FormItem>
+          </Col>
+        </Row>
+        <Row>
+          <Col span="12">
+            <FormItem label="请求配置" prop="httpParameter">                        
+              <Row>
+                <Col span="18">
+                  <Input v-model="debuggerFormDialog.httpParameter" disabled></Input>
+                </Col>
+                <Col span="6" style="text-align: right;">
+                  <Button type="primary" @click="showHandleDialog('handleModal','httpParameter')" size="small">添加</Button>
+                </Col>
+              </Row>
+            </FormItem>
+          </Col>
+          <Col span="12">
+            <FormItem label="头部" prop="headers">
+              <Row>
+                <Col span="18">
+                  <Input v-model="debuggerFormDialog.headers" disabled></Input>
+                </Col>
+                <Col span="6" style="text-align: right;">
+                  <Button type="primary" @click="showHandleDialog('handleModal','headers')" size="small">添加</Button>
+                </Col>
+              </Row>
+            </FormItem>
+          </Col>
+        </Row>
+        <Row v-show="messageShow">
+          <Col span="20">
+            {{message}}
+          </Col>
+          <Col span="4">
+            <Button type="primary" @click="closeMessage" size="small">关闭</Button>
+          </Col>
+        </Row>
+      </Form>
+      <div slot="footer">
+        <Button @click="resetDubberForm('debuggerFormDialog')">取消</Button>
+        <Button type="primary" @click="submitDebuggerDialogForm('debuggerFormDialog')">调试</Button>
+      </div>
+    </Modal>
+    <!-- 添加请求配置、头部 -->
+    <Modal v-model="handleModal" :title="settingHeaderTxt" :mask-closable="false" @on-cancel="handleCancle">
+      <Row style="margin-bottom: 10px;">
+        <Button type="primary" @click="showHandleDialog('addHandleModal')" size="small">{{label.add}}</Button>
+      </Row>
+      <Row v-show="isShow" style="margin-bottom: 10px;">
+        <Col span="18">
+          <Row style="text-align: center;" :gutter="16">
+            <Col span="12">key</Col>
+            <Col span="12">value</Col>
+          </Row>
+        </Col>
+        <Col span="6"></Col>            
+      </Row>
+      <Row v-for="(item,index) in handleData" :key="index" style="margin-bottom: 10px;">
+        <Col span="18">
+          <Row :gutter="16">
+            <Col span="12">
+              <Input v-model="item.key" placeholder='key' size="small" disabled></Input>
+            </Col>
+            <Col span="12">
+              <Input v-model="item.value" placeholder='value' size="small" disabled></Input>
+            </Col>
+          </Row>
+        </Col>
+        <Col span="6">
+          <Button type="primary" @click="editHandle(index)" size="small" style="margin-left: 10px;margin-right: 10px;">编辑</Button>
+          <Button type="error" @click="deleteHandle(index)" size="small">删除</Button>
+        </Col>
+      </Row>        
+      <div slot="footer">
+        <Button @click="handleCancle">取消</Button>            
+        <Button type="primary" @click="handleBesure">确定</Button>
+      </div>
+    </Modal>
+    <Modal v-model="addHandleModal" title="添加" :mask-closable="false" @on-cancel="addHandleCancle('addHandleDialog')">
+      <Form :model="addHandleDialog" ref="addHandleDialog" :rules="rules" :label-width="80">
+        <FormItem label="key" prop="key">
+          <Input :autofocus="true" v-model="addHandleDialog.key" placeholder='key'></Input>
+        </FormItem>
+        <FormItem label="value" prop="value">
+          <Input v-model="addHandleDialog.value" placeholder='value'></Input>
+        </FormItem>
+      </Form>
+      <div slot="footer">
+        <Button @click="addHandleCancle('addHandleDialog')">取消</Button>
+        <Button type="primary" @click="addHandleBesure('addHandleDialog')">确定</Button>
       </div>
     </Modal>
   </div>
@@ -130,16 +266,66 @@
           debugger: 'thirdpartySetting/debug.do'
         },
         pager: {
+          data: [
+            {
+              id: '948819372377862144',
+              thirdpartyClassid: '948818526680346624',
+              thirdpartyType: '2',
+              apiName: '黄历',
+              apiUrl: 'http://jisuhlcx.market.alicloudapi.com/huangli/date',
+              apiIcon: '',
+              apiDesc: '工具类型API直接访问即可',
+              apiKey: '',
+              apiSecret: '',
+              apiCode: '',
+              apiStatus: '1'
+            }, {
+              id: '948861862766120960',
+              thirdpartyClassid: '948818816473198592',
+              thirdpartyType: '2',
+              apiName: '重置IM用户密码',
+              apiUrl: 'http://a1.easemob.com/{0}/{1}/users/{2}/password',
+              apiIcon: '',
+              apiDesc: '0:org_name 1:app_name 2:{owner_username} 用户名',
+              apiKey: '',
+              apiSecret: '',
+              apiCode: '',
+              apiStatus: '1'
+            }, {
+              id: '948867166710992896',
+              thirdpartyClassid: '948818816473198592',
+              thirdpartyType: '2',
+              apiName: '转让群组',
+              apiUrl: 'http://a1.easemob.com/{0}/{1}/chatgroups/{2}',
+              apiIcon: '',
+              apiDesc: '0:org_name 1:app_name 2：群组ID',
+              apiKey: '',
+              apiSecret: '',
+              apiCode: '',
+              apiStatus: '1'
+            }
+          ],
           url: 'thirdpartySetting/dataGrid.do'
         },
         currDialog: 'add',
         dialogShow: false,
         dialogSubmitLoading: false,
-        showApiIcon: false,
         isComm: false,
         onOffDisabled: false,
-        thirdpartyClassidMap: {},
-        thirdpartyClassid: [],
+        thirdpartyClassidMap: {
+          '948818526680346624': '阿里云-云市场',
+          '948818816473198592': '环信'
+        },
+        thirdpartyClassid: [
+          {
+            'value': '948818526680346624',
+            'label': '阿里云-云市场'
+          },
+          {
+            'value': '948818816473198592',
+            'label': '环信'
+          }
+        ],
         formSearch: {
           apiName: '',
           thirdpartyClassid: '',
@@ -159,6 +345,56 @@
           apiStatus: '1'
         },
         debuggerDialogShow: false,
+        debuggerFormDialog: {
+          settingId: "",
+          httpMethod: "",
+          isEncrypt: "0",
+          httpParameter: "",
+          headers: "",
+          // bodys: "",
+          charSet: "UTF-8"
+        },
+        debuggingApiNameMap: [],
+        httpMethod: [
+          {
+            value: "GET",
+            label: "GET"
+          },{
+            value: "POST",
+            label: "POST"
+          },{
+            value: "PUT",
+            label: "PUT"
+          },{
+            value: "DELETE",
+            label: "DELETE"
+          }
+        ],
+        charSet: [
+          {
+            value: "ISO-8859-A",
+            label: "ISO-8859-A"
+          },{
+            value: "UTF-8",
+            label: "UTF-8"
+          }
+        ],
+        messageShow: false,
+        message: "",
+        settingHeaderTxt: "",//判断新增的是请求配置还是头部，值为请求配置或头部
+        handleModal: false,
+        isShow: false,
+        handleData: [],
+        addHandleModal: false,
+        handleAddEdit: true,
+        addHandleDialog: {
+          key: "",
+          value: ""
+        },
+        rememberData:{//保存已添加的数据
+          headers: [],
+          httpParameter: []
+        },
         columns: [
           {
             title: '配置ID',
@@ -287,21 +523,164 @@
         vm.formDialog.id = '0'
         vm.$refs[name].resetFields()
       },
-      submitDialogForm (name) {},
+      submitDialogForm (name) {
+        let vm = this
+        vm.$refs[name].validate(function (valid) {
+          if (valid) {
+            let ajaxData = vm.util.editAddAjaxData(vm)
+            console.log(ajaxData)
+            vm.$store.dispatch('submitDialogForm', {
+              'vm': vm,
+              'name': name
+            })
+          }
+        })
+      },
       uploadSuccess () {},
       resetSearch (name) {
         var vm = this
+        vm.formSearch.thirdpartyClassid = ''
         vm.$refs[name].resetFields()
+        vm.submitSearch(name)
       },
       submitSearch (name) {
-        console.log('搜索')
+        let vm = this
+        vm.$store.dispatch('submitSearch', {
+          'vm': vm,
+          'name': name
+        })
+      },
+      closeMessage: function(){
+        this.messageShow = false
+        this.message = ""
+      },
+      // 重置调试表单
+      resetDubberForm: function(name){
+        var vm = this;
+        vm.debuggerDialogShow = false;
+        vm.debuggerApiName = "";
+        vm.debuggerFormDialog.isEncrypt = "0";
+        vm.debuggerFormDialog.settingId = "";
+        vm.debuggerFormDialog.httpMethod = "";
+        vm.debuggerFormDialog.charSet = "UTF-8";
+        vm.$refs[name].resetFields();
+        vm.closeMessage();
+        vm.handleData = [];
+        vm.rememberData = {//清空已添加的数据
+          headers: [],
+          httpParameter: []
+        };
+      },
+      // 提交调试表单
+      submitDebuggerDialogForm: function(name){
+        console.log('提交调试表单')
+      },
+      handleCancle: function(){
+        var vm = this
+        vm.settingHeaderTxt = ""
+        vm.handleData = []
+        vm.handleModal = false;
+      },
+      handleBesure: function(){
+        var vm = this
+        if(vm.settingHeader=="httpParameter"){
+          vm.rememberData.httpParameter = vm.util.extend(vm.handleData)
+          vm.debuggerFormDialog.httpParameter = vm.formatData(vm.handleData)
+        }else if(vm.settingHeader=="headers"){
+          vm.rememberData.headers = vm.util.extend(vm.handleData)
+          vm.debuggerFormDialog.headers = vm.formatData(vm.handleData,true)
+        }
+        vm.handleAddEdit = true
+        vm.handleCancle()
+      },
+      // 添加按钮
+      showHandleDialog: function(name,choice){
+        var vm = this
+        vm[name] = true
+        if(typeof(choice)=="undefined")return
+        if(choice=="httpParameter"){
+          vm.settingHeaderTxt = "添加请求配置"
+        }else if(choice=="headers"){
+          vm.settingHeaderTxt = "添加头部"
+        }
+        vm.settingHeader = choice;
+        // // 数据回显
+        vm.handleData = vm.util.extend(vm.rememberData[choice])
+      },
+      // 3添加
+      addHandleBesure: function(name){
+        var vm = this
+        var key = "" + vm.addHandleDialog.key
+        var value = "" + vm.addHandleDialog.value
+        if(vm.handleAddEdit){
+          // 添加
+          vm.handleData.push({
+              "key": key,
+              "value": value
+          })
+        }else{
+          // 编辑
+          vm.handleData[vm.handleIndex].key = key
+          vm.handleData[vm.handleIndex].value = value
+        }
+        vm.addHandleCancle(name)
+      },
+      addHandleCancle: function(name){
+        var vm = this
+        vm.$refs[name].resetFields()
+        vm.addHandleModal = false
+        vm.handleAddEdit = true
+        vm.handleIndex = null
+      },
+      editHandle: function(index){
+        var vm = this
+        vm.addHandleModal = true
+        vm.addHandleDialog.key = vm.handleData[index].key
+        vm.addHandleDialog.value = vm.handleData[index].value
+        vm.handleAddEdit = false
+        vm.handleIndex = index //编辑的索引
+      },
+      deleteHandle: function(index){
+        var vm = this;
+        vm.$Modal.confirm({
+          type: 'confirm',
+          title: '确认',
+          content: '确认删除这条数据吗？',
+          onOk: function () {
+            vm.handleData.splice(index,1);
+          }
+        })
+      },
+      formatData: function(data,hasSpace){
+        let vm = this
+        if(typeof(hasSpace)=="undefinde")hasSpace = false
+        var _data = vm.util.extend(data)
+        if(_data.length==0)return "";
+        var str = "";
+        for(var i=0;i<_data.length;i++){
+          if(i==_data.length-1){
+            if(hasSpace){
+              str += '"' + _data[i].key.trim() + '":"' + _data[i].value.trim() + '"';
+            }else{
+              str += '"' + _data[i].key.split(" ").join("").trim() + '":"' + _data[i].value.split(" ").join("").trim() + '"';    
+            } 
+          }else{
+            if(hasSpace){
+              str += '"' + _data[i].key.trim() + '":"' + _data[i].value.trim() + '",'; 
+            }else{
+              str += '"' + _data[i].key.split(" ").join("").trim() + '":"' + _data[i].value.split(" ").join("").trim() + '",';    
+            }
+          }
+        }
+        str = "{" + str + "}";
+        return str;
       },
       initDialog (data) {},
       changePager (data) {
-        this.util.changePager(this, data)
+          this.util.changePager(this, data)
       },
       paging () {
-        this.util.paging(this)
+          this.util.paging(this)
       },
       initData () {}
     },
@@ -312,6 +691,13 @@
       vm.paging(vm)
     },
     mounted () {
+    },
+    watch: {
+      dialogShow (val) {
+        if (!val) {
+          this.currDialog = 'add'
+        }
+      }
     }
   }
 </script>

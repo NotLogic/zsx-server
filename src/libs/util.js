@@ -281,6 +281,22 @@ const util = {
     }
     return obj
   },
+  // 编辑和新增提交的数据不同，新增时不提交id
+  editAddAjaxData (vm) {
+    let ajaxData = {}
+    if (vm.currDialog === 'add') {
+      for (let key in vm.formDialog) {
+        if (key != 'id') {
+          ajaxData[key] = vm.formDialog[key]
+        }
+      }
+    } else if (vm.currDialog === 'edit') {
+      for (let key in vm.formDialog) {
+        ajaxData[key] = vm.formDialog[key]
+      }
+    }
+    return ajaxData
+  },
   // 请求页面table数据
   paging (vm) {
     let util = this

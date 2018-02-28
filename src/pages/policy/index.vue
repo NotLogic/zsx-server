@@ -6,7 +6,7 @@
         <Input v-model="formSearch.title" placeholder="标题" size="small" style="width: 120px"></Input>
       </FormItem>
       <FormItem label="关联地区">
-        <Cascader :data="derail_address_arr" v-model="derail_address_obj_s" @on-change="searchAddrChange" filterable size="small" style="margin-top: 5px;"></Cascader>
+        <Cascader :data="derail_address_arr" v-model="derail_address_obj_s" filterable size="small" style="margin-top: 5px;"></Cascader>
       </FormItem>
       <FormItem label="状态" prop="status">
         <Select v-model="formSearch.status" placeholder="请选择" style="width: 80px;" size="small" clearable>
@@ -50,7 +50,7 @@
         <Row>
           <Col span="12">
             <FormItem label="政策时间" prop="policyDate">
-              <Date-picker type="date" v-model="formDialog.policyDate" :editable="false" placeholder="请选择日期"></Date-picker>
+              <DatePicker type="date" v-model="formDialog.policyDate" :editable="false" placeholder="请选择日期"></DatePicker>
             </FormItem>
           </Col>
           <Col span="12">
@@ -104,6 +104,37 @@
         <Button type="primary" @click="submitDialogForm('formDialog')" :loading="dialogSubmitLoading">{{label.submit}}</Button>
       </div>
     </Modal>
+    <!-- 预览 -->
+    <Modal v-model="previewModal" title="预览" id="preview-modal" :styles="{top:'50px'}" width="850" @on-cancel="resetPreview">
+    	<Row>
+    		<i-col span="24" class="title">招商基本信息:</i-col>
+    	</Row>
+    	<Row :gutter="16" class-name="preview-row">
+            <i-col span="12">标题:  {{previewData.title}}</i-col>
+            <i-col span="12" id="preview-image">图片:  <img :src="previewData.image"></i-col>
+        </Row>
+        <Row :gutter="16" class-name="preview-row">
+            <i-col span="12">来源地址:  <a :href="previewData.sourceUrl" target="_blank">{{previewData.sourceUrl}}</a></i-col>
+            <i-col span="12">所属地区:  {{previewData.provinceCityarea}}</i-col>
+        </Row>
+        <Row :gutter="16" class-name="preview-row">
+            <i-col span="12">政策来源:  {{previewData.policySoucre}}</i-col>
+            <i-col span="12">政策时间:  {{previewData.policyDate}}</i-col>
+        </Row>
+        <Row :gutter="16" class-name="preview-row" style="border-bottom: .5px solid #e9eaec;padding-bottom: 5px;">
+            <i-col span="12">时间规则:  {{previewData.dateRule}}</i-col>
+            <i-col span="12">状态:  {{previewData.status}}</i-col>
+        </Row>  
+        <Row class-name="preview-row">
+            <i-col span="24">
+                <div class="title">招商内容:</div>
+                <div class="preview-txt" v-html="previewData.content"></div>
+            </i-col>
+        </Row>      
+    	<div slot="footer">            
+            <i-button type="primary" @click="resetPreview">确定</i-button>
+        </div>
+	</Modal>
   </div>
 </template>
 
@@ -179,6 +210,8 @@
         currDialog: 'add',
         dialogShow: false,
         dialogSubmitLoading: false,
+        previewModal: false,
+        previewData: {},
         chinaJson: {},
         derail_address_arr: [],
         derail_address_obj_sub: [],
@@ -327,7 +360,7 @@
                   style: { marginRight: '5px' },
                   on: {
                     click: function () {
-                      console.log('预览')
+                      vm.policyPreview(params.index,params.row)
                     }
                   }
                 }, '预览'),
@@ -373,6 +406,19 @@
         vm.derail_address_obj_sub = []
         vm.$refs[name].resetFields()
       },
+      submitDialogForm (name) {
+        let vm = this
+        vm.$refs[name].validate(function (valid) {
+          if (valid) {
+            let ajaxData = vm.util.editAddAjaxData(vm)
+            console.log(ajaxData)
+            vm.$store.dispatch('submitDialogForm', {
+              'vm': vm,
+              'name': name
+            })
+          }
+        })
+      },
       resetSearch (name) {
         let vm = this
         vm.$refs[name].resetFields()
@@ -380,12 +426,43 @@
         vm.submitSearch(name)
       },
       submitSearch (name) {
-
+        let vm = this
+        vm.$store.dispatch('submitSearch', {
+          'vm': vm,
+          'name': name
+        })
       },
-      searchAddrChange () {},
-      subAddrChange () {},
-      handleSuccess () {},
-      handleFormatError () {},
+      subAddrChange (value) {
+        var vm = this
+				vm.formDialog.provinceId = value[0]
+				vm.formDialog.cityId = value[1]
+				vm.formDialog.areaId = value[2]
+      },
+      handleSuccess (res) {
+        if(res.state=="SUCCESS"){
+          this.$Message.success("上传成功！")
+          this.formDialog.image = res.url
+        }
+      },
+      handleFormatError () {
+        this.$Message.error('文件格式错误，请选择jpg,jpeg或png格式的文件')
+      },
+      resetPreview () {
+        this.previewModal = false
+        this.previewData = {}
+      },
+      policyPreview: function(index,data){
+				var vm = this;
+				var _data= vm.util.extend(data);
+        if(_data.status=="0"){
+            _data.status = "未发布";
+        }else{
+            _data.status = "已发布";
+        }                                
+        _data.provinceCityarea = vm.util.getProvinceCityArea([_data.provinceId,_data.cityId,_data.areaId],vm.chinaJson,true);                
+        vm.previewData = _data;
+        vm.previewModal = true;
+			},
       initDialog (data) {
         let vm = this
         let _data = vm.util.extend(data)
@@ -416,10 +493,42 @@
     },
     mounted () {
     },
-    watch: {}
+    watch: {
+      dialogShow (val) {
+        if (!val) {
+          this.currDialog = 'add'
+        }
+      },
+      derail_address_obj_s (val) {
+        if (val[val.length - 1] == null) return
+        this.formSearch.areaId = val[val.length - 1]
+      }
+    }
   }
 </script>
 
 <style scoped>
-
+  #preview-modal .ivu-col{
+		font-size: 14px;
+		word-wrap:break-word;
+	}
+	#preview-modal .ivu-modal-header-inner{
+		font-size: 20px;
+	}
+	#preview-modal .title{
+		font-size: 15px;
+    font-weight: 700;
+	}
+	.preview-row{
+    margin: 4px 0;
+	}
+	#preview-image img{
+		max-width: 150px;
+		max-height: 150px;
+	}
+	.preview-txt{
+		max-height: 450px;
+		overflow-y:auto;     
+    text-indent: 28px;
+	}
 </style>

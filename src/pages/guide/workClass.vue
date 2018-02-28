@@ -312,7 +312,14 @@
       submitDialogForm (name) {
         let vm = this
         vm.$refs[name].validate(function (valid) {
-          console.log(vm.formDialog)
+          if (valid) {
+            let ajaxData = vm.util.editAddAjaxData(vm)
+            console.log(ajaxData)
+            vm.$store.dispatch('submitDialogForm', {
+              'vm': vm,
+              'name': name
+            })
+          }
         })
       },
       searchAddrChange (value) {
@@ -362,7 +369,13 @@
         return this.$store.state.label
       }
     },
-    watch: {},
+    watch: {
+      dialogShow (val) {
+        if (!val) {
+          this.currDialog = 'add'
+        }
+      }
+    },
     created () {
       let vm = this
       vm.initData()

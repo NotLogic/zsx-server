@@ -41,8 +41,8 @@
             </FormItem>
           </Col>
           <Col span="12">
-            <FormItem label="来源Url" prop="sourceUrl">
-              <Input v-model="formDialog.sourceUrl" placeholder="请输入来源Url"></Input>
+            <FormItem label="来源地址" prop="sourceUrl">
+              <Input v-model="formDialog.sourceUrl" placeholder="请输入来源地址"></Input>
             </FormItem>
           </Col>
         </Row>
@@ -101,6 +101,37 @@
       <div slot="footer">
         <Button @click="resetDialogForm('formDialog')">{{label.clear}}</Button>
         <Button type="primary" @click="submitDialogForm('formDialog')" :loading="dialogSubmitLoading">{{label.submit}}</Button>
+      </div>
+    </Modal>
+    <!-- 预览 -->
+    <Modal v-model="previewModal" id="preview-modal" title="预览" :styles="{top:'50px'}" :mask-closable="false" width="850" @on-cancel="resetPreview">
+      <Row>
+        <Col span="24" class="title">政务基本信息:</Col>
+      </Row>
+      <Row :gutter="16" class-name="preview-row">
+        <Col span="12">标题:  {{previewData.title}}</Col>
+        <Col span="12" id="preview-image">图片:   <img :src="previewData.image"></Col>
+      </Row>
+      <Row :gutter="16" class-name="preview-row">            
+        <Col span="12">所属地区:  {{previewData.provinceCityarea}}</Col>
+        <Col span="12">政务来源:  {{previewData.governmentSource}}</Col>
+      </Row>
+      <Row :gutter="16" class-name="preview-row">
+        <Col span="12">来源地址:  <a :href="previewData.sourceUrl" target="_blank">{{previewData.sourceUrl}}</a></Col>
+        <Col span="12">政务发布时间:  {{previewData.governmentDate}}</Col>
+      </Row>
+      <Row :gutter="16" class-name="preview-row" style="border-bottom: .5px solid #e9eaec;padding-bottom: 5px;">
+        <Col span="12">政务时间规则:  {{previewData.dateRule}}</Col>
+        <Col span="12">状态:  {{previewData.status}}</Col>
+      </Row>
+      <Row class-name="preview-row">
+        <Col span="24">
+          <div class="title">政务内容:</div>
+          <div class="preview-txt" v-html="previewData.content"></div>
+        </Col>
+      </Row>
+      <div slot="footer">            
+        <Button type="primary" @click="resetPreview">确定</Button>
       </div>
     </Modal>
   </div>
@@ -170,6 +201,8 @@
         currDialog: 'add',
         dialogShow: false,
         dialogSubmitLoading: false,
+        previewModal: false,
+        previewData: {},
         chinaJson: {},
         derail_address_arr: [],
         derail_address_obj_sub: [],
@@ -319,7 +352,7 @@
                   style: { marginRight: '5px' },
                   on: {
                     click: function () {
-                      console.log('预览')
+                      vm.policyPreview(params.index, params.row)
                     }
                   }
                 }, '预览'),
@@ -365,11 +398,68 @@
         vm.derail_address_obj_sub = []
         vm.$refs[name].resetFields()
       },
-      getProvinceCityArea () {},
-      searchAddrChange () {},
-      subAddrChange () {},
-      handleSuccess () {},
-      handleFormatError () {},
+      submitDialogForm (name) {
+        let vm = this
+        vm.$refs[name].validate(function (valid) {
+          if (valid) {
+            let ajaxData = vm.util.editAddAjaxData(vm)
+            console.log(ajaxData)
+            vm.$store.dispatch('submitDialogForm', {
+              'vm': vm,
+              'name': name
+            })
+          }
+        })
+      },
+      searchAddrChange (value) {
+        this.formSearch.areaId = value[2]
+      },
+      subAddrChange (value) {
+        var vm = this
+				vm.formDialog.provinceId = value[0]
+				vm.formDialog.cityId = value[1]
+				vm.formDialog.areaId = value[2]
+      },
+      handleSuccess (res) {
+        if(res.state=="SUCCESS"){
+          this.$Message.success("上传成功！")
+          this.formDialog.image = res.url
+        }
+      },
+      handleFormatError () {
+        this.$Message.error('文件格式错误，请选择jpg,jpeg或png格式的文件')
+      },
+      policyPreview: function(index,data){
+        var vm = this;
+        var _data= vm.util.extend(data);
+        if(_data.status=="0"){
+          _data.status = "未发布"
+        }else{
+          _data.status = "已发布"
+        }
+        _data.provinceCityarea = vm.util.getProvinceCityArea([_data.provinceId,_data.cityId,_data.areaId],vm.chinaJson,true);                
+        vm.previewData = _data
+        vm.previewModal = true
+      },
+      resetPreview: function(){
+        this.previewModal = false
+        this.previewData = {}
+      },
+      resetSearch (name) {
+        var vm = this
+        vm.formSearch.status = ""
+        vm.formSearch.areaId = ''
+				vm.derail_address_obj_s = []
+        vm.$refs[name].resetFields()
+        vm.submitSearch(name)
+      },
+      submitSearch (name) {
+        let vm = this
+        vm.$store.dispatch('submitSearch', {
+          'vm': vm,
+          'name': name
+        })
+      },
       initDialog (data) {
         let vm = this
         let _data = vm.util.extend(data)
@@ -401,10 +491,38 @@
     mounted () {
       
     },
-    watch: {}
+    watch: {
+      dialogShow (val) {
+        if (!val) {
+          this.currDialog = 'add'
+        }
+      }
+    }
   }
 </script>
 
 <style scoped>
-
+  #preview-modal .ivu-col{
+		font-size: 14px;
+		word-wrap:break-word;
+	}
+	#preview-modal .ivu-modal-header-inner{
+		font-size: 20px;
+	}
+	#preview-modal .title{
+    font-size: 15px;
+    font-weight: 700;
+	}
+	.preview-row{
+    margin: 4px 0;
+	}
+	#preview-image img{
+  max-width: 150px;
+  max-height:150px;
+	}
+	.preview-txt{
+  max-height: 450px;
+  overflow-y:auto;    
+  text-indent: 28px;
+	}
 </style>

@@ -92,6 +92,31 @@
           delete: 'thirdpartyClass/delete.do'
         },
         pager: {
+          data: [
+            {
+              id: '948818526680346624',
+              name: '阿里云-云市场',
+              thirdpartyKey: '24697083',
+              thirdpartySecret: '006d099557db912ee6bb9d8030829868',
+              orgName: '',
+              thirdpartyUser: '深圳市众善行',
+              thirdpartyPass: 'zsx88888888',
+              thirdpartyCode: '1c334e54b3974fe681125643fe20e3cf',
+              appName: '',
+              isComm: '0'
+            }, {
+              id: '948818816473198592',
+              name: '环信',
+              thirdpartyKey: '1101180104178346#qq',
+              thirdpartySecret: 'YXA6Pv54YoCXalATvmLDn3bWYwRuNtY',
+              orgName: '1101180104178346',
+              thirdpartyUser: 'xiayang730@sohu.com',
+              thirdpartyPass: '3431265',
+              thirdpartyCode: 'YXA67-NfUPD8EeeZNs-bqOrVXQ',
+              appName: 'qq',
+              isComm: '1'
+            }
+          ],
           url: 'thirdpartyClass/dataGrid.do'
         },
         currDialog: 'add',
@@ -209,10 +234,21 @@
       },
       resetDialogForm (name) {
         let vm = this
-        vm.formDialog.id = '0'
         vm.$refs[name].resetFields()
       },
-      submitDialogForm (name) {},
+      submitDialogForm (name) {
+        let vm = this
+        vm.$refs[name].validate(function (valid) {
+          if (valid) {
+            let ajaxData = vm.util.editAddAjaxData(vm)
+            console.log(ajaxData)
+            vm.$store.dispatch('submitDialogForm', {
+              'vm': vm,
+              'name': name
+            })
+          }
+        })
+      },
       initDialog (data) {},
       paging () {
         this.util.paging(this)
@@ -226,6 +262,13 @@
       vm.paging(vm)
     },
     mounted () {
+    },
+    watch: {
+      dialogShow (val) {
+        if (!val) {
+          this.currDialog = 'add'
+        }
+      }
     }
   }
 </script>

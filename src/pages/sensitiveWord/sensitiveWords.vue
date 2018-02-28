@@ -1,20 +1,23 @@
 <template>
   <div class="sensitiveWords">
-    <Form inline>
-      <FormItem>
-        <Button type="primary" @click="addRow" size="small">{{label.add}}</Button>
-      </FormItem>
-      <FormItem>
+    <i-form :model="formSearch" ref="formSearch" inline :label-width="60">
+        <Form-item label="敏感词" prop="searchWord">
+            <i-input v-model="formSearch.word" placeholder="敏感词" size="small"></i-input>
+        </Form-item>
+        <Button type="ghost" style="margin-right: 8px;margin-top: 5px;" @click="resetSearch('formSearch')" size="small">{{label.clear}}</Button>
+        <Button type="primary" style="margin-right: 8px;margin-top: 5px;" @click="submitSearch('formSearch')" size="small">{{label.search}}</Button>
+        <Button type="primary" style="margin-right: 8px;margin-top: 5px;" @click="refurbish" size="small">敏感词库立即生效</Button>
+        <Button type="primary" style="margin-right: 8px;margin-top: 5px;" @click="addRow" size="small">{{label.add}}</Button>
         <Upload name="execlFile"
                 action="sensitiveWord/execl.do"
                 :on-success="upExeclSuccess"
                 :format="['xlsx']"
                 :on-format-error="handleFormatError"
-                :show-upload-list="false">
-          <Button type="primary" size="small">{{label.uploadExcel}}</Button>
+                :show-upload-list="false"
+                style="display:inline-block;">
+          <Button type="primary" size="small" style="margin-top:5px;">{{label.uploadExcel}}</Button>
         </Upload>
-      </FormItem>
-    </Form>
+    </i-form>
     <!-- <mainTable :columns="columns" :data="pager.data" :height="610"></mainTable> -->
     <mainTable :columns="columns" :data="pager.data"></mainTable>
     <paging @changePager="changePager" @paging="paging" :total="pager.total" :currPage="pager.currPage" :pagesize="pager.pagesize" :page-size-opts="pageSizeOpts"></paging>
@@ -53,23 +56,31 @@
           add: 'sensitiveWord/add.do',
           edit: 'sensitiveWord/edit.do',
           delete: 'sensitiveWord/delete.do',
-          paging: '',
           refurbish: 'sensitiveWord/refurbish.do' //词库立即生效
         },
         pager: {
+          data: [
+            {
+              id: '955404688858189825',
+              word: '安局办公楼'
+            }, {
+              id: '946291305121988608',
+              word: '龚平'
+            }, {
+              id: '946291305197486080',
+              word: '黄色网站'
+            }
+          ],
           url: 'sensitiveWord/dataGrid.do',
           pagesize: 50
         },
         currDialog: 'add',
         dialogShow: false,
         dialogSubmitLoading: false,
-        data: [
-          {
-            id: '12324',
-            word: 'asd'
-          }
-        ],
         pageSizeOpts: [50, 100, 150, 200],
+        formSearch: {
+            word: ""
+        },
         formDialog: {
           id: '',
           word: ''
@@ -137,16 +148,41 @@
       upExeclSuccess () {},
       handleFormatError () {},
       resetDialogForm (name) {
-        let vm = this
-        vm.formDialog.id = '0'
-        vm.$refs[name].resetFields()
+        this.$refs[name].resetFields()
       },
       submitDialogForm (name) {
         let vm = this
-        vm.$store.dispatch('submitDialogForm', {
-          'vm': this,
+        vm.$refs[name].validate(function (valid) {
+          if (valid) {
+            let ajaxData = vm.util.editAddAjaxData(vm)
+            console.log(ajaxData)
+            vm.$store.dispatch('submitDialogForm', {
+              'vm': vm,
+              'name': name
+            })
+          }
+        })
+      },
+      resetSearch (name) {
+        this.$refs[name].resetFields()
+        this.submitSearch(name)
+      },
+      submitSearch (name) {
+        let vm = this
+        vm.$store.dispatch('submitSearch', {
+          'vm': vm,
           'name': name
         })
+      },
+      // 敏感词库立即生效
+      refurbish () {},
+      upExeclSuccess (res) {
+        if(res.code){
+          this.$Message.success("上传成功！")
+        } 
+      },
+      handleFormatError () {
+        this.$Message.error('文件格式错误，请选择xlsx格式的文件')
       },
       initDialog (data) {},
       changePager (data) {
@@ -164,6 +200,13 @@
       vm.paging(vm)
     },
     mounted () {
+    },
+    watch: {
+      dialogShow (val) {
+        if (!val) {
+          this.currDialog = 'add'
+        }
+      }
     }
   }
 </script>

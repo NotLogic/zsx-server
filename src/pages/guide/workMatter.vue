@@ -881,6 +881,10 @@
             ajaxData.workMatter = JSON.stringify(workMatter)
             ajaxData.workMatterAddressesList = JSON.stringify(workMatterAddressesList)
             console.log(ajaxData)
+            vm.$store.dispatch('submitDialogForm', {
+              'vm': vm,
+              'name': name
+            })
             vm.editAddrData = [] //提交数据后清除
           }
         })

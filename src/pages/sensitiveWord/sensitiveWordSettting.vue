@@ -50,20 +50,31 @@
           defaultRule: 'sensitiveWordSettting/setting.do' //设置默认规则
         },
         pager: {
+          data: [
+            {
+              id: '946583771071037440',
+              rpWord: "qweqwe",
+              matchType: "1",
+              isdefault: "1"
+            }, {
+              id: '946583771071037441',
+              rpWord: "sd",
+              matchType: "2",
+              isdefault: "0"
+            }, {
+              id: '946583771071037442',
+              rpWord: "qw123",
+              matchType: "1",
+              isdefault: "0"
+            }
+          ],
           url: 'sensitiveWordSettting/dataGrid.do'
         },
         currDialog: 'add',
         dialogShow: false,
         dialogSubmitLoading: false,
-        data: [
-          {
-            id: '213123',
-            rpWord: "as",
-            matchType: "2",
-            isdefault: "1"
-          }
-        ],
         formDialog: {
+          id: '',
           rpWord: "",
           matchType: "1",
           isdefault: "0"
@@ -121,6 +132,24 @@
                     }
                   }
                 }, '编辑'),
+                (function(){
+                  if(params.row.isdefault == '1'){
+                    return create('Button', {
+                      props: { type: 'primary', size: 'small' ,disabled: true},
+                      style: { marginRight: '5px' }
+                    }, '设为默认')
+                  }else{
+                    return create('Button', {
+                      props: { type: 'primary', size: 'small' },
+                      style: { marginRight: '5px' },
+                      on: {
+                        click: function () {
+                          vm.setDefaultRule(params.index)
+                        }
+                      }
+                    }, '设为默认');
+                  }
+                })(),
                 create('Button', {
                   props: {
                     type: 'error',
@@ -154,10 +183,26 @@
       handleFormatError () {},
       resetDialogForm (name) {
         let vm = this
-        vm.formDialog.id = '0'
+        vm.formDialog.matchType = "1"
+        vm.formDialog.isdefault = "0"
         vm.$refs[name].resetFields()
       },
-      submitDialogForm (name) {},
+      submitDialogForm (name) {
+        let vm = this
+        vm.$refs[name].validate(function (valid) {
+          if (valid) {
+            let ajaxData = vm.util.editAddAjaxData(vm)
+            console.log(ajaxData)
+            vm.$store.dispatch('submitDialogForm', {
+              'vm': vm,
+              'name': name
+            })
+          }
+        })
+      },
+      setDefaultRule (index) {
+        console.log('设为默认index：',index)
+      },
       initDialog () {},
       paging () {
         this.util.paging(this)
