@@ -525,6 +525,7 @@
         handleVar: "",//存储添加或编辑的是哪个数据 值为handleTitle的某个key
         handleObj: '',
         delimiter: '、',
+        editAddrData: [], //编辑地址时点击过编辑按钮的数据  ，在提交表单或取消提交时重置
         // 操作数据 end
         addrDialog: {
           areasId: "",             
@@ -569,7 +570,6 @@
           workMatterAddressesList: [], // 编辑时至少有一个值
           complaintPhone: '' // 监督电话
         },
-        // 提交的地址数据  这是一个复合数据
         columns: [
           {
             title: '编号',
@@ -627,19 +627,37 @@
             title: '办理条件',
             key: 'requiredConditions',
             width: 500,
-            ellipsis: true
+            ellipsis: true,
+            render: (create, params) => {
+              let vm = this
+              let hasNbsp = !!params.row.requiredConditions.indexOf('&nbsp;')
+              let txt = hasNbsp ? (params.row.requiredConditions + '').split("&nbsp;").join(" ") : params.row.requiredConditions
+              return create('span',txt)
+            }
           },
           {
             title: '所需材料',
             key: 'materialRequested',
             width: 350,
-            ellipsis: true
+            ellipsis: true,
+            render: (create, params) => {
+              let vm = this
+              let hasNbsp = !!params.row.materialRequested.indexOf('&nbsp;')
+              let txt = hasNbsp ? (params.row.materialRequested + '').split("&nbsp;").join(" ") : params.row.materialRequested
+              return create('span',txt)
+            }
           },
           {
             title: '网上流程',
             key: 'onlineManagement',
             width: 500,
-            ellipsis: true
+            ellipsis: true,
+            render: (create, params) => {
+              let vm = this
+              let hasNbsp = !!params.row.onlineManagement.indexOf('&nbsp;')
+              let txt = hasNbsp ? (params.row.onlineManagement + '').split("&nbsp;").join(" ") : params.row.onlineManagement
+              return create('span',txt)
+            }
           },
           {
             title: '限时说明',
@@ -822,12 +840,21 @@
           vm.formDialog.workMatterAddressesList = [];
           vm.addrDialog.addressArr = [];
         }
+        vm.editAddrData = []
         vm.$refs[name].resetFields()
       },
       submitDialogForm (name) {
         let vm = this
         vm.$refs[name].validate(function (valid) {
           if (valid) {
+            if (!vm.addrDialog.derail_address_obj.length) {
+              vm.$Message.error('请选择省市，并添加办事地址')
+              return
+            }
+            if (!vm.formDialog.workMatterAddressesList.length) {
+              vm.$Message.error('请至少添加一个办事地址')
+              return
+            }
             let ajaxData = {
               'workMatter': '',
               'workMatterAddressesList': ''
@@ -846,12 +873,15 @@
                 workMatter[key] = vm.formDialog[key]
               }
               // 编辑时提交的地址数据是地址列表中点过编辑按钮的数据，如果都没点过编辑，则提交第一个
-              // 先提交所有的
-              workMatterAddressesList = vm.util.extend(vm.formDialog.workMatterAddressesList)
+              if (vm.editAddrData.length==0) {
+                vm.editAddrData.push(vm.formDialog.workMatterAddressesList[0])
+              }
+              workMatterAddressesList = vm.editAddrData
             }
             ajaxData.workMatter = JSON.stringify(workMatter)
             ajaxData.workMatterAddressesList = JSON.stringify(workMatterAddressesList)
             console.log(ajaxData)
+            vm.editAddrData = [] //提交数据后清除
           }
         })
       },
@@ -864,6 +894,16 @@
           '1': '有效'
         }
         _data.matterStatus = status[_data.matterStatus]
+        if(_data.requiredConditions.indexOf("&nbsp;")!="-1"){
+          // 原数据直接展示  有  &nbsp; 的数据去掉 &nbsp;
+          _data.requiredConditions = _data.requiredConditions.split("&nbsp;").join(" ");
+        }
+        if(_data.materialRequested.indexOf("&nbsp;")!="-1"){
+          _data.materialRequested = _data.materialRequested.split("&nbsp;").join(" ");
+        }
+        if(_data.onlineManagement.indexOf("&nbsp;")!="-1"){
+          _data.onlineManagement = _data.onlineManagement.split("&nbsp;").join(" ");
+        }
         vm.previewData = _data
         vm.previewData.provinceCity = vm.util.getProvinceCityArea([_data.provincesId,_data.citiesId],vm.chinaJson,true)
         vm.previewModal = true
@@ -893,6 +933,8 @@
         var vm = this
         vm.formDialog.provincesId = value[0]
         vm.formDialog.citiesId = value[1]
+        vm.addrDialog.derail_address_obj = value
+        console.log('vm.addrDialog.derail_address_obj: ',vm.addrDialog.derail_address_obj)
       },
       handleSuccess (res) {
         if(res.state=="SUCCESS"){
@@ -987,6 +1029,7 @@
         for (let key in data) {
           vm.addrDialog[key] = data[key]
         }
+        vm.editAddrData.push(vm.formDialog.workMatterAddressesList[index])
         vm.addrModal = true
       },
       // 删除地址

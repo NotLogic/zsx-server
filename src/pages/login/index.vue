@@ -66,6 +66,10 @@
             vm.$http.post(vm.loginUrl, vm.loginForm).then(function (res) {
               if (res.data.code == 1) {
                 vm.fn()
+              } else {
+                vm.$Message.error(res.data.message)
+                vm.loginForm.username = ''
+                vm.loginForm.password = ''
               }
             })
           }
