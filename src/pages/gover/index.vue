@@ -131,7 +131,7 @@
         </Col>
       </Row>
       <div slot="footer">            
-        <Button type="primary" @click="resetPreview">确定</Button>
+        <Button type="primary" @click="resetPreview">{{label.close}}</Button>
       </div>
     </Modal>
   </div>

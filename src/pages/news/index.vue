@@ -58,7 +58,7 @@
               <Row>
                 <Col span="12">
                   <div class="image_upload_list">
-                    <img v-bind:src="formDialog.image"/>
+                    <img style="max-width:100px;max-height:100px;" :src="formDialog.image"/>
                   </div>
                 </Col>
                 <Col span="12">
@@ -82,6 +82,18 @@
         <Button type="primary" @click="submitDialogForm('formDialog')" :loading="dialogSubmitLoading">{{label.submit}}</Button>
       </div>
     </Modal>
+    <Modal v-model="previewModal" :mask-closable="false" width="700" title="查看">
+        <h2>{{previewData.title}}</h2>
+        <br>
+        <p>{{previewData.newsSrc}}&nbsp;&nbsp;&nbsp;{{previewData.date}}</p>
+        <br>
+        <div v-html="previewData.content" class="pic" style="overflow-y:auto;max-height:500px"></div>
+        <br>
+        <!-- <p><a v-bind:href="newsUrl">原文链接</a></p> -->
+        <div slot="footer">
+            <i-button type="primary" @click="previewModal=false">关闭</i-button>
+        </div>
+    </Modal>
   </div>
 </template>
 
@@ -102,10 +114,56 @@
           delete: 'news/delete.do'
         },
         pager: {
+          data: [
+            {
+              id: '22972',
+              areaId: '659007',
+              url: '',
+              title: '光明新区周家大道（马田段）土地整备攻坚战告捷',
+              newsSrc: '绿色光明网',
+              content: '',
+              date: '',
+              image: 'http://iguangming.sznews.com/images/attachement/png/site640/20171220/IMG889ffafebae246370159022.PNG',
+              commentNum: '789',
+              upvoteNum: '798',
+              shareNum: '897',
+              status: '0',
+              detailAddress: '深圳市光明新区'
+            }, {
+              id: '22970',
+              areaId: '659007',
+              url: '',
+              title: '光明新区首设全待行路口 提升道路通行能力',
+              newsSrc: '绿色光明网',
+              content: '',
+              date: '',
+              image: 'http://iguangming.sznews.com/images/attachement/jpg/site640/20171220/IMGb083feb941e04637355087.jpg',
+              commentNum: '123',
+              upvoteNum: '132',
+              shareNum: '312',
+              status: '1',
+              detailAddress: '深圳市光明新区'
+            }, {
+              id: '22968',
+              areaId: '659005',
+              url: '',
+              title: '观湖街道“上围艺术+”党群驿站揭牌启用',
+              newsSrc: '龙华网',
+              content: '',
+              date: '',
+              image: 'http://ilonghua.sznews.com/images/attachement/jpg/site1011/20171219/IMG74e543574fc54636456847.jpg',
+              commentNum: '456',
+              upvoteNum: '465',
+              shareNum: '654',
+              status: '2',
+              detailAddress: '深圳市龙华新区'
+            }
+          ],
           url: 'news/dataGrid.do',
           sort: 'createTime',
           order: 'desc'
         },
+        previewModal: false,
         currDialog: 'add',
         dialogShow: false,
         dialogSubmitLoading: false,
@@ -113,6 +171,12 @@
         derail_address_arr_s: [],
         derail_address_obj_s: [],
         batchOprArr: [],
+        previewData: {
+          title: '',
+          newsSrc: '',
+          date: '',
+          content: '',
+        },
         formSearch: {
           startTime: '',
           endTime: '',
@@ -124,7 +188,7 @@
           areaType: '0'
         },
         formDialog: {
-          id: '0',
+          id: '',
           areaId: '',
           url: '',
           title: '',
@@ -259,7 +323,7 @@
                 }, '编辑'),
                 create('Button', {
                   props: {
-                    type: 'primary',
+                    type: 'success',
                     size: 'small'
                   },
                   style: {
@@ -267,7 +331,10 @@
                   },
                   on: {
                     click: () => {
-                      console.log('查看')
+                      for (let key in vm.previewData) {
+                        vm.previewData[key] = params.row[key]
+                      }
+                      vm.previewModal = true
                     }
                   }
                 }, '查看'),
@@ -346,7 +413,14 @@
       vm.paging(vm)
     },
     mounted () {
-    }
+    },
+    watch: {
+      dialogShow (val) {
+        if (!val) {
+          this.currDialog = 'add'
+        }
+      }
+    },
   }
 </script>
 

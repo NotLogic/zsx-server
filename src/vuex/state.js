@@ -9,6 +9,7 @@ export default {
     'search': '搜索',
     'debugging': '调试',
     'sure': '确定',
+    'close': '关闭',
     'cancle': '取消',
     'uploadImg': '上传图片',
     'uploadExcel': '导入Excel'

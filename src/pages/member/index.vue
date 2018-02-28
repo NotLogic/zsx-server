@@ -140,7 +140,7 @@
           createdateEnd: ''
         },
         formDialog: {
-          id:0,
+          id: '',
           homeId:'',
           homeName:'',
           currPlaceId:'',

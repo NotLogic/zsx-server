@@ -215,7 +215,7 @@
           </Col>                
       </Row>
       <div slot="footer">
-        <Button type="primary" @click="closeAddrList">{{label.sure}}</Button>
+        <Button type="primary" @click="closeAddrList">{{label.close}}</Button>
       </div>
     </Modal>
     <!-- 地址弹出框 -->
@@ -316,7 +316,7 @@
           </Col>
       </Row>
       <div slot="footer">
-        <Button type="primary" @click="resetPreview">{{label.sure}}</Button>
+        <Button type="primary" @click="resetPreview">{{label.close}}</Button>
       </div>
     </Modal>
     <!-- 2 -->
@@ -1218,9 +1218,6 @@
         //   vm.workClassId = workClassId
         // })
         // 初始化省市区
-        if (!sessionStorage.chinaJson) {
-          vm.util.initChinaDataAndJson()
-        }
         let chinaJson = vm.util.extend(JSON.parse(sessionStorage.chinaJson))
         let chinaData = vm.util.extend(JSON.parse(sessionStorage.chinaData))
         let _chinaData = []
@@ -1253,6 +1250,13 @@
       dialogShow (val) {
         if (!val) {
           this.currDialog = 'add'
+        }
+      },
+      derail_address_obj_s (val) {
+        if (val.length) {
+          this.formSearch.areaId = val[2]
+        } else {
+          this.formSearch.areaId = ''
         }
       }
     },

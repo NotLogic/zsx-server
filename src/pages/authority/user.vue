@@ -1,10 +1,10 @@
 <template>
   <div class="user">
     <Form :model="formSearch" ref="formSearch" inline :label-width="60">
-        <FormItem label="用户" prop="userParam">
-            <Input v-model="formSearch.userParam" placeholder="姓名/账号/手机号" size="small"></Input>
+        <FormItem label="用户">
+            <Input v-model="formSearch.name" placeholder="姓名/账号/手机号" size="small"></Input>
         </FormItem>
-        <FormItem label="管理区域" prop="source">
+        <FormItem label="管理区域">
             <Cascader :data="derail_address_arr" v-model="derail_address_obj_s" filterable size="small" style="margin-top: 5px"></Cascader>
             <Input v-model="formSearch.aredId" v-if="false"></Input>
         </FormItem>
@@ -101,6 +101,45 @@
           delete: 'user/delete.do'
         },
         pager: {
+          data: [
+            {
+              id: '',
+              loginName: 'xiayy',
+              name: '夏洋洋',
+              password: 'reterterwt',
+              sex: '1',
+              age: 22,
+              roleIds: [],
+              createTime: '2017-12-20 10:24:52',
+              phone: '123456',
+              status: '1',
+              areaId: ''
+            }, {
+              id: '',
+              loginName: 'chenxiang',
+              name: '陈祥',
+              password: 'fhghmvjk',
+              sex: '2',
+              age: 22,
+              roleIds: [],
+              createTime: '2017-12-20 10:24:22',
+              phone: '123456',
+              status: '1',
+              areaId: ''
+            }, {
+              id: '',
+              loginName: 'liubb',
+              name: '刘彬彬',
+              password: 'hjktytry',
+              sex: '3',
+              age: 22,
+              roleIds: [],
+              createTime: '2017-12-20 10:24:01',
+              phone: '123456',
+              status: '1',
+              areaId: ''
+            }
+          ],
           url: 'user/dataGrid.do',
           sort: 'createTime',
           order: 'desc'
@@ -117,19 +156,19 @@
           name: '',
           createdateStart: '',
           createdateEnd: '',
-          areaId:null
+          areaId: ''
         },
         formDialog: {
-            id: 0,
-            loginName: '',
-            name: '',
-            password: '',
-            sex: 0,
-            age: 22,
-            roleIds: [],
-            phone: '',
-            status: '1',
-            areaId:null
+          id: '',
+          loginName: '',
+          name: '',
+          password: '',
+          sex: '',
+          age: 22,
+          roleIds: [],
+          phone: '',
+          status: '1',
+          areaId: ''
         },
         columns: [
           {
@@ -223,7 +262,36 @@
             }
           }
         ],
-        rules: {}
+        rules: {
+          loginName: [
+            { required: true, message: '登录名称不能为空', trigger: 'blur' },
+            { type: 'string', min: 4, max: 64, message: '登录名须在4-64个字符之间', trigger: 'blur' }
+          ],
+          name: [
+            { required: true, message: '姓名不能为空', trigger: 'blur' }
+          ],
+          password: [
+            { required: true, message: '密码不能为空', trigger: 'blur' }
+          ],
+          status: [
+            { required: true, message: '用户状态不能为空', trigger: 'change' }
+          ],
+          // userType: [
+          //   { required: true, message: '用户类型不能为空', trigger: 'change' }
+          // ],
+          // roleIds: [
+          //   { required: true, message: '用户角色不能为空', trigger: 'blur' }
+          // ],
+          sex: [
+            { required: true, message: '用户性别不能为空', trigger: 'change' }
+          ],
+          // detailAddress: [
+          //   { required: true, message: '请选择关联地区', trigger: 'change' }
+          // ],
+          phone : [
+            { required: true, message: '联系方式不能为空', trigger: 'change' },
+          ]
+        }
       }
     },
     computed: {
@@ -233,13 +301,37 @@
     },
     methods: {
       resetSearch (name) {
-        this.$refs[name].resetFields()
+        let vm = this
+        vm.derail_address_obj_s = []
+        vm.formSearch.name = ''
+        vm.$refs[name].resetFields()
+        vm.submitSearch(name)
+      },
+      submitSearch (name) {
+        let vm = this
+        vm.$store.dispatch('submitSearch', {
+          'vm': vm,
+          'name': name
+        })
       },
       addRow () {
         this.$store.commit('addRow', this)
       },
       resetDialogForm (name) {
         this.$refs[name].resetFields()
+      },
+      submitDialogForm (name) {
+        let vm = this
+        vm.$refs[name].validate(function (valid) {
+          if (valid) {
+            let ajaxData = vm.util.editAddAjaxData(vm)
+            console.log(ajaxData)
+            vm.$store.dispatch('submitDialogForm', {
+              'vm': vm,
+              'name': name
+            })
+          }
+        })
       },
       initDialog () {},
       changePager (data) {
@@ -248,7 +340,10 @@
       paging () {
         this.util.paging(this)
       },
-      initData () {}
+      initData () {
+        let vm = this
+        vm.derail_address_arr = vm.util.extend(JSON.parse(sessionStorage.chinaData))
+      }
     },
     created () {
       let vm = this
@@ -257,7 +352,21 @@
       vm.paging(vm)
     },
     mounted () {
-    }
+    },
+    watch: {
+      dialogShow (val) {
+        if (!val) {
+          this.currDialog = 'add'
+        }
+      },
+      derail_address_obj_s (val) {
+        if (val.length) {
+          this.formSearch.areaId = val[2]
+        } else {
+          this.formSearch.areaId = ''
+        }
+      }
+    },
   }
 </script>
 

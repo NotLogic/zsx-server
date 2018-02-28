@@ -12,7 +12,7 @@
           </Col>
           <Col span="12">
             <FormItem label="排序" prop="seq">
-              <Input v-model="formDialog.seq"></Input>
+              <Input number v-model="formDialog.seq"></Input>
             </FormItem>
           </Col>
         </Row>
@@ -65,6 +65,24 @@
           delete: 'role/delete.do'
         },
         pager: {
+          data: [
+            {
+              id: '1',
+              name: 'admin',
+              seq: 0,
+              description: '超级管理员'
+            }, {
+              id: '35',
+              name: '网编',
+              seq: 0,
+              description: '网编角色'
+            }, {
+              id: '36',
+              name: '前端开发',
+              seq: 0,
+              description: '前端web开发角色'
+            }
+          ],
           url: 'role/dataGrid.do'
         },
         currDialog: 'add',
@@ -107,7 +125,7 @@
             width: 200,
             render: (create, params) => {
               let vm = this
-              if (params.row.name === '超管') {
+              if (params.row.id === '1') {
                 return create('Button', {
                   props: {
                     type: 'primary',
@@ -166,7 +184,7 @@
                     },
                     on: {
                       click: () => {
-                        console.log(vm)
+                        console.log('删除')
                       }
                     }
                   }, '删除')
@@ -184,14 +202,24 @@
     },
     methods: {
       addRow () {
-        this.$store.commit('addRow', {
-          'vm': this
-        })
+        this.$store.commit('addRow', this)
       },
       resetDialogForm (name) {
         this.$refs[name].resetFields()
       },
-      submitDialogForm (name) {},
+      submitDialogForm (name) {
+        let vm = this
+        vm.$refs[name].validate(function (valid) {
+          if (valid) {
+            let ajaxData = vm.util.editAddAjaxData(vm)
+            console.log(ajaxData)
+            vm.$store.dispatch('submitDialogForm', {
+              'vm': vm,
+              'name': name
+            })
+          }
+        })
+      },
       // 展开/折叠
       treeExpand () {
         let vm = this
@@ -324,7 +352,13 @@
     mounted () {
       // this.getTreeDataByAppRoutes()
     },
-    watch: {}
+    watch: {
+      dialogShow (val) {
+        if (!val) {
+          this.currDialog = 'add'
+        }
+      }
+    }
   }
 </script>
 

@@ -132,7 +132,7 @@
             </i-col>
         </Row>      
     	<div slot="footer">            
-            <i-button type="primary" @click="resetPreview">确定</i-button>
+            <i-button type="primary" @click="resetPreview">{{label.close}}</i-button>
         </div>
 	</Modal>
   </div>
