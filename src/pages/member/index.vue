@@ -299,6 +299,14 @@
         this.derail_address_obj_s_h = []
         this.derail_address_obj_s_c = []
         this.$refs[name].resetFields()
+        this.submitSearch(name)
+      },
+      submitSearch (name) {
+        let vm = this
+        vm.$store.dispatch('submitSearch', {
+          'vm': vm,
+          'name': name
+        })
       },
       changePager (data) {
         this.util.changePager(this, data)

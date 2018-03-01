@@ -69,6 +69,8 @@
               </Select>
             </FormItem>
           </Col>
+        </Row>
+        <Row>
           <Col span="12">
             <FormItem label="办理条件" prop="requiredConditions">
               <Row>
@@ -81,8 +83,6 @@
               </Row>
             </FormItem>
           </Col>
-        </Row>
-        <Row>
           <Col span="12">
             <FormItem label="所需材料" prop="materialRequested">
               <Row>
@@ -95,6 +95,8 @@
               </Row>
             </FormItem>
           </Col>
+        </Row>
+        <Row>
           <Col span="12">
             <FormItem label="网上流程" prop="onlineManagement">
               <Row>
@@ -103,6 +105,18 @@
                 </Col>
                 <Col span="6" style="text-align: right;">
                   <Button size="small" type="primary" @click="showHandleDialog('handleModal','onlineManagement')">{{label[currDialog]}}</Button>
+                </Col>
+              </Row>
+            </FormItem>
+          </Col>
+          <Col span="12">
+            <FormItem label="窗口流程" prop="windowManagement">
+              <Row>
+                <Col span="18">
+                  <Input v-model="formDialog.windowManagement" disabled placeholder="请添加网上流程"></Input>
+                </Col>
+                <Col span="6" style="text-align: right;">
+                  <Button size="small" type="primary" @click="showHandleDialog('handleModal','windowManagement')">{{label[currDialog]}}</Button>
                 </Col>
               </Row>
             </FormItem>
@@ -513,12 +527,14 @@
         handleTitle: {
           requiredConditions: "办理条件",
           materialRequested: "所需材料",
-          onlineManagement: "网上流程"
+          onlineManagement: "网上流程",
+          windowManagement: '窗口流程'
         },
         handleValue: {
           requiredConditions: [],
           materialRequested: [],
-          onlineManagement: []
+          onlineManagement: [],
+          windowManagement: []
         },
         handleIndex: null,
         handleAddEdit: true,//true表示新增，false表示编辑
@@ -562,6 +578,7 @@
           requiredConditions: '', // 办理条件
           materialRequested: '', // 所需材料
           onlineManagement: '', // 网上流程
+          windowManagement: '', // 窗口流程
           timeLimitExplanation: '', // 限时说明
           chargingStandard: '', // 收费标准
           managementBasis: '', // 办理依据
@@ -654,8 +671,26 @@
             ellipsis: true,
             render: (create, params) => {
               let vm = this
-              let hasNbsp = !!params.row.onlineManagement.indexOf('&nbsp;')
-              let txt = hasNbsp ? (params.row.onlineManagement + '').split("&nbsp;").join(" ") : params.row.onlineManagement
+              let txt = ''
+              if (params.row.onlineManagement) {
+                let hasNbsp = !!params.row.onlineManagement.indexOf('&nbsp;')
+                txt = hasNbsp ? (params.row.onlineManagement + '').split("&nbsp;").join(" ") : params.row.onlineManagement
+              }
+              return create('span',txt)
+            }
+          },
+          {
+            title: '窗口流程',
+            key: 'windowManagement',
+            width: 500,
+            ellipsis: true,
+            render: (create, params) => {
+              let vm = this
+              let txt = ''
+              if (params.row.windowManagement) {
+                let hasNbsp = !!params.row.windowManagement.indexOf('&nbsp;')
+                txt = hasNbsp ? (params.row.windowManagement + '').split("&nbsp;").join(" ") : params.row.windowManagement
+              }
               return create('span',txt)
             }
           },
@@ -816,7 +851,8 @@
         vm.handleValue = {
             requiredConditions: vm.formDialog.requiredConditions,
             materialRequested: vm.formDialog.materialRequested,
-            onlineManagement: vm.formDialog.onlineManagement
+            onlineManagement: vm.formDialog.onlineManagement,
+            windowManagement: vm.formDialog.windowManagement
         }
         vm.currDialog = 'edit'
         vm.dialogShow = true
@@ -834,7 +870,8 @@
         vm.handleValue = {
           requiredConditions: [],
           materialRequested: [],
-          onlineManagement: []
+          onlineManagement: [],
+          windowManagement: []
         };
         if(vm.currDialog=="add"){
           vm.formDialog.workMatterAddressesList = [];
@@ -908,6 +945,9 @@
         if(_data.onlineManagement.indexOf("&nbsp;")!="-1"){
           _data.onlineManagement = _data.onlineManagement.split("&nbsp;").join(" ");
         }
+        if(_data.windowManagement.indexOf("&nbsp;")!="-1"){
+          _data.windowManagement = _data.windowManagement.split("&nbsp;").join(" ");
+        }
         vm.previewData = _data
         vm.previewData.provinceCity = vm.util.getProvinceCityArea([_data.provincesId,_data.citiesId],vm.chinaJson,true)
         vm.previewModal = true
@@ -938,7 +978,6 @@
         vm.formDialog.provincesId = value[0]
         vm.formDialog.citiesId = value[1]
         vm.addrDialog.derail_address_obj = value
-        console.log('vm.addrDialog.derail_address_obj: ',vm.addrDialog.derail_address_obj)
       },
       handleSuccess (res) {
         if(res.state=="SUCCESS"){
@@ -1134,7 +1173,10 @@
           // 处理的是网上流程
           vm.formDialog.onlineManagement = vm.formatData(vm.handleData,vm.delimiter);
           vm.handleValue.onlineManagement = [].concat(vm.handleData);
-        }                
+        }else if (vm.handleVar=="windowManagement") {
+          vm.formDialog.windowManagement = vm.formatData(vm.handleData,vm.delimiter);
+          vm.handleValue.windowManagement = [].concat(vm.handleData);
+        }
         vm.handleAddEdit = true;
         vm.handleModal = false;
       },
@@ -1145,7 +1187,9 @@
             vm.handleTitleText = vm.handleTitle[which];
             // 区分变量赋值
             vm.handleVar = which;
-        }
+        }else{
+          return
+        } 
         // 先处理 vm.handleValue   vm.currDialog=="edit"
         // 新增、编辑的是哪个字段 // "requiredConditions","materialRequested","onlineManagement"                
         // if(which=="requiredConditions"){
@@ -1156,8 +1200,6 @@
         //   vm.handleData = vm.dataFilterArr(vm.handleValue.onlineManagement,vm.delimiter)
         // }
         vm.handleData = vm.dataFilterArr(vm.handleValue[which],vm.delimiter)
-        console.log('vm.handleValue[which]:',typeof vm.handleValue[which])
-        console.log(vm.handleData)
       },
       editHandle (index) {
         var vm = this

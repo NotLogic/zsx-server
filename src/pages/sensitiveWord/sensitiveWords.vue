@@ -1,9 +1,9 @@
 <template>
   <div class="sensitiveWords">
-    <i-form :model="formSearch" ref="formSearch" inline :label-width="60">
-        <Form-item label="敏感词" prop="searchWord">
-            <i-input v-model="formSearch.word" placeholder="敏感词" size="small"></i-input>
-        </Form-item>
+    <Form :model="formSearch" ref="formSearch" inline :label-width="60">
+        <FormItem label="敏感词" prop="searchWord">
+            <Input v-model="formSearch.word" placeholder="敏感词" size="small"></Input>
+        </FormItem>
         <Button type="ghost" style="margin-right: 8px;margin-top: 5px;" @click="resetSearch('formSearch')" size="small">{{label.clear}}</Button>
         <Button type="primary" style="margin-right: 8px;margin-top: 5px;" @click="submitSearch('formSearch')" size="small">{{label.search}}</Button>
         <Button type="primary" style="margin-right: 8px;margin-top: 5px;" @click="refurbish" size="small">敏感词库立即生效</Button>
@@ -17,7 +17,7 @@
                 style="display:inline-block;">
           <Button type="primary" size="small" style="margin-top:5px;">{{label.uploadExcel}}</Button>
         </Upload>
-    </i-form>
+    </Form>
     <!-- <mainTable :columns="columns" :data="pager.data" :height="610"></mainTable> -->
     <mainTable :columns="columns" :data="pager.data"></mainTable>
     <paging @changePager="changePager" @paging="paging" :total="pager.total" :currPage="pager.currPage" :pagesize="pager.pagesize" :page-size-opts="pageSizeOpts"></paging>
