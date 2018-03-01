@@ -107,32 +107,32 @@
     <!-- 预览 -->
     <Modal v-model="previewModal" title="预览" id="preview-modal" :styles="{top:'50px'}" width="850" @on-cancel="resetPreview">
     	<Row>
-    		<i-col span="24" class="title">招商基本信息:</i-col>
+    		<Col span="24" class="title">招商基本信息:</Col>
     	</Row>
     	<Row :gutter="16" class-name="preview-row">
-            <i-col span="12">标题:  {{previewData.title}}</i-col>
-            <i-col span="12" id="preview-image">图片:  <img :src="previewData.image"></i-col>
+            <Col span="12">标题:  {{previewData.title}}</Col>
+            <Col span="12" id="preview-image">图片:  <img :src="previewData.image"></Col>
         </Row>
         <Row :gutter="16" class-name="preview-row">
-            <i-col span="12">来源地址:  <a :href="previewData.sourceUrl" target="_blank">{{previewData.sourceUrl}}</a></i-col>
-            <i-col span="12">所属地区:  {{previewData.provinceCityarea}}</i-col>
+            <Col span="12">来源地址:  <a :href="previewData.sourceUrl" target="_blank">{{previewData.sourceUrl}}</a></Col>
+            <Col span="12">所属地区:  {{previewData.provinceCityarea}}</Col>
         </Row>
         <Row :gutter="16" class-name="preview-row">
-            <i-col span="12">政策来源:  {{previewData.policySoucre}}</i-col>
-            <i-col span="12">政策时间:  {{previewData.policyDate}}</i-col>
+            <Col span="12">政策来源:  {{previewData.policySoucre}}</Col>
+            <Col span="12">政策时间:  {{previewData.policyDate}}</Col>
         </Row>
         <Row :gutter="16" class-name="preview-row" style="border-bottom: .5px solid #e9eaec;padding-bottom: 5px;">
-            <i-col span="12">时间规则:  {{previewData.dateRule}}</i-col>
-            <i-col span="12">状态:  {{previewData.status}}</i-col>
+            <Col span="12">时间规则:  {{previewData.dateRule}}</Col>
+            <Col span="12">状态:  {{previewData.status}}</Col>
         </Row>  
         <Row class-name="preview-row">
-            <i-col span="24">
+            <Col span="24">
                 <div class="title">招商内容:</div>
                 <div class="preview-txt" v-html="previewData.content"></div>
-            </i-col>
+            </Col>
         </Row>      
     	<div slot="footer">            
-            <i-button type="primary" @click="resetPreview">{{label.close}}</i-button>
+            <Button type="primary" @click="resetPreview">{{label.close}}</Button>
         </div>
 	</Modal>
   </div>

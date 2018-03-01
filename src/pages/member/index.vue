@@ -1,102 +1,100 @@
 <template>
   <div class="member">
-    <i-form :model="formSearch" ref="formSearch" inline :label-width="60">
-        <Form-item label="关键词" prop="keyWord">
-            <i-input v-model="formSearch.keyWord" placeholder="账号/昵称" size="small"></i-input>
-        </Form-item>
-        <Form-item label="家乡" prop="source">
+    <Form :model="formSearch" ref="formSearch" inline :label-width="60">
+        <FormItem label="关键词" prop="keyWord">
+            <Input v-model="formSearch.keyWord" placeholder="账号/昵称" size="small"></Input>
+        </FormItem>
+        <FormItem label="家乡" prop="source">
             <Cascader :data="derail_address_arr" v-model="derail_address_obj_s_h" filterable size="small" style="margin-top: 5px"></Cascader>
-            <i-input v-model="formSearch.homeId" v-if="false"></i-input>
-        </Form-item>
-        <Form-item label="居住地" prop="source">
+        </FormItem>
+        <FormItem label="居住地" prop="source">
             <Cascader :data="derail_address_arr" v-model="derail_address_obj_s_c" filterable size="small" style="margin-top: 5px"></Cascader>
-            <i-input v-model="formSearch.currPlaceId" v-if="false"></i-input>
-        </Form-item>
-        <Form-item label="账号类型" prop="source">
-            <i-select v-model="formSearch.userType" placeholder="请选择" size="small" clearable style="width:80px;">
-                <i-option value="1">手机号</i-option>
-                <i-option value="2">QQ</i-option>
-                <i-option value="3">微信</i-option>
-                <i-option value="4">新浪</i-option>
-            </i-select>
-        </Form-item>
-         <Form-item label="注册时间">
-            <Form-item prop="createdateStart">
-                <Date-picker type="datetime" placeholder="点击选择时间" v-model="formSearch.createdateStart" size="small" :clearable="false"></Date-picker>
-            </Form-item>
-            <Form-item>至</Form-item>
-            <Form-item prop="createdateEnd">
-                <Date-picker type="datetime" placeholder="点击选择时间" v-model="formSearch.createdateEnd" size="small" :clearable="false"></Date-picker>
-            </Form-item>
-        </Form-item>
-        <Form-item label="状态" prop="source">
-            <i-select v-model="formSearch.status" placeholder="请选择" size="small" clearable style="width:80px;">
-                <i-option value="1">正常</i-option>
-                <i-option value="2">禁用</i-option>
-            </i-select>
-        </Form-item>
+        </FormItem>
+        <FormItem label="账号类型" prop="source">
+            <Select v-model="formSearch.userType" placeholder="请选择" size="small" clearable style="width:80px;">
+                <Option value="1">手机号</Option>
+                <Option value="2">QQ</Option>
+                <Option value="3">微信</Option>
+                <Option value="4">新浪</Option>
+            </Select>
+        </FormItem>
+         <FormItem label="注册时间">
+            <FormItem prop="createdateStart">
+                <DatePicker type="datetime" placeholder="点击选择时间" v-model="formSearch.createdateStart" size="small" :clearable="false"></DatePicker>
+            </FormItem>
+            <FormItem>至</FormItem>
+            <FormItem prop="createdateEnd">
+                <DatePicker type="datetime" placeholder="点击选择时间" v-model="formSearch.createdateEnd" size="small" :clearable="false"></DatePicker>
+            </FormItem>
+        </FormItem>
+        <FormItem label="状态" prop="source">
+            <Select v-model="formSearch.status" placeholder="请选择" size="small" clearable style="width:80px;">
+                <Option value="1">正常</Option>
+                <Option value="2">禁用</Option>
+            </Select>
+        </FormItem>
         <Button type="ghost" style="margin:5px 8px 24px 0;" @click="resetSearch('formSearch')" size="small">{{label.clear}}</Button>
         <Button type="primary" style="margin: 5px 8px 24px 0;" @click="submitSearch('formSearch')" size="small">{{label.search}}</Button>
         <Button type="primary" style="margin: 5px 8px 24px 0;" @click="addRow" size="small">{{label.add}}</Button>
-    </i-form>
+    </Form>
     <!-- <mainTable :columns="columns" :data="pager.data" :height="610"></mainTable> -->
     <mainTable :columns="columns" :data="pager.data"></mainTable>
     <paging @changePager="changePager" @paging="paging" :total="pager.total" :currPage="pager.currPage"></paging>
     <Modal v-model="dialogShow" :title="label[currDialog]" :mask-closable="false" width="350" @on-cancel="resetDialogForm('formDialog')">
-      <i-form :model="formDialog" ref="formDialog" :rules="rules" :label-width="90">
+      <Form :model="formDialog" ref="formDialog" :rules="rules" :label-width="90">
         <Row>
-            <i-col span="24">
-                <Form-item label="会员ID" prop="id">
-                    <i-input v-model="formDialog.id" placeholder=""></i-input>
-                </Form-item>
-            </i-col>
+            <Col span="24">
+                <FormItem label="会员ID" prop="id">
+                    <Input v-model="formDialog.id" placeholder=""></Input>
+                </FormItem>
+            </Col>
         </Row>
         <Row>
-          <i-col span="24">
-            <Form-item label="账号名" prop="account">
-              <i-input v-model="formDialog.account" placeholder=""></i-input>
-            </Form-item>
-          </i-col>
+          <Col span="24">
+            <FormItem label="账号名" prop="account">
+              <Input v-model="formDialog.account" placeholder=""></Input>
+            </FormItem>
+          </Col>
         </Row>
         <Row>
-          <i-col span="24">
-            <Form-item label="账户类型" prop="userType">
-              <i-select v-model="formDialog.userType" placeholder="请选择" size="small" clearable>
-                <i-option value="1">手机号</i-option>
-                <i-option value="2">QQ</i-option>
-                <i-option value="3">微信</i-option>
-                <i-option value="4">新浪</i-option>
-              </i-select>
-            </Form-item>
-          </i-col>
+          <Col span="24">
+            <FormItem label="账户类型" prop="userType">
+              <Select v-model="formDialog.userType" placeholder="请选择" size="small" clearable>
+                <Option value="1">手机号</Option>
+                <Option value="2">QQ</Option>
+                <Option value="3">微信</Option>
+                <Option value="4">新浪</Option>
+              </Select>
+            </FormItem>
+          </Col>
         </Row>
         <Row>
-            <i-col span="24">
-                <Form-item label="注册时间" prop="createTime">
-                    <Date-picker type="datetime" placeholder="点击选择时间" v-model="formDialog.createTime"></Date-picker>
-                </Form-item>
-            </i-col>
+            <Col span="24">
+                <FormItem label="注册时间" prop="createTime">
+                    <DatePicker type="datetime" placeholder="点击选择时间" v-model="formDialog.createTime"></DatePicker>
+                </FormItem>
+            </Col>
         </Row>
         <Row>
-          <i-col span="24">
-            <Form-item label="最后登录时间" prop="lastLoginTime">
-              <Date-picker type="datetime" placeholder="点击选择时间" v-model="formDialog.lastLoginTime"></Date-picker>
-            </Form-item>
-          </i-col>
+          <Col span="24">
+            <FormItem label="最后登录时间" prop="lastLoginTime">
+              <DatePicker type="datetime" placeholder="点击选择时间" v-model="formDialog.lastLoginTime"></DatePicker>
+            </FormItem>
+          </Col>
         </Row>
         <Row>
-          <i-col span="24">
-            <Form-item label="用户状态" prop="status">
-              <Radio-group v-model="formDialog.status">
+          <Col span="24">
+            <FormItem label="用户状态" prop="status">
+              <RadioGroup v-model="formDialog.status">
                 <Radio label="1">正常</Radio>
                 <Radio label="2">禁用</Radio>
-              </Radio-group>
-            </Form-item>
-          </i-col>
+              </RadioGroup>
+            </FormItem>
+          </Col>
         </Row>
-      </i-form>
+      </Form>
       <div slot="footer">
-        <i-button type="primary" @click="_submitDialogForm('formDialog')" :loading="dialogSubmitLoading">{{label.submit}}</i-button>
+        <Button type="primary" @click="_submitDialogForm('formDialog')" :loading="dialogSubmitLoading">{{label.submit}}</Button>
       </div>
     </Modal>
   </div>
@@ -131,11 +129,11 @@
         dialogShow: false,
         dialogSubmitLoading: false,
         formSearch: {
-          keyWord:null,
-          homeId:null,
-          currPlaceId:null,
-          userType:null,
-          status:null,
+          keyWord: '',
+          homeId: '',
+          currPlaceId: '',
+          userType:'',
+          status: '',
           createdateStart: '',
           createdateEnd: ''
         },
@@ -298,6 +296,8 @@
       resetSearch (name) {
         this.formSearch.userType = ''
         this.formSearch.status = ''
+        this.derail_address_obj_s_h = []
+        this.derail_address_obj_s_c = []
         this.$refs[name].resetFields()
       },
       changePager (data) {
@@ -306,7 +306,10 @@
       paging () {
         this.util.paging(this)
       },
-      initData () {}
+      initData () {
+        let vm = this
+        vm.derail_address_arr = JSON.parse(sessionStorage.chinaData)
+      }
     },
     computed: {
       label () {
@@ -320,7 +323,28 @@
       vm.paging(vm)
     },
     mounted () {
-    }
+    },
+    watch: {
+      dialogShow (val) {
+        if (!val) {
+          this.currDialog = 'add'
+        }
+      },
+      derail_address_obj_s_h (val) {
+        if (val.length) {
+          this.formSearch.homeId = val[2]
+        } else {
+          this.formSearch.homeId = ''
+        }
+      },
+      derail_address_obj_s_c (val) {
+        if (val.length) {
+          this.formSearch.currPlaceId = val[2]
+        } else {
+          this.formSearch.currPlaceId = ''
+        }
+      }
+    },
   }
 </script>
 

@@ -12,33 +12,24 @@
       </FormItem>
       <FormItem label="广告状态" prop="lockStatus">
         <Select v-model="formSearch.lockStatus" placeholder="请选择" size="small" clearable style="width: 80px;">
-          <Option value="1">正常</Option>
-          <Option value="2">禁用</Option>
-          <Option value="3">过时</Option>
+          <Option v-for="item in lockStatus" :key="item.value" :value="item.value">{{item.label}}</Option>
         </Select>
       </FormItem>
       <FormItem label="投放级别" prop="areaType">
-        <Select v-model="formSearch.areaType" placeholder="请选择" size="small" @on-change="areaTypeChange_s">
-          <Option value="0">全部</Option>
-          <Option value="4">区级</Option>
-          <Option value="3">市级</Option>
-          <Option value="2">省级</Option>
-          <Option value="1">全国</Option>
+        <Select v-model="formSearch.areaType" placeholder="请选择" size="small" clearable style="width: 80px;">
+          <Option v-for="item in areaType" :key="item.value" :value="item.value">{{item.label}}</Option>
         </Select>
       </FormItem>
-      <FormItem label="关联地区" prop="source">
-        <Cascader :data="derail_address_arr_s" v-model="derail_address_obj_s" :filterable="true" size="small"
-                  style="margin-top: 5px"></Cascader>
+      <FormItem label="关联地区">
+        <Cascader :data="derail_address_arr_s" v-model="derail_address_obj_s" :filterable="true" size="small" style="margin-top: 5px"></Cascader>
       </FormItem>
       <FormItem label="展示时间">
         <FormItem prop="startTime">
-          <DatePicker type="datetime" placeholder="点击选择时间" v-model="formSearch.startTime" size="small"
-                       :clearable="false"></DatePicker>
+          <DatePicker type="datetime" placeholder="点击选择时间" v-model="formSearch.startTime" size="small" :clearable="false"></DatePicker>
         </FormItem>
         <FormItem>至</FormItem>
         <FormItem prop="endTime">
-          <DatePicker type="datetime" placeholder="点击选择时间" v-model="formSearch.endTime" size="small"
-                       :clearable="false"></DatePicker>
+          <DatePicker type="datetime" placeholder="点击选择时间" v-model="formSearch.endTime" size="small" :clearable="false"></DatePicker>
         </FormItem>
       </FormItem>
       <Button type="ghost" style="margin:5px 8px 24px 0;" @click="resetSearch('formSearch')" size="small">{{label.clear}}</Button>
@@ -68,8 +59,8 @@
           <Col span="12">
             <Col span="12">
               <FormItem label="主图" prop="imagePath">
-                <div class="image_upload_list" style="width:100px;height:100px;">
-                  <img v-if="formDialog.imagePath!=null && formDialog.imagePath!=''" :src="formDialog.imagePath"/>
+                <div class="image_upload_list" style="width:100px;height:100px;border:1px solid #eee;">
+                  <img v-if="formDialog.imagePath" :src="formDialog.imagePath" style="max-width: 100%;max-height:100%;"/>
                   <img v-else src="static/images/img-upload-default.png" style="max-width: 100%;max-height:100%;"/>
                 </div>
               </FormItem>
@@ -104,8 +95,7 @@
         <Row>
           <Col span="12">
             <FormItem label="排序" prop="sort" inline>
-              <InputNumber :max="10" :min="1" v-model="formDialog.sort"
-                            :disabled="formDialog.sort==1&&formDialog.isUp==2"></InputNumber>
+              <InputNumber :max="10" :min="1" v-model="formDialog.sort" :disabled="formDialog.sort==1&&formDialog.isUp==2"></InputNumber>
               <Button type="default" v-if="formDialog.sort==1"
                         @click="formDialog.isUp = formDialog.isUp==1 ?2:1">{{formDialog.isUp==1 ? '置顶' :
                 '取消置顶'}}
@@ -135,16 +125,13 @@
         <Row>
           <Col span="12">
             <FormItem label="投放级别" prop="areaType">
-              <Select v-model="formDialog.areaType" placeholder="请选择" @on-change="areaTypeChange">
-                <Option value="4">区级</Option>
-                <Option value="3">市级</Option>
-                <Option value="2">省级</Option>
-                <Option value="1">全国</Option>
+              <Select v-model="formDialog.areaType" placeholder="请选择">
+                <Option v-for="item in areaType" :key="item.value" :value="item.value">{{item.label}}</Option>
               </Select>
             </FormItem>
           </Col>
           <Col span="12">
-            <FormItem label="关联地区" prop="derail_address_obj">
+            <FormItem label="关联地区">
               <Cascader :data="derail_address_arr" v-model="derail_address_obj" placeholder="选择关联地区"
                         clearabled="false"></Cascader>
             </FormItem>
@@ -176,6 +163,57 @@
           delete: 'ad/delete.do'
         },
         pager: {
+          data: [
+            {
+              id: '380700856033280',
+              userId: '',
+              title: '大溪谷',
+              imagePath: 'http://iguangming.sznews.com/images/attachement/png/site640/20171220/IMG889ffafebae246370159022.PNG',
+              lockStatus: '1',
+              postion: '2',
+              href: 'http://www.baidu.com',
+              sort: 1,
+              clickNum: '123',
+              detailAddress: '湖北省襄阳市樊城区',
+              startTime: '2017-12-11 17:55:19',
+              endTime: '2017-12-28 17:55:19',
+              isUp: '1',
+              areaType: '1',
+              context: '按时气味儿13'
+            }, {
+              id: '380700582551552',
+              userId: '',
+              title: '特色牛肉面',
+              imagePath: 'http://iguangming.sznews.com/images/attachement/jpg/site640/20171220/IMGb083feb941e04637355087.jpg',
+              lockStatus: '1',
+              postion: '1',
+              href: 'http://www.baidu.com',
+              sort: 1,
+              clickNum: '345',
+              detailAddress: '湖北省襄阳市樊城区',
+              startTime: '2017-12-11 00:00:00',
+              endTime: '2017-12-28 00:00:00',
+              isUp: '1',
+              areaType: '2',
+              context: '按时规范化'
+            }, {
+              id: '380699319488512',
+              userId: '',
+              title: '古城市新襄阳',
+              imagePath: 'http://ilonghua.sznews.com/images/attachement/jpg/site1011/20171219/IMG74e543574fc54636456847.jpg',
+              lockStatus: '1',
+              postion: '3',
+              href: 'http://www.baidu.com',
+              sort: 1,
+              clickNum: '76',
+              detailAddress: '湖北省襄阳市樊城区',
+              startTime: '2017-12-11 00:00:00',
+              endTime: '2017-12-22 00:00:00',
+              isUp: '1',
+              areaType: '3',
+              context: '登革热提前'
+            }
+          ],
           url: 'ad/dataGrid.do',
           tSort: 'createTime',
           order: 'desc'
@@ -184,9 +222,36 @@
         dialogShow: false,
         dialogSubmitLoading: false,
         derail_address_arr: [],
-        derail_address_obj: [],
         derail_address_arr_s: [],
+        derail_address_obj: [],
         derail_address_obj_s: [],
+        lockStatus: [
+          {
+            value: '1',
+            label: '正常'
+          }, {
+            value: '2',
+            label: '禁用'
+          }, {
+            value: '3',
+            label: '过时'
+          }
+        ],
+        areaType: [
+          {
+            value: '1',
+            label: '全国'
+          }, {
+            value: '2',
+            label: '省级'
+          }, {
+            value: '3',
+            label: '市级'
+          }, {
+            value: '4',
+            label: '区级'
+          }
+        ],
         adPostionData: [
           {
             value: '1',
@@ -217,15 +282,20 @@
             label: '帖子详情'
           }
         ],
+        provinceData: [],
+        cityData: [],
+        areaData: [],
+        countryData: [{label: "中国", value: "000000", children: []}],
         formSearch: {
           startTime: '',
           endTime: '',
-          province: 0,
-          city: 0,
-          type: null,
-          lockStatus: null,
-          title: null,
-          areaType: '0'
+          // province: 0,
+          // city: 0,
+          type: '',
+          lockStatus: '',
+          title: '',
+          areaType: '4',
+          areaId: ''
         },
         formDialog: {
           id: '',
@@ -236,12 +306,13 @@
           postion: '1',
           href: '',
           sort: 1,
-          clickNum: '',
+          // clickNum: '',
           detailAddress: '',
           startTime: '',
           endTime: '',
           isUp: '1',
           areaType: '1',
+          areaId: '',
           context: ''
         },
         columns: [
@@ -296,36 +367,17 @@
             'width': 120,
             'sortable': true,
             render: (create, params) => {
-              var map = [
-                {
-                  value: '1',
-                  label: '首页banner'
-                }, {
-                  value: '2',
-                  label: '首页新闻列表'
-                }, {
-                  value: '3',
-                  label: '首页新闻详情'
-                }, {
-                  value: '4',
-                  label: '政务banner'
-                }, {
-                  value: '5',
-                  label: '招商banner'
-                }, {
-                  value: '6',
-                  label: '办事指南详情'
-                }, {
-                  value: '7',
-                  label: '便民工具'
-                }, {
-                  value: '8',
-                  label: '广场帖子列表'
-                }, {
-                  value: '9',
-                  label: '帖子详情'
-                }
-              ]
+              var map = {
+                '1': '首页banner',
+                '2': '首页新闻列表',
+                '3': '首页新闻详情',
+                '4': '政务banner',
+                '5': '招商banner',
+                '6': '办事指南详情',
+                '7': '便民工具',
+                '8': '广场帖子列表',
+                '9': '帖子详情'
+              }
               return create('span', map[params.row.postion])
             }
           },
@@ -464,17 +516,36 @@
       },
       resetSearch (name) {
         var vm = this
+        vm.derail_address_obj_s = []
         vm.$refs[name].resetFields()
+        vm.submitSearch(name)
       },
       submitSearch (name) {
-        console.log('搜索')
+        let vm = this
+        vm.$store.dispatch('submitSearch', {
+          'vm': vm,
+          'name': name
+        })
       },
       resetDialogForm (name) {
         let vm = this
+        vm.derail_address_arr = vm.countryData
+        vm.derail_address_obj = []
         vm.$refs[name].resetFields()
       },
-      areaTypeChange () {},
-      areaTypeChange_s () {},
+      submitDialogForm (name) {
+        let vm = this
+        vm.$refs[name].validate(function (valid) {
+          if (valid) {
+            let ajaxData = vm.util.editAddAjaxData(vm)
+            console.log(ajaxData)
+            vm.$store.dispatch('submitDialogForm', {
+              'vm': vm,
+              'name': name
+            })
+          }
+        })
+      },
       handleSuccess () {},
       postionChange () {},
       initDialog () {},
@@ -484,7 +555,14 @@
       paging () {
         this.util.paging(this)
       },
-      initData () {}
+      initData () {
+        let vm = this
+        vm.areaData = JSON.parse(sessionStorage.chinaData)
+        vm.cityData = vm.util.getCityDataByData(JSON.parse(sessionStorage.chinaData))
+        vm.provinceData = vm.util.getProvinceDataByData(JSON.parse(sessionStorage.chinaData))
+        vm.derail_address_arr_s = JSON.parse(sessionStorage.chinaData)
+        vm.derail_address_arr = vm.countryData
+      }
     },
     created () {
       let vm = this
@@ -494,6 +572,53 @@
     },
     mounted () {
       
+    },
+    watch: {
+      dialogShow (val) {
+        if (!val) {
+          this.currDialog = 'add'
+        }
+      },
+      derail_address_obj_s (val) {
+        if (val.length) {
+          this.formSearch.areaId = val[2]
+        } else {
+          this.formSearch.areaId = ''
+        }
+      },
+      derail_address_obj (val) {
+        if (val.length) {
+          this.formDialog.areaId = val[2]
+        } else {
+          this.formDialog.areaId = ''
+        }
+      },
+      'formSearch.areaType': function(val) {
+        let vm = this
+        if (val=='1') {
+          vm.derail_address_arr_s = vm.countryData
+        } else if (val=='2') {
+          vm.derail_address_arr_s = vm.provinceData
+        } else if (val=='3') {
+          vm.derail_address_arr_s = vm.cityData
+        } else if (val=='4') {
+          vm.derail_address_arr_s = vm.areaData
+        }
+        vm.derail_address_obj_s = []
+      },
+      'formDialog.areaType': function(val) {
+        let vm = this
+        if (val=='1') {
+          vm.derail_address_arr = vm.countryData
+        } else if (val=='2') {
+          vm.derail_address_arr = vm.provinceData
+        } else if (val=='3') {
+          vm.derail_address_arr = vm.cityData
+        } else if (val=='4') {
+          vm.derail_address_arr = vm.areaData
+        }
+        vm.derail_address_obj = []
+      },
     }
   }
 </script>

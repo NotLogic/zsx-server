@@ -6,7 +6,6 @@
         </FormItem>
         <FormItem label="管理区域">
             <Cascader :data="derail_address_arr" v-model="derail_address_obj_s" filterable size="small" style="margin-top: 5px"></Cascader>
-            <Input v-model="formSearch.aredId" v-if="false"></Input>
         </FormItem>
         <FormItem label="创建时间">
             <FormItem prop="createdateStart">

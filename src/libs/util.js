@@ -107,6 +107,27 @@ const util = {
     }
     return data
   },
+  getProvinceDataByData(chinaData) {
+    let provinceData = []
+    let util = this
+    let _chinaData = util.extend(chinaData)
+    _chinaData.forEach(item => {
+      item.children = []
+    })
+    provinceData = _chinaData
+    return provinceData
+  },
+  getCityDataByData (chinaData) {
+    let cityData = []
+    let _chinaData = util.extend(chinaData)
+    _chinaData.forEach(item => {
+      item.children.forEach(child => {
+        child.children = []
+      })
+    })
+    cityData = _chinaData
+    return cityData
+  },
   getAddrByCityId (chinaJson, cityId) {
     return [
       chinaJson[cityId.toString().slice(0, 2) + '0000'],

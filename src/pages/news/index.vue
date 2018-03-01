@@ -21,14 +21,12 @@
         </Select>
       </FormItem>
       <FormItem label="采集时间">
-        <FormItem prop="operatedateStart">
-          <DatePicker type="datetime" placeholder="点击选择时间" style="width: 160px;" v-model="formSearch.createdateStart" size="small"
-                       clearable></DatePicker>
+        <FormItem prop="createdateStart">
+          <DatePicker type="datetime" placeholder="点击选择时间" style="width: 160px;" v-model="formSearch.createdateStart" size="small" clearable></DatePicker>
         </FormItem>
         <FormItem>至</FormItem>
-        <FormItem prop="operatedateEnd">
-          <DatePicker type="datetime" placeholder="点击选择时间" style="width: 160px;" v-model="formSearch.createdateEnd" size="small"
-                       clearable></DatePicker>
+        <FormItem prop="createdateEnd">
+          <DatePicker type="datetime" placeholder="点击选择时间" style="width: 160px;" v-model="formSearch.createdateEnd" size="small" clearable></DatePicker>
         </FormItem>
       </FormItem>
       <Button type="ghost" style="margin:5px 8px 24px 0;" @click="resetSearch('formSearch')" size="small">{{label.clear}}</Button>
@@ -63,7 +61,7 @@
                 </Col>
                 <Col span="12">
                   <Upload name="upfile" action="ueditor/upload.do" :show-upload-list="false" :on-success="handleSuccess">
-                    <i-button type="ghost" icon="ios-cloud-upload-outline">{{label.uploadImg}}</i-button>
+                    <Button type="ghost" icon="ios-cloud-upload-outline">{{label.uploadImg}}</Button>
                   </Upload>
                 </Col>
               </Row>
@@ -91,7 +89,7 @@
         <br>
         <!-- <p><a v-bind:href="newsUrl">原文链接</a></p> -->
         <div slot="footer">
-            <i-button type="primary" @click="previewModal=false">关闭</i-button>
+            <Button type="primary" @click="previewModal=false">关闭</Button>
         </div>
     </Modal>
   </div>
@@ -168,7 +166,6 @@
         dialogShow: false,
         dialogSubmitLoading: false,
         derail_address_arr: [],
-        derail_address_arr_s: [],
         derail_address_obj_s: [],
         batchOprArr: [],
         previewData: {
@@ -381,10 +378,16 @@
     methods: {
       resetSearch (name) {
         var vm = this
+        vm.derail_address_obj_s = []
         vm.$refs[name].resetFields()
+        vm.submitSearch(name)
       },
       submitSearch (name) {
-        console.log('搜索')
+        let vm = this
+        vm.$store.dispatch('submitSearch', {
+          'vm': vm,
+          'name': name
+        })
       },
       batchDelete () {
         console.log('批量删除')
@@ -397,6 +400,19 @@
         let vm = this
         vm.$refs[name].resetFields()
       },
+      submitDialogForm (name) {
+        let vm = this
+        vm.$refs[name].validate(function (valid) {
+          if (valid) {
+            let ajaxData = vm.util.editAddAjaxData(vm)
+            console.log(ajaxData)
+            vm.$store.dispatch('submitDialogForm', {
+              'vm': vm,
+              'name': name
+            })
+          }
+        })
+      },
       initDialog (data) {},
       changePager (data) {
         this.util.changePager(this, data)
@@ -404,7 +420,10 @@
       paging () {
         this.util.paging(this)
       },
-      initData () {}
+      initData () {
+        let vm = this
+        vm.derail_address_arr = JSON.parse(sessionStorage.chinaData)
+      }
     },
     created () {
       let vm = this
@@ -418,6 +437,13 @@
       dialogShow (val) {
         if (!val) {
           this.currDialog = 'add'
+        }
+      },
+      derail_address_obj_s (val) {
+        if (val.length) {
+          this.formSearch.areaId = val[2]
+        } else {
+          this.formSearch.areaId = ''
         }
       }
     },

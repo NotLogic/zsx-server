@@ -12,7 +12,7 @@
           </Col>
           <Col span="12">
             <FormItem label="排序" prop="seq">
-              <Input number v-model="formDialog.seq"></Input>
+              <InputNumber :min="0" v-model="formDialog.seq"></InputNumber>
             </FormItem>
           </Col>
         </Row>
