@@ -96,38 +96,119 @@
               id: '1',
               name: '权限管理',
               resourceType: '0',
+              url: '',
+              openMode: '',
+              icon: '',
+              level: '0',
+              seq: 1,
+              status: '1',
+              opened: '1',
+              pid: [],
+              permission: ''
+            }, {
+              id: '11',
+              name: '资源管理',
+              resourceType: '0',
               url: '/resource/main.do',
               openMode: 'ajax',
               icon: '',
+              level: '1',
               seq: 1,
               status: '1',
               opened: '1',
               pid: [],
               permission: 'upms:resource:main'
             }, {
-              id: '2',
-              name: '会员管理',
+              id: '111',
+              name: '列表',
               resourceType: '1',
-              url: '/member/main.do',
+              url: '/resource/treeGrid.do',
               openMode: 'ajax',
               icon: '',
+              level: '2',
               seq: 1,
               status: '1',
               opened: '1',
               pid: [],
-              permission: 'upms:appUser:main'
+              permission: 'upms:resource:treeGrid'
+            }, {
+              id: '112',
+              name: '添加',
+              resourceType: '1',
+              url: '/resource/add.do',
+              openMode: 'ajax',
+              icon: '',
+              level: '2',
+              seq: 1,
+              status: '1',
+              opened: '1',
+              pid: [],
+              permission: 'upms:resource:add'
+            }, {
+              id: '12',
+              name: '角色管理',
+              resourceType: '0',
+              url: '/role/main.do',
+              openMode: 'ajax',
+              icon: '',
+              level: '1',
+              seq: 1,
+              status: '1',
+              opened: '1',
+              pid: [],
+              permission: 'upms:role:main'
+            }, {
+              id: '121',
+              name: '列表',
+              resourceType: '1',
+              url: '/role/dataGrid.do',
+              openMode: 'ajax',
+              icon: '',
+              level: '2',
+              seq: 1,
+              status: '1',
+              opened: '1',
+              pid: [],
+              permission: 'upms:role:dataGrid'
+            }, {
+              id: '122',
+              name: '添加',
+              resourceType: '1',
+              url: '/role/add.do',
+              openMode: 'ajax',
+              icon: '',
+              level: '2',
+              seq: 1,
+              status: '1',
+              opened: '1',
+              pid: [],
+              permission: 'upms:role:add'
+            }, {
+              id: '2',
+              name: '会员管理',
+              resourceType: '0',
+              url: '',
+              openMode: '',
+              icon: '',
+              seq: 1,
+              level: '0',
+              status: '1',
+              opened: '1',
+              pid: [],
+              permission: ''
             }, {
               id: '3',
               name: '新闻管理',
               resourceType: '0',
-              url: '/news/main.do',
-              openMode: 'iframe',
+              url: '',
+              openMode: '',
               icon: '',
               seq: 1,
+              level: '0',
               status: '1',
               opened: '1',
               pid: [],
-              permission: 'upms:news:main'
+              permission: ''
             }
           ],
           url: 'resource/treeGrid.do'
@@ -209,10 +290,16 @@
                   1: 'ios-arrow-forward',
                   2: 'ios-arrow-right'
               }
+              // params.row.level  菜单级别 0 1 2 
+              let leftNum = params.row.level * 20
               return create('span', [
                 create('Button', {
                   props: {
-                    type: 'text'
+                    type: 'text',
+                    icon: icon[params.row.level]
+                  },
+                  style: {
+                    marginLeft: leftNum + 'px'
                   },
                   on: {
                     click: function () {
@@ -408,5 +495,13 @@
 </script>
 
 <style scoped>
-
+  .mar-0{
+    margin-right: 0;
+  }
+  .mr-1{
+    margin-right: 10px;
+  }
+  .mr-2{
+    margin-right: 20px;
+  }
 </style>
