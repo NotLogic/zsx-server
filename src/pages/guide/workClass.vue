@@ -304,10 +304,11 @@
         })
       },
       resetDialogForm (name) {
-        this.provinceCity = []
-        this.formDialog.classIcon = ''
-        this.formDialog.cityCode = ''
-        this.$refs[name].resetFields()
+        let vm = this
+        vm.provinceCity = []
+        vm.formDialog.classIcon = ''
+        vm.formDialog.cityCode = ''
+        vm.$refs[name].resetFields()
       },
       submitDialogForm (name) {
         let vm = this
@@ -345,7 +346,7 @@
         return txt
       },
       paging () {
-        util.paging(this)
+        this.util.paging(this)
       },
       initData () {
         // chinaJson 在main.js中初始化

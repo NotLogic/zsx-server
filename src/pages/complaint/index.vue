@@ -130,7 +130,7 @@
                 var map = {
                     1:'广告',2:'政治敏感',3:'包含不适宜公开的内容',4:'人身辱骂',5:'涉嫌黄色等违反法规的内容'
                 };
-                var str = params.row.tipsContent==''?'':params.row.tipsContent.replace('1', map[1]).replace('2', map[2]).replace('3', map[3]).replace('4', map[4]).replace('5', map[5])
+                var str = params.row.tipsContent ? params.row.tipsContent.replace('1', map[1]).replace('2', map[2]).replace('3', map[3]).replace('4', map[4]).replace('5', map[5]) : ''
                 return create('span',str);
             }
           },

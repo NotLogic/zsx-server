@@ -1,13 +1,409 @@
 <template>
   <div class="resource">
-    资源管理
-    <router-link :to="{name: 'main'}">返回主页</router-link>
+    <Button type="primary" style="margin: 5px 8px 24px 0;" @click="addRow" size="small">{{label.add}}</Button>
+    <mainTable :columns="columns" :data="pager.data"></mainTable>
+    <Modal v-model="dialogShow" :title="label[currDialog]" :mask-closable="false" width="750" @on-cancel="resetDialogForm('formDialog')">
+        <Form :model="formDialog" ref="formDialog" :rules="rules" :label-width="80">
+          <Row>
+            <Col span="12">
+              <FormItem label="资源名称" prop="name">
+                <Input v-model="formDialog.name" placeholder="请输入资源名称"></Input>
+              </FormItem>
+            </Col>
+            <Col span="12">
+              <FormItem label="资源类型" prop="resourceType">                    	
+                <Select v-model="formDialog.resourceType">
+                  <Option v-for="item in resourceType" :value="item.value" :key="item.value">{{ item.label }}</Option>
+                </Select>
+              </FormItem>
+            </Col>
+          </Row>
+          <Row>
+            <Col span="12">
+              <FormItem label="资源路径" prop="url">
+                <Input v-model="formDialog.url"></Input>
+              </FormItem>
+            </Col>
+            <Col span="12">
+              <FormItem label="打开方式" prop="openMode">
+                  <Select v-model="formDialog.openMode">
+                    <Option v-for="item in openMode" :value="item.value" :key="item.value">{{ item.label }}</Option>
+                  </Select>
+              </FormItem>
+            </Col>
+          </Row>
+          <Row>
+            <Col span="12">
+              <FormItem label="菜单图标" prop="icon">
+                <Input v-model="formDialog.icon"></Input>
+              </FormItem>
+            </Col>
+            <Col span="12">
+              <FormItem label="排序" prop="seq">
+                <Input v-model="formDialog.seq"></Input>
+              </FormItem>
+            </Col>
+          </Row>
+          <Row>
+            <Col span="12">
+              <FormItem label="状态" prop="status">
+                <Select v-model="formDialog.status">
+                  <Option v-for="item in status" :value="item.value" :key="item.value">{{ item.label }}</Option>
+                </Select>
+              </FormItem>
+            </Col>
+            <Col span="12">
+              <FormItem label="上级资源" prop="pid">
+                <Select v-model="formDialog.pid">
+                  <Option v-for="item in pid" :value="item.value" :key="item.value">{{ item.label }}</Option>
+                </Select>
+              </FormItem>
+            </Col>
+          </Row>
+          <Row>
+            <Col span="12">
+              <FormItem label="权限" prop="permission">
+                <Input v-model="formDialog.permission" placeholder="格式如下:upms:resource:add"></Input>
+              </FormItem>
+            </Col>
+          </Row>
+      </Form>
+      <div slot="footer">
+        <Button @click="resetDialogForm('formDialog')">{{label.clear}}</Button>
+        <Button type="primary" @click="submitDialogForm('formDialog')" :loading="dialogSubmitLoading">{{label.submit}}</Button>
+      </div>
+    </Modal>
   </div>
 </template>
 
 <script>
+  import mainTable from '@/components/mainTable'
   export default {
-    name: 'resource'
+    name: 'resource',
+    components: {
+      mainTable
+    },
+    data () {
+      return {
+        url: {
+          add: 'resource/add.do',
+          edit: 'resource/edit.do',
+          delete: 'resource/delete.do'
+        },
+        pager: {
+          data: [
+            {
+              id: '1',
+              name: '权限管理',
+              resourceType: '0',
+              url: '/resource/main.do',
+              openMode: 'ajax',
+              icon: '',
+              seq: 1,
+              status: '1',
+              opened: '1',
+              pid: [],
+              permission: 'upms:resource:main'
+            }, {
+              id: '2',
+              name: '会员管理',
+              resourceType: '1',
+              url: '/member/main.do',
+              openMode: 'ajax',
+              icon: '',
+              seq: 1,
+              status: '1',
+              opened: '1',
+              pid: [],
+              permission: 'upms:appUser:main'
+            }, {
+              id: '3',
+              name: '新闻管理',
+              resourceType: '0',
+              url: '/news/main.do',
+              openMode: 'iframe',
+              icon: '',
+              seq: 1,
+              status: '1',
+              opened: '1',
+              pid: [],
+              permission: 'upms:news:main'
+            }
+          ],
+          url: 'resource/treeGrid.do'
+        },
+        dialogShow: false,
+        currDialog: 'add',
+        dialogSubmitLoading: false,
+        resourceType: [
+          {
+            value: '0',
+            label: '菜单'
+          },
+          {
+            value: '1',
+            label: '按钮'
+          }
+        ],
+        openMode: [
+          {
+            value: '',
+            label: '无(用于上层菜单)'
+          },
+          {
+            value: 'ajax',
+            label: 'ajax'
+          },
+          {
+            value: 'iframe',
+            label: 'iframe'
+          }
+        ],
+        status:[
+          {
+            value: '1',
+            label: '正常'
+          },
+          {
+            value: '2',
+            label: '关闭'
+          }
+        ],
+        opened: {
+          '1': '打开',
+          '2': '关闭'
+        },
+        pid: [{
+          value: '',
+          label: '',
+          children: []
+        }],
+        formDialog: {
+          id: '',
+          name: '',
+          resourceType: '',
+          url: '',
+          openMode: '',
+          icon: '',
+          seq: 1,
+          status: '1',
+          opened: '1',
+          pid: [],
+          permission: ''
+        },
+        columns: [
+          {
+            "title": "编号",
+            "key": "id",
+            'fixed': 'left',
+            "width": 100
+          },
+          {
+            "title": "资源名称",
+            "key": "name",
+            "width": 200,
+            render: (create, params) => {
+              var vm = this
+              var icon = {
+                  0: 'chevron-right',
+                  1: 'ios-arrow-forward',
+                  2: 'ios-arrow-right'
+              }
+              return create('span', [
+                create('Button', {
+                  props: {
+                    type: 'text'
+                  },
+                  on: {
+                    click: function () {
+                        vm.$store.commit('editRow', {
+                        'vm': vm,
+                        'data': params.row,
+                        'initDialog': vm.initDialog(params.row)
+                      })
+                    }
+                  }
+                }, params.row.name)
+              ])
+            }
+          },
+          {
+            "title": "资源路径",
+            "key": "url",
+            "width": 200
+          },
+          {
+            "title": "权限",
+            "key": "permission",
+            "width": 200
+          },
+          {
+            "title": "状态",
+            "key": "status",
+            "width": 100,
+            render: function (create, params) {
+              var map = {
+                1: '正常',
+                2: '停用'
+              }
+              return create('span', map[params.row.status]);
+            }
+          },
+          {
+            "title": "打开方式",
+            "key": "openMode",
+            "width": 100
+          },
+          {
+            "title": "资源类型",
+            "key": "resourceType",
+            "width": 120,
+            render: function (create, params) {
+              var map = {
+                '0': '菜单',
+                '1': '按钮'
+              }
+              return create('span', map[params.row.resourceType])
+            }
+          },
+          {
+            "title": "图标",
+            "key": "iconCls",
+            "width": 150
+          },
+          {
+            "title": "排序",
+            "key": "seq",
+            // "width": 100
+          },
+          {
+            'title': '操作',
+            'key': 'action',
+            'width': 140,
+            'align': 'center',
+            'fixed': 'right',
+            render: (create, params) => {
+              let vm = this
+              //若为顶级菜单，则无删除，编辑操作
+              // if(params.row.pid==0){
+              //   return
+              // }
+              return create('div', [
+                create('Button', {
+                  props: {
+                    type: 'primary',
+                    size: 'small'
+                  },
+                  style: {
+                    marginRight: '5px'
+                  },
+                  on: {
+                    click: () => {
+                      vm.$store.commit('editRow', {
+                        'vm': vm,
+                        'data': params.row,
+                        'initDialog': vm.initDialog(params.row)
+                      })
+                    }
+                  }
+                }, '编辑'),
+                create('Button', {
+                  props: {
+                    type: 'error',
+                    size: 'small'
+                  },
+                  on: {
+                    click: () => {
+                      vm.$Modal.confirm({
+                        title: '确认',
+                        content: '确认删除这条数据吗？',
+                        onOk: function () {
+                          vm.$store.dispatch('delRow', {
+                            'vm': vm,
+                            'params': params
+                          })
+                        }
+                      })
+                    }
+                  }
+                }, '删除')
+              ])
+            }
+          }
+        ],
+        rules: {
+          name: [
+            { required: true, message: '资源名称不能为空', trigger: 'blur' }
+          ],
+          status: [
+            { required: true, message: '状态不能为空', trigger: 'change' }
+          ],
+          open: [
+            { required: true, message: '打开方式不能为空', trigger: 'change' }
+          ],
+          // pid: [
+          //   { required: true, message: '上级资源不能为空', trigger: 'change' }
+          // ],
+          // url: [
+          //   { required: true, message: '资源路径不能为空', trigger: 'change' }
+          // ],
+          resourceType:[
+            { required: true, message: '资源类型不能为空', trigger: 'change' }
+          ],
+          opened:[
+            { required: true, message: '菜单状态不能为空', trigger: 'change' }
+          ]
+        }
+      }
+    },
+    methods: {
+      addRow () {
+        this.$store.commit('addRow', this)
+      },
+      initDialog (data) {
+        
+      },
+      resetDialogForm (name) {
+        let vm = this
+        vm.$refs[name].resetFields()
+      },
+      submitDialogForm (name) {
+        let vm = this
+        vm.$refs[name].validate(function (valid) {
+          if (valid) {
+            let ajaxData = vm.util.editAddAjaxData(vm)
+            console.log(ajaxData)
+            vm.$store.dispatch('submitDialogForm', {
+              'vm': vm,
+              'name': name
+            })
+          }
+        })
+      },
+      paging () {
+        this.util.paging(this)
+      },
+      initData () {}
+    },
+    created () {
+      let vm = this
+      vm.initData()
+      vm.$store.commit('initPager', vm)
+      vm.paging(vm)
+    },
+    mounted () {},
+    computed: {
+      label () {
+        return this.$store.state.label
+      }
+    },
+    watch: {
+      dialogShow (val) {
+        if (!val) {
+          this.currDialog = 'add'
+        }
+      }
+    }
   }
 </script>
 
