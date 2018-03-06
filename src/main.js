@@ -2,6 +2,7 @@ import Vue from 'vue'
 import App from './App'
 import router from './router'
 import iView from 'iview'
+import tinymce from 'tinymce'
 // 引入'babel-polyfill' 兼容ie 9-11 ie不支持Promise方法
 import 'babel-polyfill'
 import store from './vuex'
@@ -14,6 +15,7 @@ Vue.use(iView)
 Vue.prototype.$http = http
 // 将扩展方法挂在到Vue上
 Vue.prototype.util = util
+Vue.prototype.$tinymce = tinymce
 /* eslint-disable no-new */
 new Vue({
   el: '#app',

@@ -12,10 +12,7 @@
         </FormItem>
         <FormItem label="账号类型" prop="source">
             <Select v-model="formSearch.userType" placeholder="请选择" size="small" clearable style="width:80px;">
-                <Option value="1">手机号</Option>
-                <Option value="2">QQ</Option>
-                <Option value="3">微信</Option>
-                <Option value="4">新浪</Option>
+                <Option v-for="item in userType" :value="item.value" :key="item.value">{{item.label}}</Option>
             </Select>
         </FormItem>
          <FormItem label="注册时间">
@@ -59,11 +56,8 @@
         <Row>
           <Col span="24">
             <FormItem label="账户类型" prop="userType">
-              <Select v-model="formDialog.userType" placeholder="请选择" size="small" clearable>
-                <Option value="1">手机号</Option>
-                <Option value="2">QQ</Option>
-                <Option value="3">微信</Option>
-                <Option value="4">新浪</Option>
+              <Select v-model="formDialog.userType" placeholder="请选择" clearable>
+                <Option v-for="item in userType" :value="item.value" :key="item.value">{{item.label}}</Option>
               </Select>
             </FormItem>
           </Col>
@@ -121,6 +115,24 @@
           sort: 'createTime',
           order: 'desc'
         },
+        userType: [
+          {
+            value: '1',
+            label: '手机'
+          },
+          {
+            value: '2',
+            label: 'QQ'
+          },
+          {
+            value: '3',
+            label: '微信'
+          },
+          {
+            value: '4',
+            label: '新浪'
+          }
+        ],
         derail_address_arr: [],
         derail_address_obj_s_h: [],
         derail_address_arr: [],

@@ -35,6 +35,29 @@ export const mainRoutes = {
   ]
 }
 export const appRoutes = [
+  // 富文本
+  // {
+  //   path: '/ueditor',
+  //   name: 'ueditor',
+  //   meta: {
+  //     title: '富文本',
+  //     access: 1,
+  //     icon: ''
+  //   },
+  //   component: main,
+  //   children: [
+  //     {
+  //       path: 'index',
+  //       name: 'ueditor_index',
+  //       meta: {
+  //         title: '富文本',
+  //         access: 1,
+  //         icon: ''
+  //       },
+  //       component: resolve => { require(['@/pages/ueditor'], resolve) }
+  //     }
+  //   ]
+  // },
   // 权限管理
   {
     path: '/authority',

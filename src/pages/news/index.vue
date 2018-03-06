@@ -37,7 +37,7 @@
     <!-- <mainTable :columns="columns" :data="pager.data" :height="610"></mainTable> -->
     <mainTable :columns="columns" :data="pager.data"></mainTable>
     <paging @changePager="changePager" @paging="paging" :total="pager.total" :currPage="pager.currPage"></paging>
-    <Modal v-model="dialogShow" :title="label[currDialog]" :mask-closable="false" width="750" @on-cancel="resetDialogForm('formDialog')">
+    <Modal v-model="dialogShow" :title="label[currDialog]" :mask-closable="false" width="800" @on-cancel="resetDialogForm('formDialog')">
       <Form :model="formDialog" ref="formDialog" :rules="rules" :label-width="80">
         <Row>
           <Col span="14">
@@ -47,7 +47,7 @@
             <FormItem label="新闻来源" prop="newsSrc">
               <Input v-model="formDialog.newsSrc" placeholder="请输入新闻来源"></Input>
             </FormItem>
-            <FormItem label="关联地区" prop="areaId">
+            <FormItem label="关联地区">
               <Input v-model="formDialog.detailAddress" :disabled="true"></Input>
             </FormItem>
           </Col>
@@ -55,8 +55,9 @@
             <FormItem label="新闻主图" prop="image">
               <Row>
                 <Col span="12">
-                  <div class="image_upload_list">
-                    <img style="max-width:100px;max-height:100px;" :src="formDialog.image"/>
+                  <div style="width:100px;height:100px;border:1px solid #eee;">
+                    <img v-if="formDialog.image" style="max-width:100%;" :src="formDialog.image" />
+                    <img v-else style="max-width:100%;" src="static/images/img-upload-default.png"/>
                   </div>
                 </Col>
                 <Col span="12">
@@ -71,12 +72,13 @@
         <Row>
           <Col span="24">
             <FormItem label="新闻内容" prop="content">
-              <Input v-model="formDialog.content" placeholder="新闻内容富文本"></Input>
+              <editor @updateContent="updateContent" :content="formDialog.content"></editor>
             </FormItem>
           </Col>
         </Row>
       </Form>
       <div slot="footer">
+        <Button @click="resetDialogForm('formDialog')">{{label.clear}}</Button>
         <Button type="primary" @click="submitDialogForm('formDialog')" :loading="dialogSubmitLoading">{{label.submit}}</Button>
       </div>
     </Modal>
@@ -98,11 +100,13 @@
 <script>
   import mainTable from '@/components/mainTable'
   import paging from '@/components/paging'
+  import editor from '@/components/tinymce'
   export default {
     name: 'news_index',
     components: {
       mainTable,
-      paging
+      paging,
+      editor
     },
     data: function () {
       return {
@@ -119,7 +123,7 @@
               url: '',
               title: '光明新区周家大道（马田段）土地整备攻坚战告捷',
               newsSrc: '绿色光明网',
-              content: '',
+              content: '今鞍山道卡萨丁',
               date: '',
               image: 'http://iguangming.sznews.com/images/attachement/png/site640/20171220/IMG889ffafebae246370159022.PNG',
               commentNum: '789',
@@ -133,7 +137,7 @@
               url: '',
               title: '光明新区首设全待行路口 提升道路通行能力',
               newsSrc: '绿色光明网',
-              content: '',
+              content: '阿斯顿',
               date: '',
               image: 'http://iguangming.sznews.com/images/attachement/jpg/site640/20171220/IMGb083feb941e04637355087.jpg',
               commentNum: '123',
@@ -147,7 +151,7 @@
               url: '',
               title: '观湖街道“上围艺术+”党群驿站揭牌启用',
               newsSrc: '龙华网',
-              content: '',
+              content: '为人头就偶尔提',
               date: '',
               image: 'http://ilonghua.sznews.com/images/attachement/jpg/site1011/20171219/IMG74e543574fc54636456847.jpg',
               commentNum: '456',
@@ -398,22 +402,34 @@
       handleSuccess () {},
       resetDialogForm (name) {
         let vm = this
+        vm.setContent('')
         vm.$refs[name].resetFields()
       },
       submitDialogForm (name) {
-        let vm = this
-        vm.$refs[name].validate(function (valid) {
-          if (valid) {
-            let ajaxData = vm.util.editAddAjaxData(vm)
-            console.log(ajaxData)
-            vm.$store.dispatch('submitDialogForm', {
-              'vm': vm,
-              'name': name
-            })
-          }
-        })
+        this.util.submitDialogForm(this, name)
       },
-      initDialog (data) {},
+      getContent () {
+        let content = ''
+        if (this.$tinymce.get('tinymceEditer').getContent()) {
+          content = this.$tinymce.get('tinymceEditer').getContent()
+        }
+        return content
+      },
+      setContent (content) {
+        let set = ''
+        if (content) {
+          set = content
+        }
+        this.$tinymce.get('tinymceEditer').setContent(set)
+      },
+      updateContent (content) {
+        this.formDialog.content = content
+      },
+      initDialog (data) {
+        let vm = this
+        let _data = vm.util.extend(data)
+        vm.setContent(_data.content)
+      },
       changePager (data) {
         this.util.changePager(this, data)
       },

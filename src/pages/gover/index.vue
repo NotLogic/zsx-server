@@ -20,8 +20,8 @@
     </Form>
     <mainTable :columns="columns" :data="pager.data"></mainTable>
     <paging @changePager="changePager" @paging="paging" :total="pager.total" :currPage="pager.currPage"></paging>
-    <Modal v-model="dialogShow" :title="label[currDialog]" :mask-closable="false" width="750" @on-cancel="resetDialogForm('formDialog')">
-      <Form :model="formDialog" ref="formDialog" :rules="rules" :label-width="90">
+    <Modal v-model="dialogShow" :title="label[currDialog]" :mask-closable="false" width="950" @on-cancel="resetDialogForm('formDialog')" :styles="{top:'25px'}">
+      <Form :model="formDialog" ref="formDialog" :rules="rules" :label-width="90" style="max-width: 900px;">
         <Row>
           <Col span="12">
             <FormItem label="标题" prop="title">
@@ -29,7 +29,7 @@
             </FormItem>
           </Col>
           <Col span="12">
-            <FormItem label="所属地区" prop="aa">
+            <FormItem label="所属地区">
               <Cascader :data="derail_address_arr" v-model="derail_address_obj_sub" @on-change="subAddrChange" filterable style="margin-top: 5px"></Cascader>
             </FormItem>
           </Col>
@@ -60,10 +60,10 @@
         </Row>
         <Row>
           <Col span="12">
-            <FormItem label="图片" prop="images">
+            <FormItem label="图片" prop="image">
               <Row>
                 <Col span="12">
-                  <div style="width:130px;border:1px solid #eee;">
+                  <div style="width:100px;height:100px;border:1px solid #eee;">
                     <img v-if="formDialog.image" style="max-width:100%;" :src="formDialog.image" />
                     <img v-else style="max-width:100%;" src="static/images/img-upload-default.png"/>
                   </div>
@@ -93,7 +93,7 @@
         <Row>
           <Col span="24">
             <FormItem label="内容" prop="content">
-              <Input v-model="formDialog.content" placeholder="富文本"></Input>
+              <editor @updateContent="updateContent" :content="formDialog.content"></editor>
             </FormItem>
           </Col>
         </Row>
@@ -140,11 +140,13 @@
 <script>
   import mainTable from '@/components/mainTable'
   import paging from '@/components/paging'
+  import editor from '@/components/tinymce'
   export default {
     name: 'gover_index',
     components: {
       mainTable,
-      paging
+      paging,
+      editor
     },
     data: function () {
       return {
@@ -162,7 +164,7 @@
               cityId: '341300',
               areaId: '341323',
               image: 'http://www.lingbi.gov.cn/UploadFile/image/20171215/2017121516510522522.jpg',
-              content: '',
+              content: '萨拉就肯定是可否考虑对方是',
               governmentSource: '灵璧县政府网',
               sourceUrl: 'http://www.szns.gov.cn/xxgk/qzfxxgkml/zcwj/qjzcwj/201712/t20171208_10200040.htm',
               governmentDate: '2017-12-15 00:00:00',
@@ -393,23 +395,13 @@
       },
       resetDialogForm (name) {
         let vm = this
-        vm.formDialog.id = '0'
-        vm.formDialog.image = ''
         vm.derail_address_obj_sub = []
+        vm.setContent('')
         vm.$refs[name].resetFields()
       },
       submitDialogForm (name) {
         let vm = this
-        vm.$refs[name].validate(function (valid) {
-          if (valid) {
-            let ajaxData = vm.util.editAddAjaxData(vm)
-            console.log(ajaxData)
-            vm.$store.dispatch('submitDialogForm', {
-              'vm': vm,
-              'name': name
-            })
-          }
-        })
+        vm.util.submitDialogForm(vm, name)
       },
       searchAddrChange (value) {
         this.formSearch.areaId = value[2]
@@ -460,10 +452,28 @@
           'name': name
         })
       },
+      getContent () {
+        let content = ''
+        if (this.$tinymce.get('tinymceEditer').getContent()) {
+          content = this.$tinymce.get('tinymceEditer').getContent()
+        }
+        return content
+      },
+      setContent (content) {
+        let set = ''
+        if (content) {
+          set = content
+        }
+        this.$tinymce.get('tinymceEditer').setContent(set)
+      },
+      updateContent (content) {
+        this.formDialog.content = content
+      },
       initDialog (data) {
         let vm = this
         let _data = vm.util.extend(data)
         vm.derail_address_obj_sub = [_data.provinceId, _data.cityId, _data.areaId]
+        vm.setContent(_data.content)
       },
       changePager (data) {
         this.util.changePager(this, data)
@@ -495,6 +505,18 @@
       dialogShow (val) {
         if (!val) {
           this.currDialog = 'add'
+        }
+      },
+      derail_address_obj_sub (val) {
+        let vm = this
+        if (val.length) {
+          vm.formDialog.provinceId = val[0]
+          vm.formDialog.cityId = val[1]
+          vm.formDialog.areaId = val[2]
+        } else {
+          vm.formDialog.provinceId = ''
+          vm.formDialog.cityId = ''
+          vm.formDialog.areaId = ''
         }
       }
     }

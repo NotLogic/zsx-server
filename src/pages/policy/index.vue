@@ -21,8 +21,8 @@
     <mainTable :columns="columns" :data="pager.data"></mainTable>
     <paging @changePager="changePager" @paging="paging" :total="pager.total" :currPage="pager.currPage"></paging>
     <!-- 弹出框 -->
-    <Modal v-model="dialogShow" :title="label[currDialog]" :mask-closable="false" width="750" @on-cancel="resetDialogForm('formDialog')">
-      <Form :model="formDialog" ref="formDialog" :rules="rules" :label-width="80">
+    <Modal v-model="dialogShow" :title="label[currDialog]" :mask-closable="false" width="950" @on-cancel="resetDialogForm('formDialog')" :styles="{top:'25px'}">
+      <Form :model="formDialog" ref="formDialog" :rules="rules" :label-width="80" style="max-width: 900px;">
         <Row>
           <Col span="12">
             <FormItem label="标题" prop="title">
@@ -61,10 +61,10 @@
         </Row>
         <Row>
           <Col span="12">
-            <FormItem label="图片" prop="images">
+            <FormItem label="图片" prop="image">
               <Row>
                 <Col span="12">
-                  <div style="width:130px;border:1px solid #eee;">
+                  <div style="width:100px;height:100px;border:1px solid #eee;">
                     <img v-if="formDialog.image" style="max-width:100%;" :src="formDialog.image" />
                     <img v-else style="max-width:100%;" src="static/images/img-upload-default.png"/>
                   </div>
@@ -94,7 +94,8 @@
         <Row>
           <Col span="24">
             <FormItem label="内容" prop="content">
-              <ueditor :id="'policyUeditor'" :content="formDialog.content"></ueditor> 
+              <!-- 富文本 -->
+              <editor @updateContent="updateContent" :content="formDialog.content"></editor>
             </FormItem>
           </Col>
         </Row>
@@ -141,15 +142,14 @@
 <script>
   import mainTable from '@/components/mainTable'
   import paging from '@/components/paging'
-  import ueditor from '@/components/ueditor'
-  // 为什么下边的会提示模块找不到
-  // import ueditor from '@/components/ueditor/text-editor'
+  import editor from '@/components/tinymce'
+  // import tinymce from 'tinymce' //在main.js挂载到vue上
   export default {
     name: 'policy_index',
     components: {
       mainTable,
       paging,
-      ueditor
+      editor
     },
     data: function () {
       return {
@@ -169,7 +169,7 @@
               image: 'http://www.sz.gov.cn/lhxq/qt/zsyz/tzdt/201706/W020170612595410856312.jpg',
               cityId: '440300',
               areaId: '440306',
-              content: '',
+              content: '<p>听诉求，解难题，助发展。5月12日上午，龙华区委书记余新国率队到辖区企业进行实地调研，了解企业发展，听取企业诉求，要求相关部门和街道为企业做大做强提供优质服务。区委常委、区委（政府）办公室主任韩荡，副区长陈建民一同调研。</p><p>“企业占地面积有多大？现在有多少员工？去年产值有多少……”余新国一行首先来到深圳领威科技有限公司，深入企业车间了解生产情况，并倾听企业现阶段的诉求，了解企业在发展过程中遇到的难题。据了解，深圳领威科技有限公司占地面积12万平方米，拥有员工1249人，是一家集科技、研发、生产于一体的大型机械制造企业。2016年度产值7.4亿元，纳税4960.75万元，在龙华纳税100强企业中排名第63，在龙华工业100强企业中排名第45。在调研过程中，企业负责人向调研组反映目前面临的困扰，如园区水泵房的建设滞后、周边的交通和配套服务有待改善等。区经促局、区环保水务局对相关问题一一进行解答，并表示将积极协助企业解决问题。</p><p>在深圳市深越光电技术有限公司，余新国一行了解到，深越表面声波屏和电阻式触摸屏的产能位居全国第二，电容屏产能名列国内五强，目前和三星、华为、联想、酷派、OPPO、VIVO等一线著名品牌建立长期合作的关系，得到了国内外高端客户的广泛好评，但现阶段面临着产能跟不上市场订单需求的发展难题。该企业为加大研发力度，拟建立研发中心大楼、办公大楼，并建成电子产业园，将上下游企业整合，完善产业链条，打造产业集群，希望政府能提供项目用地，协助各手续的办理，并积极推动项目建成。</p><p>余新国表示，经过实地调研已经了解到企业面临的问题，希望企业与街道和相关部门加强沟通，紧密联系，进一步表达自身的实际需求。同时，相关部门可积极利用“工改工”方式盘活存量土地，为科技创新企业和优势产业腾出更多空间。余新国要求，各部门各街道要多到辖区企业走访，第一时间掌握企业动态，并为他们提供优质服务，助力企业做大做强。</p>',
               sourceUrl: 'http://www.sz.gov.cn/dpxq/qt/zsy',
               policySoucre: '深圳市政府网',
               policyDate: '2017-12-13 00:00:00',
@@ -183,7 +183,7 @@
               image: 'http://www.sz.gov.cn/lhxq/qt/zsyz/tzdt/201706/W020170612595410856312.jpg',
               cityId: '440100',
               areaId: '440113',
-              content: '',
+              content: '<p>听诉求，解难题，助发展。5月12日上午，龙华区委书记余新国率队到辖区企业进行实地调研，了解企业发展，听取企业诉求，要求相关部门和街道为企业做大做强提供优质服务。区委常委、区委（政府）办公室主任韩荡，副区长陈建民一同调研。</p><p>“企业占地面积有多大？现在有多少员工？去年产值有多少……”余新国一行首先来到深圳领威科技有限公司，深入企业车间了解生产情况，并倾听企业现阶段的诉求，了解企业在发展过程中遇到的难题。据了解，深圳领威科技有限公司占地面积12万平方米，拥有员工1249人，是一家集科技、研发、生产于一体的大型机械制造企业。2016年度产值7.4亿元，纳税4960.75万元，在龙华纳税100强企业中排名第63，在龙华工业100强企业中排名第45。在调研过程中，企业负责人向调研组反映目前面临的困扰，如园区水泵房的建设滞后、周边的交通和配套服务有待改善等。区经促局、区环保水务局对相关问题一一进行解答，并表示将积极协助企业解决问题。</p><p>在深圳市深越光电技术有限公司，余新国一行了解到，深越表面声波屏和电阻式触摸屏的产能位居全国第二，电容屏产能名列国内五强，目前和三星、华为、联想、酷派、OPPO、VIVO等一线著名品牌建立长期合作的关系，得到了国内外高端客户的广泛好评，但现阶段面临着产能跟不上市场订单需求的发展难题。该企业为加大研发力度，拟建立研发中心大楼、办公大楼，并建成电子产业园，将上下游企业整合，完善产业链条，打造产业集群，希望政府能提供项目用地，协助各手续的办理，并积极推动项目建成。</p><p>余新国表示，经过实地调研已经了解到企业面临的问题，希望企业与街道和相关部门加强沟通，紧密联系，进一步表达自身的实际需求。同时，相关部门可积极利用“工改工”方式盘活存量土地，为科技创新企业和优势产业腾出更多空间。余新国要求，各部门各街道要多到辖区企业走访，第一时间掌握企业动态，并为他们提供优质服务，助力企业做大做强。</p>',
               sourceUrl: 'http://www.sz.gov.cn/dpxq/qt/zsy',
               policySoucre: '深圳市政府网',
               policyDate: '2017-12-21 00:00:00',
@@ -197,7 +197,7 @@
               image: 'http://barb.sznews.com/attachment/images/201710/11/9c0a3c20-d207-4f57-9258-2a4e2a778956.jpg.1',
               cityId: '440600',
               areaId: '440607',
-              content: '',
+              content: '<p>听诉求，解难题，助发展。5月12日上午，龙华区委书记余新国率队到辖区企业进行实地调研，了解企业发展，听取企业诉求，要求相关部门和街道为企业做大做强提供优质服务。区委常委、区委（政府）办公室主任韩荡，副区长陈建民一同调研。</p><p>“企业占地面积有多大？现在有多少员工？去年产值有多少……”余新国一行首先来到深圳领威科技有限公司，深入企业车间了解生产情况，并倾听企业现阶段的诉求，了解企业在发展过程中遇到的难题。据了解，深圳领威科技有限公司占地面积12万平方米，拥有员工1249人，是一家集科技、研发、生产于一体的大型机械制造企业。2016年度产值7.4亿元，纳税4960.75万元，在龙华纳税100强企业中排名第63，在龙华工业100强企业中排名第45。在调研过程中，企业负责人向调研组反映目前面临的困扰，如园区水泵房的建设滞后、周边的交通和配套服务有待改善等。区经促局、区环保水务局对相关问题一一进行解答，并表示将积极协助企业解决问题。</p><p>在深圳市深越光电技术有限公司，余新国一行了解到，深越表面声波屏和电阻式触摸屏的产能位居全国第二，电容屏产能名列国内五强，目前和三星、华为、联想、酷派、OPPO、VIVO等一线著名品牌建立长期合作的关系，得到了国内外高端客户的广泛好评，但现阶段面临着产能跟不上市场订单需求的发展难题。该企业为加大研发力度，拟建立研发中心大楼、办公大楼，并建成电子产业园，将上下游企业整合，完善产业链条，打造产业集群，希望政府能提供项目用地，协助各手续的办理，并积极推动项目建成。</p><p>余新国表示，经过实地调研已经了解到企业面临的问题，希望企业与街道和相关部门加强沟通，紧密联系，进一步表达自身的实际需求。同时，相关部门可积极利用“工改工”方式盘活存量土地，为科技创新企业和优势产业腾出更多空间。余新国要求，各部门各街道要多到辖区企业走访，第一时间掌握企业动态，并为他们提供优质服务，助力企业做大做强。</p>',
               sourceUrl: 'http://www.sz.gov.cn/dpxq/qt/zsy',
               policySoucre: '深圳市政府网',
               policyDate: '2017-10-16 00:00:00',
@@ -401,23 +401,13 @@
       },
       resetDialogForm (name) {
         let vm = this
-        vm.formDialog.id = '0'
         vm.formDialog.image = ''
         vm.derail_address_obj_sub = []
+        vm.setContent('')
         vm.$refs[name].resetFields()
       },
       submitDialogForm (name) {
-        let vm = this
-        vm.$refs[name].validate(function (valid) {
-          if (valid) {
-            let ajaxData = vm.util.editAddAjaxData(vm)
-            console.log(ajaxData)
-            vm.$store.dispatch('submitDialogForm', {
-              'vm': vm,
-              'name': name
-            })
-          }
-        })
+        this.util.submitDialogForm(this, name)
       },
       resetSearch (name) {
         let vm = this
@@ -462,12 +452,31 @@
         _data.provinceCityarea = vm.util.getProvinceCityArea([_data.provinceId,_data.cityId,_data.areaId],vm.chinaJson,true);                
         vm.previewData = _data;
         vm.previewModal = true;
-			},
+      },
+      getContent () {
+        let content = ''
+        if (this.$tinymce.get('tinymceEditer').getContent()) {
+          content = this.$tinymce.get('tinymceEditer').getContent()
+        }
+        return content
+      },
+      setContent (content) {
+        let set = ''
+        if (content) {
+          set = content
+        }
+        this.$tinymce.get('tinymceEditer').setContent(set)
+      },
+      updateContent (content) {
+        this.formDialog.content = content
+      },
       initDialog (data) {
         let vm = this
         let _data = vm.util.extend(data)
         vm.derail_address_obj_sub = [_data.provinceId, _data.cityId, _data.areaId]
+        vm.setContent(_data.content)
       },
+      initPostDialog (data) {},
       changePager (data) {
         this.util.changePager(this, data)
       },
@@ -483,7 +492,8 @@
     computed: {
       label () {
         return this.$store.state.label
-      }
+      },
+      
     },
     created () {
       let vm = this
@@ -502,6 +512,18 @@
       derail_address_obj_s (val) {
         if (val[val.length - 1] == null) return
         this.formSearch.areaId = val[val.length - 1]
+      },
+      derail_address_obj_sub (val) {
+        let vm = this
+        if (val.length) {
+          vm.formDialog.provinceId = val[0]
+          vm.formDialog.cityId = val[1]
+          vm.formDialog.areaId = val[2]
+        } else {
+          vm.formDialog.provinceId = ''
+          vm.formDialog.cityId = ''
+          vm.formDialog.areaId = ''
+        }
       }
     }
   }
