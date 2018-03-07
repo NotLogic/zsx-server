@@ -33,9 +33,7 @@
       </Form>
       <div slot="footer">
         <Button @click="resetDialogForm('formDialog')">{{label.clear}}</Button>
-        <Button type="primary" @click="submitDialogForm('formDialog')" :loading="dialogSubmitLoading">
-          {{label.submit}}
-        </Button>
+        <Button type="primary" @click="submitDialogForm('formDialog')" :loading="dialogSubmitLoading">{{label.submit}}</Button>
       </div>
     </Modal>
   </div>
@@ -151,17 +149,7 @@
         this.$refs[name].resetFields()
       },
       submitDialogForm (name) {
-        let vm = this
-        vm.$refs[name].validate(function (valid) {
-          if (valid) {
-            let ajaxData = vm.util.editAddAjaxData(vm)
-            console.log(ajaxData)
-            vm.$store.dispatch('submitDialogForm', {
-              'vm': vm,
-              'name': name
-            })
-          }
-        })
+        this.util.submitDialogForm(this, name)
       },
       resetSearch (name) {
         this.$refs[name].resetFields()

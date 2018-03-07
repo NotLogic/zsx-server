@@ -400,8 +400,7 @@
         vm.$refs[name].resetFields()
       },
       submitDialogForm (name) {
-        let vm = this
-        vm.util.submitDialogForm(vm, name)
+        this.util.submitDialogForm(this, name)
       },
       searchAddrChange (value) {
         this.formSearch.areaId = value[2]

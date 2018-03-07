@@ -26,7 +26,6 @@
     </Form>
     <mainTable :columns="columns" :data="pager.data"></mainTable>
     <paging @changePager="changePager" @paging="paging" :total="pager.total" :currPage="pager.currPage"></paging>
-
   </div>
 </template>
 

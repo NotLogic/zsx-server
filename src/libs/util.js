@@ -347,10 +347,12 @@ const util = {
     vm.$refs[name].validate(function (valid) {
       if (valid) {
         if (vm.initPostDialog) {
-          vm.initPostDialog(vm.formDialog)
+          vm.formDialog = vm.initPostDialog(vm.formDialog)
         }
         let ajaxData = vm.util.editAddAjaxData(vm)
-        console.log(ajaxData)
+        let ajaxUrl = vm.url[vm.currDialog]
+        console.log("ajaxData: ",ajaxData)
+        console.log("ajaxUrl: ",ajaxUrl)
         vm.$store.dispatch('submitDialogForm', {
           'vm': vm,
           'name': name

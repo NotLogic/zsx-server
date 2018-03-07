@@ -88,7 +88,8 @@
         </Row>
       </Form>
       <div slot="footer">
-        <Button type="primary" @click="_submitDialogForm('formDialog')" :loading="dialogSubmitLoading">{{label.submit}}</Button>
+        <Button @click="resetDialogForm('formDialog')">{{label.clear}}</Button>
+        <Button type="primary" @click="submitDialogForm('formDialog')" :loading="dialogSubmitLoading">{{label.submit}}</Button>
       </div>
     </Modal>
   </div>
@@ -303,7 +304,11 @@
         this.$store.commit('addRow', this)
       },
       resetDialogForm (name) {
-        this.$refs[name].resetFields()
+        let vm = this
+        vm.$refs[name].resetFields()
+      },
+      submitDialogForm (name) {
+        this.util.submitDialogForm(this, name)
       },
       resetSearch (name) {
         this.formSearch.userType = ''

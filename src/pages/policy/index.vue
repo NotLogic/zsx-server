@@ -156,8 +156,7 @@
         url: {
           add: 'policy/add.do',
           edit: 'policy/edit.do',
-          delete: 'policy/delete.do',
-          paging: 'policy/dataGrid.do'
+          delete: 'policy/delete.do'
         },
         pager: {
           url: "policy/dataGrid.do",

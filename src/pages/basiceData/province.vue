@@ -32,24 +32,24 @@
     </Modal>
 
     <!-- 添加/编辑 弹窗 -->
-    <Modal v-model="dialogShow" :title="label[currDialog]" :mask-closable="false" width="750" @on-cancel="resetDialog">
+    <Modal v-model="dialogShow" :title="label[currDialog]" :mask-closable="false" width="750" @on-cancel="resetDialogForm('formDialog')">
       <Form :model="formDialog" ref="formDialog" :rules="rules" :label-width="80">
         <Row>
           <Col span="12">
-            <FormItem v-if="choice === 'province'" label="省份名称" prop="provinceName">
+            <FormItem v-if="choice == 'province'" :key="choice" label="省份名称" prop="provinceName">
               <Input v-model="formDialog.provinceName" placeholder="请输入省份名称"></Input>
             </FormItem>
-            <FormItem v-else-if="choice === 'city'" label="市名称" prop="cityName">
+            <FormItem v-if="choice == 'city'" :key="choice" label="市名称" prop="cityName">
               <Input v-model="formDialog.cityName" placeholder="请输入市名称"></Input>
             </FormItem>
-            <FormItem v-else-if="choice === 'area'" label="区名称" prop="areaName">
+            <FormItem v-if="choice == 'area'" :key="choice" label="区名称" prop="areaName">
               <Input v-model="formDialog.areaName" placeholder="请输入区名称"></Input>
             </FormItem>
           </Col>
         </Row>
       </Form>
       <div slot="footer">
-        <Button @click="resetDialog">{{label.clear}}</Button>
+        <Button @click="resetDialogForm('formDialog')">{{label.clear}}</Button>
         <Button type="primary" @click="submitDialogForm('formDialog')" :loading="dialogSubmitLoading">{{label.submit}}</Button>
       </div>
     </Modal>
@@ -67,11 +67,17 @@
     },
     data () {
       return {
+        url: {
+          add: 'province/add.do',
+          edit: 'province/edit.do',
+          delete: 'province/delete.do',
+        },
         currDialog: 'edit',
         dialogShow: false,
         cityDialogShow: false,
         areaDialogShow: false,
         dialogSubmitLoading: false,
+        editInd: 0,
         formDialog: {
           id: '',
           provinceName: '',
@@ -132,7 +138,7 @@
                     style: { marginRight: '5px' },
                     on: {
                       click: function () {
-                        // vm.editRow(params.row, 'province')
+                        vm.editRow(params.row, 'province')
                       }
                     }
                   }, vm.label.edit)
@@ -199,7 +205,7 @@
                     style: { marginRight: '5px' },
                     on: {
                       click: function () {
-                        // vm.editRow(params.row, 'province')
+                        vm.editRow(params.row, 'city')
                       }
                     }
                   }, vm.label.edit)
@@ -250,7 +256,7 @@
                   style: { marginRight: '5px' },
                   on: {
                     click: function () {
-                      // vm.editRow(params.row, 'province')
+                      vm.editRow(params.row, 'area')
                     }
                   }
                 }, vm.label.edit),
@@ -281,6 +287,19 @@
     methods: {
       closeModal (name) {
         this[name] = false
+      },
+      editRow (data, choice) {
+        let vm = this
+        let _data = vm.util.extend(data)
+        vm.choice = choice
+        vm.editInd = _data["_index"]
+        vm.currDialog = 'edit'
+        for (let key in vm.formDialog) {
+          if (typeof(_data[key]) != 'undefined') {
+            vm.formDialog[key] = _data[key]
+          }
+        }
+        vm.dialogShow = true
       },
       showCity (provinceId) {
         var vm = this
@@ -318,24 +337,35 @@
         }
         return dataArr
       },
-      resetDialog () {
+      resetDialogForm (name) {
         var vm = this
-        if (vm.formDialog.id) vm.formDialog.id = ''
-        if (vm.formDialog.provinceName) vm.formDialog.provinceName = ''
-        if (vm.formDialog.cityName) vm.formDialog.cityName = ''
-        if (vm.formDialog.areaName) vm.formDialog.areaName = ''
+        // if (vm.formDialog.provinceName) vm.formDialog.provinceName = ''
+        // if (vm.formDialog.cityName) vm.formDialog.cityName = ''
+        // if (vm.formDialog.areaName) vm.formDialog.areaName = ''
+        vm.formDialog.provinceName = ''
+        vm.formDialog.cityName = ''
+        vm.formDialog.areaName = ''
+        // vm.$refs[name].resetFields()
       },
       submitDialogForm (name) {
-        console.log(name)
+        this.util.submitDialogForm(this, name)
       },
       addRow (choice) {
         let vm = this
         vm.choice = choice
-        vm.currDialog = 'add'
-        vm.dialogShow = true
+        vm.$store.commit('addRow', vm)
       },
       // 校验所有数据
-      checkData () {}
+      checkData () {},
+      initPostDialog (data) {
+        let _data = this.util.extend(data)
+        for (let key in _data) {
+          if (!_data[key]) {
+            delete _data[key]
+          }
+        }
+        return _data
+      }
     },
     mounted () {
       let vm = this
@@ -358,7 +388,14 @@
       //   console.log('res2: ', res2)
       // }))
     },
-    watch: {}
+    watch: {
+      'dialogShow': function(val,oldVal){
+            if(!val){
+              this.currDialog = 'add'
+              this.editInd = 0
+            }
+        }
+    }
   }
 </script>
 

@@ -208,17 +208,7 @@
         this.$refs[name].resetFields()
       },
       submitDialogForm (name) {
-        let vm = this
-        vm.$refs[name].validate(function (valid) {
-          if (valid) {
-            let ajaxData = vm.util.editAddAjaxData(vm)
-            console.log(ajaxData)
-            vm.$store.dispatch('submitDialogForm', {
-              'vm': vm,
-              'name': name
-            })
-          }
-        })
+        this.util.submitDialogForm(this, name)
       },
       // 展开/折叠
       treeExpand () {

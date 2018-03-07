@@ -41,8 +41,8 @@
           </Row>
           <Row>
             <Col span="12">
-              <FormItem label="群组图片" prop="impagePath">
-                <Input v-model="formDialog.impagePath" placeholder="请输入群组图片路径"></Input>
+              <FormItem label="群组图片" prop="imagePath">
+                <Input v-model="formDialog.imagePath" placeholder="请输入群组图片路径"></Input>
               </FormItem>
             </Col>
             <Col span="12">
@@ -305,17 +305,7 @@
         vm.$refs[name].resetFields()
       },
       submitDialogForm (name) {
-        let vm = this
-        vm.$refs[name].validate(function (valid) {
-          if (valid) {
-            let ajaxData = vm.util.editAddAjaxData(vm)
-            console.log(ajaxData)
-            vm.$store.dispatch('submitDialogForm', {
-              'vm': vm,
-              'name': name
-            })
-          }
-        })
+        this.util.submitDialogForm(this, name)
       },
       changePager (data) {
         this.util.changePager(this, data)

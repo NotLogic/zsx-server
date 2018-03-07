@@ -2,7 +2,7 @@
   "name": "zsx-server",
   "version": "1.0.0",
   "description": "众善行后台Vue重构",
-  "author": "",
+  "author": "Logic<1045382156@qq.com>",
   "private": true,
   "scripts": {
     "dev": "webpack-dev-server --inline --progress --config build/webpack.dev.conf.js",

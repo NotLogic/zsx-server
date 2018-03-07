@@ -15,15 +15,71 @@
             <DatePicker type="datetime" placeholder="点击选择时间" v-model="formSearch.createdateEnd" size="small" :clearable="false"></DatePicker>
           </FormItem>
         </FormItem>
-        <Button type="ghost" style="margin-right: 8px;margin-top: 5px;" @click="resetSearch('formSearch')" size="small">{{label.clear}}</Button>
-        <Button type="primary" style="margin-right: 8px;margin-top: 5px;" @click="submitSearch('formSearch')" size="small">{{label.search}}</Button>
-        <Button type="warning" style="margin-right: 8px;margin-top: 5px;" :disabled="batchOprArr.length==0" @click="batchIgnore" size="small">批量忽略</Button>
-        <Button type="warning" style="margin-right: 8px;margin-top: 5px;" :disabled="batchOprArr.length==0" @click="batchLock" size="small">批量屏蔽</Button>
-        <Button type="primary" style="margin-right: 8px;margin-top: 5px;" @click="exportData" size="small">导出</Button>
+        <Button type="ghost" style="margin: 5px 8px 24px 0;" @click="resetSearch('formSearch')" size="small">{{label.clear}}</Button>
+        <Button type="primary" style="margin: 5px 8px 24px 0;" @click="submitSearch('formSearch')" size="small">{{label.search}}</Button>
+        <Button type="warning" style="margin: 5px 8px 24px 0;" :disabled="batchOprArr.length==0" @click="batchIgnore" size="small">批量忽略</Button>
+        <Button type="warning" style="margin: 5px 8px 24px 0;" :disabled="batchOprArr.length==0" @click="batchLock" size="small">批量屏蔽</Button>
+        <Button type="primary" style="margin: 5px 8px 24px 0;" @click="exportData" size="small">导出</Button>
+        <!-- <Button type="primary" style="margin: 5px 8px 24px 0;" @click="addRow" size="small">{{label.add}}</Button> -->
     </Form>
     <mainTable :columns="columns" :data="pager.data"></mainTable>
     <paging @changePager="changePager" @paging="paging" :total="pager.total" :currPage="pager.currPage"></paging>
-    
+    <Modal v-model="dialogShow" :title="label[currDialog]" :mask-closable="false" width="750" @on-cancel="resetDialogForm('formDialog')">
+      <Form :model="formDialog" ref="formDialog" :rules="rules" :label-width="80">
+        <Row>
+          <Col span="12">
+            <FormItem label="发布人id" prop="sAppId">
+              <Input v-model="formDialog.sAppId" placeholder="请输入发布人id"></Input>
+            </FormItem>
+          </Col>
+          <Col span="12">
+            <FormItem label="举报人id" prop="appId">
+              <Input v-model="formDialog.appId" placeholder="请输入举报人id"></Input>
+            </FormItem>
+          </Col>
+        </Row>
+        <Row>
+          <Col span="12">
+            <FormItem label="帖子/评论id" prop="sId">
+              <Input v-model="formDialog.sId" placeholder="请输入帖子/评论id"></Input>
+            </FormItem>
+          </Col>
+          <Col span="12">
+            <FormItem label="1:广告,2:政治敏感,3:不适宜公开,4:骂人,5:色情等违法" prop="tipsContent">
+              <Input v-model="formDialog.tipsContent" placeholder="请输入1:广告,2:政治敏感,3:不适宜公开,4:骂人,5:色情等违法"></Input>
+            </FormItem>
+          </Col>
+        </Row>
+        <Row>
+          <Col span="12">
+            <FormItem label="1:未屏蔽,2:已屏蔽" prop="status">
+              <Input v-model="formDialog.status" placeholder="请输入1:未屏蔽,2:已屏蔽"></Input>
+            </FormItem>
+          </Col>
+          <Col span="12">
+            <FormItem label="1:未处理,2:已处理" prop="chStatus">
+              <Input v-model="formDialog.chStatus" placeholder="请输入1:未处理,2:已处理"></Input>
+            </FormItem>
+          </Col>
+        </Row>
+        <Row>
+          <Col span="12">
+            <FormItem label="1:新闻,2:谈天说地,3:老乡帮衬,4:商务合作 5:意见投票" prop="tipType">
+              <Input v-model="formDialog.tipType" placeholder="请输入1:新闻,2:谈天说地,3:老乡帮衬,4:商务合作 5:意见投票"></Input>
+            </FormItem>
+          </Col>
+          <Col span="12">
+            <FormItem label="1:帖子,2:评论" prop="type">
+              <Input v-model="formDialog.type" placeholder="请输入1:帖子,2:评论"></Input>
+            </FormItem>
+          </Col>
+        </Row>
+      </Form>
+      <div slot="footer">
+        <Button @click="resetDialogForm('formDialog')">{{label.clear}}</Button>
+        <Button type="primary" @click="submitDialogForm('formDialog')" :loading="dialogSubmitLoading">{{label.submit}}</Button>
+      </div>
+    </Modal>
   </div>
 </template>
 
@@ -43,6 +99,9 @@
           edit: 'appTips/edit.do',
           delete: 'appTips/delete.do'
         },
+        currDialog: 'add',
+        dialogShow: false,
+        dialogSubmitLoading: false,
         pager: {
           data: [
             {
@@ -75,6 +134,17 @@
           chStatus: ''
         },
         batchOprArr:[],
+        formDialog: {
+          id: '',
+          sAppId: '',
+          appId: '',
+          sId: '',
+          tipsContent: '',
+          status: '',
+          chStatus: '',
+          tipType: '',
+          type: ''
+        },
         columns: [
           {
             'type': 'selection',
@@ -188,10 +258,14 @@
               ])
             }
           }
-        ]
+        ],
+        rules: {}
       }
     },
     methods: {
+      addRow () {
+        this.$store.commit('addRow', this)
+      },
       resetSearch (name) {
         this.$refs[name].resetFields()
         this.submitSearch(name)
@@ -202,6 +276,13 @@
           'vm': vm,
           'name': name
         })
+      },
+      resetDialogForm (name) {
+        let vm = this
+        vm.$refs[name].resetFields()
+      },
+      submitDialogForm (name) {
+        this.util.submitDialogForm(this, name)
       },
       // 批量忽略
       batchIgnore () {},
@@ -219,6 +300,13 @@
       label () {
         return this.$store.state.label
       }
+    },
+    watch: {
+      dialogShow (val) {
+        if (!val) {
+          this.currDialog = 'add'
+        }
+      },
     }
   }
 </script>
