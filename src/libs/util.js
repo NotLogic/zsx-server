@@ -347,7 +347,7 @@ const util = {
     vm.$refs[name].validate(function (valid) {
       if (valid) {
         if (vm.initPostDialog) {
-          vm.formDialog = vm.initPostDialog(vm.formDialog)
+          vm.initPostDialog(vm.formDialog)
         }
         let ajaxData = vm.util.editAddAjaxData(vm)
         let ajaxUrl = vm.url[vm.currDialog]

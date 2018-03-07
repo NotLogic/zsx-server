@@ -15,7 +15,7 @@ Vue.use(iView)
 Vue.prototype.$http = http
 // 将扩展方法挂在到Vue上
 Vue.prototype.util = util
-Vue.prototype.$tinymce = tinymce
+// Vue.prototype.$tinymce = tinymce
 /* eslint-disable no-new */
 new Vue({
   el: '#app',
@@ -45,5 +45,7 @@ new Vue({
   created () {},
   methods: {}
 })
-// 初始化时将地址数据存入sessionStorage
-util.initChinaDataAndJson()
+// 初始化时将地址数据存入 sessionStorage
+if (!sessionStorage.chinaJson || !sessionStorage.chinaData) {
+  util.initChinaDataAndJson()
+}

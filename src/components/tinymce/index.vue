@@ -1,6 +1,6 @@
 <template>
   <div>
-    <textarea class='tinymce-textarea' :content="content" id="tinymceEditer"></textarea>
+    <textarea class='tinymce-textarea' id="tinymceEditer"></textarea>
     <!-- <Spin fix v-if="spinShow">
       <Icon type="load-c" size=18 class="demo-spin-icon-load"></Icon>
       <div>加载组件中...</div>
@@ -12,14 +12,10 @@
 import tinymce from 'tinymce'
 export default {
   name: 'ueditor',
-  props: {
-    content: String
-  },
   data () {
     return {
       // spinShow: true
-      spinShow: false,
-      propContent: this.content
+      spinShow: false
     }
   },
   methods: {
@@ -32,7 +28,6 @@ export default {
           branding: false,
           elementpath: false,
           height: height,
-          // language: 'zh_CN.GB2312',
           language: 'zh_CN.GB2312',
           menubar: 'edit insert view format table tools',
           plugins: [
@@ -49,18 +44,10 @@ export default {
             borderCollapse: 'collapse'
           },
           setup: function (editor) {
-            editor.on('init', function (e) {
-              // vm.spinShow = false;
-              // getContent setContent
-              let content = ''
-              if (vm.propContent) {
-                content = vm.propContent
-              }
-              tinymce.get('tinymceEditer').setContent(content)
-            })
+            // editor.on('init', function (e) {})
             editor.on('keyup', function (e) {
-              vm.propContent = tinymce.get('tinymceEditer').getContent()
-              vm.$emit('updateContent', vm.propContent)
+              let content = tinymce.get('tinymceEditer').getContent({format: 'raw'})
+              vm.$emit('updateContent', content)
             })
           }
         });

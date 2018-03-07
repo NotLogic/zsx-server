@@ -98,6 +98,7 @@
 </template>
 
 <script>
+  import tinymce from 'tinymce'
   import mainTable from '@/components/mainTable'
   import paging from '@/components/paging'
   import editor from '@/components/tinymce'
@@ -410,19 +411,12 @@
       submitDialogForm (name) {
         this.util.submitDialogForm(this, name)
       },
-      getContent () {
-        let content = ''
-        if (this.$tinymce.get('tinymceEditer').getContent()) {
-          content = this.$tinymce.get('tinymceEditer').getContent()
-        }
-        return content
-      },
       setContent (content) {
         let set = ''
         if (content) {
           set = content
         }
-        this.$tinymce.get('tinymceEditer').setContent(set)
+        tinymce.get('tinymceEditer').setContent(set)
       },
       updateContent (content) {
         this.formDialog.content = content

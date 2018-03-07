@@ -339,9 +339,9 @@
       },
       resetDialogForm (name) {
         var vm = this
-        if (vm.formDialog.provinceName) vm.formDialog.provinceName = ''
-        if (vm.formDialog.cityName) vm.formDialog.cityName = ''
-        if (vm.formDialog.areaName) vm.formDialog.areaName = ''
+        vm.formDialog.provinceName = ''
+        vm.formDialog.cityName = ''
+        vm.formDialog.areaName = ''
       },
       submitDialogForm (name) {
         this.util.submitDialogForm(this, name)
@@ -354,13 +354,11 @@
       // 校验所有数据
       checkData () {},
       initPostDialog (data) {
-        let _data = this.util.extend(data)
-        for (let key in _data) {
-          if (!_data[key]) {
-            delete _data[key]
+        for (let key in data) {
+          if (!data[key]) {
+            delete data[key]
           }
         }
-        return _data
       }
     },
     mounted () {
