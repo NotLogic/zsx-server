@@ -111,31 +111,31 @@
     		<Col span="24" class="title">招商基本信息:</Col>
     	</Row>
     	<Row :gutter="16" class-name="preview-row">
-            <Col span="12">标题:  {{previewData.title}}</Col>
-            <Col span="12" id="preview-image">图片:  <img :src="previewData.image"></Col>
-        </Row>
-        <Row :gutter="16" class-name="preview-row">
-            <Col span="12">来源地址:  <a :href="previewData.sourceUrl" target="_blank">{{previewData.sourceUrl}}</a></Col>
-            <Col span="12">所属地区:  {{previewData.provinceCityarea}}</Col>
-        </Row>
-        <Row :gutter="16" class-name="preview-row">
-            <Col span="12">政策来源:  {{previewData.policySoucre}}</Col>
-            <Col span="12">政策时间:  {{previewData.policyDate}}</Col>
-        </Row>
-        <Row :gutter="16" class-name="preview-row" style="border-bottom: .5px solid #e9eaec;padding-bottom: 5px;">
-            <Col span="12">时间规则:  {{previewData.dateRule}}</Col>
-            <Col span="12">状态:  {{previewData.status}}</Col>
-        </Row>  
-        <Row class-name="preview-row">
-            <Col span="24">
-                <div class="title">招商内容:</div>
-                <div class="preview-txt" v-html="previewData.content"></div>
-            </Col>
-        </Row>      
+        <Col span="12">标题:  {{previewData.title}}</Col>
+        <Col span="12" id="preview-image">图片:  <img :src="previewData.image"></Col>
+      </Row>
+      <Row :gutter="16" class-name="preview-row">
+        <Col span="12">来源地址:  <a :href="previewData.sourceUrl" target="_blank">{{previewData.sourceUrl}}</a></Col>
+        <Col span="12">所属地区:  {{previewData.provinceCityarea}}</Col>
+      </Row>
+      <Row :gutter="16" class-name="preview-row">
+        <Col span="12">政策来源:  {{previewData.policySoucre}}</Col>
+        <Col span="12">政策时间:  {{previewData.policyDate}}</Col>
+      </Row>
+      <Row :gutter="16" class-name="preview-row" style="border-bottom: .5px solid #e9eaec;padding-bottom: 5px;">
+        <Col span="12">时间规则:  {{previewData.dateRule}}</Col>
+        <Col span="12">状态:  {{previewData.status}}</Col>
+      </Row>  
+      <Row class-name="preview-row">
+        <Col span="24">
+          <div class="title">招商内容:</div>
+          <div class="preview-txt" v-html="previewData.content"></div>
+        </Col>
+      </Row>      
     	<div slot="footer">            
-            <Button type="primary" @click="resetPreview">{{label.close}}</Button>
-        </div>
-	</Modal>
+        <Button type="primary" @click="resetPreview">{{label.close}}</Button>
+      </div>
+	  </Modal>
   </div>
 </template>
 
@@ -359,7 +359,7 @@
                   style: { marginRight: '5px' },
                   on: {
                     click: function () {
-                      vm.policyPreview(params.index,params.row)
+                      vm.policyPreview(params.row)
                     }
                   }
                 }, '预览'),
@@ -383,7 +383,13 @@
                   },
                   on: {
                     click: () => {
-                      console.log('删除')
+                      vm.$Modal.confirm({
+                        title: '确认',
+                        content: '确认删除这条数据吗？',
+                        onOk: function () {
+                          vm.$store.dispatch('delRow', params.row.id)
+                        }
+                      })
                     }
                   }
                 }, '删除')
@@ -440,7 +446,7 @@
         this.previewModal = false
         this.previewData = {}
       },
-      policyPreview: function(index,data){
+      policyPreview: function(data){
 				var vm = this;
 				var _data= vm.util.extend(data);
         if(_data.status=="0"){

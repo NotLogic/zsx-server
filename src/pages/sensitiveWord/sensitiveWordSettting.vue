@@ -157,7 +157,13 @@
                   },
                   on: {
                     click: () => {
-                      console.log('删除')
+                      vm.$Modal.confirm({
+                        title: '确认',
+                        content: '确认删除这条数据吗？',
+                        onOk: function () {
+                          vm.$store.dispatch('delRow', params.row.id)
+                        }
+                      })
                     }
                   }
                 }, '删除')

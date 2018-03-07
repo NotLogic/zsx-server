@@ -184,12 +184,13 @@ export default {
   },
   // -----------------------  action 提交的mutation  -------------------------------
   submitDialogForm (state) {
+    console.log('state.pager.data: ',state.pager.data)
     console.log('新增或编辑')
   },
   submitSearch (state) {
     console.log('搜索操作')
   },
   delRow (state) {
-    console.log('删除行的操作')
+    
   }
 }

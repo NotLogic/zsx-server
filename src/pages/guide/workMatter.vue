@@ -324,6 +324,12 @@
           </Col>
       </Row>
       <Row class-name="preview-row">
+          <Col span="24">                
+              <div class="title">窗口流程:</div>
+              <div class="preview-txt">{{previewData.onlineManagement}}</div>
+          </Col>
+      </Row>
+      <Row class-name="preview-row">
           <Col span="24">
               <div class="title">办理依据:</div>
               <div class="preview-txt">{{previewData.managementBasis}}</div>
@@ -400,6 +406,7 @@
               requiredConditions: '1、条件1&nbsp;2、条件2', // 办理条件
               materialRequested: '材料1', // 所需材料
               onlineManagement: '流程1', // 网上流程
+              windowManagement: '窗口流程',
               timeLimitExplanation: '说明1', // 限时说明
               chargingStandard: '标准1', // 收费标准
               managementBasis: '依据1', // 办理依据
@@ -440,6 +447,7 @@
               requiredConditions: '条件2', // 办理条件
               materialRequested: '材料2', // 所需材料
               onlineManagement: '流程2', // 网上流程
+              windowManagement: '窗口流程2',
               timeLimitExplanation: '说明2', // 限时说明
               chargingStandard: '标准2', // 收费标准
               managementBasis: '依据2', // 办理依据
@@ -474,6 +482,7 @@
               requiredConditions: '条件3', // 办理条件
               materialRequested: '材料3', // 所需材料
               onlineManagement: '流程3', // 网上流程
+              windowManagement: '窗口流程3',
               timeLimitExplanation: '说明3', // 限时说明
               chargingStandard: '标准3', // 收费标准
               managementBasis: '依据3', // 办理依据
@@ -797,7 +806,13 @@
                   },
                   on: {
                     click: () => {
-                      console.log('删除')
+                      vm.$Modal.confirm({
+                        title: '确认',
+                        content: '确认删除这条数据吗？',
+                        onOk: function () {
+                          vm.$store.dispatch('delRow', params.row.id)
+                        }
+                      })
                     }
                   }
                 }, '删除')
@@ -934,17 +949,17 @@
           '1': '有效'
         }
         _data.matterStatus = status[_data.matterStatus]
-        if(_data.requiredConditions.indexOf("&nbsp;")!="-1"){
+        if(_data.requiredConditions.indexOf("&nbsp;")){
           // 原数据直接展示  有  &nbsp; 的数据去掉 &nbsp;
           _data.requiredConditions = _data.requiredConditions.split("&nbsp;").join(" ");
         }
-        if(_data.materialRequested.indexOf("&nbsp;")!="-1"){
+        if(_data.materialRequested.indexOf("&nbsp;")){
           _data.materialRequested = _data.materialRequested.split("&nbsp;").join(" ");
         }
-        if(_data.onlineManagement.indexOf("&nbsp;")!="-1"){
+        if(_data.onlineManagement.indexOf("&nbsp;")){
           _data.onlineManagement = _data.onlineManagement.split("&nbsp;").join(" ");
         }
-        if(_data.windowManagement.indexOf("&nbsp;")!="-1"){
+        if(_data.windowManagement.indexOf("&nbsp;")){
           _data.windowManagement = _data.windowManagement.split("&nbsp;").join(" ");
         }
         vm.previewData = _data

@@ -102,7 +102,7 @@
         pager: {
           data: [
             {
-              id: '',
+              id: '123123213',
               loginName: 'xiayy',
               name: '夏洋洋',
               password: 'reterterwt',
@@ -114,7 +114,7 @@
               status: '1',
               areaId: ''
             }, {
-              id: '',
+              id: '123123123',
               loginName: 'chenxiang',
               name: '陈祥',
               password: 'fhghmvjk',
@@ -126,7 +126,7 @@
               status: '1',
               areaId: ''
             }, {
-              id: '',
+              id: '234234423',
               loginName: 'liubb',
               name: '刘彬彬',
               password: 'hjktytry',
@@ -250,9 +250,12 @@
                   },
                   on: {
                     click: () => {
-                      this.$store.dispatch('delRow', {
-                        'vm': this,
-                        'params': params
+                      vm.$Modal.confirm({
+                        title: '确认',
+                        content: '确认删除这条数据吗？',
+                        onOk: function () {
+                          vm.$store.dispatch('delRow', params.row.id)
+                        }
                       })
                     }
                   }

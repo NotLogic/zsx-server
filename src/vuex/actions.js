@@ -12,6 +12,14 @@ export default {
     commit('submitSearch')
   },
   delRow ({ commit, state }, payload) {
+    let delAjaxData = {}
+    let delRowKey = payload.delRowKey || 'id'
+    if (typeof(payload) == 'object') {
+      delAjaxData[delRowKey] = payload.delRowVal
+    } else if (typeof(payload) == 'string') {
+      delAjaxData[delRowKey] = payload
+    }
+    console.log(delAjaxData)
     commit('delRow')
   }
 }

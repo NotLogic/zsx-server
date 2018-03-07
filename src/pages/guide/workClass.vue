@@ -258,10 +258,7 @@
                         title: '确认',
                         content: '确认删除这条数据吗？',
                         onOk: function () {
-                          vm.$store.dispatch('delRow', {
-                            'vm': vm,
-                            'params': params
-                          })
+                          vm.$store.dispatch('delRow', params.row.id)
                         }
                       })
                     }

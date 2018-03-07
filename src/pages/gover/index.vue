@@ -93,6 +93,7 @@
         <Row>
           <Col span="24">
             <FormItem label="内容" prop="content">
+              <!-- 富文本 -->
               <editor @updateContent="updateContent" :content="formDialog.content"></editor>
             </FormItem>
           </Col>
@@ -177,7 +178,7 @@
               cityId: '341300',
               areaId: '341323',
               image: 'http://www.lingbi.gov.cn/UploadFile/image/20180102/20180102085222382238.jpg',
-              content: '',
+              content: '‘老师打卡记录是的会计分录',
               governmentSource: '灵璧县政府网',
               sourceUrl: 'http://www.szns.gov.cn/xxgk/qzfxxgkml/zcwj/qjzcwj/201710/t20171012_9339847.htm',
               governmentDate: '2017-12-15 00:00:00',
@@ -190,7 +191,7 @@
               cityId: '341300',
               areaId: '341323',
               image: 'http://www.lingbi.gov.cn/UploadFile/image/20171212/20171212161063206320.jpg',
-              content: '',
+              content: '的路上特任天堂官方',
               governmentSource: '灵璧县政府网',
               sourceUrl: 'http://www.szns.gov.cn/xxgk/qzfxxgkml/zcwj/qjzcwj/201710/t20171012_9339848.htm',
               governmentDate: '2017-12-15 00:00:00',
@@ -378,7 +379,13 @@
                   },
                   on: {
                     click: () => {
-                      console.log('删除')
+                      vm.$Modal.confirm({
+                        title: '确认',
+                        content: '确认删除这条数据吗？',
+                        onOk: function () {
+                          vm.$store.dispatch('delRow', params.row.id)
+                        }
+                      })
                     }
                   }
                 }, '删除')

@@ -112,6 +112,31 @@
           delete: 'member/delete.do'
         },
         pager: {
+          data: [
+            {
+              id: '123212213213',
+              homeId:'',
+              homeName:'',
+              currPlaceId:'',
+              currPlaceName:'',
+              account:'',
+              nickName:'',
+              password:'',
+              salt:'',
+              sex:'',
+              age:'',
+              phone:'',
+              profession:'',
+              imagePath:'',
+              currentPlace:'',
+              homePlace:'',
+              status:'',
+              remark:'',
+              createTime:'',
+              modifyTime:'',
+              lastLoginTime:''
+            }
+          ],
           url: 'member/dataGrid.do',
           sort: 'createTime',
           order: 'desc'
@@ -283,7 +308,7 @@
                 }, '查看'),
                 create('Button', {
                   props: {
-                    type: 'error',
+                    type: 'info',
                     size: 'small'
                   },
                   on: {

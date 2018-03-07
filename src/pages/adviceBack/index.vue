@@ -19,10 +19,10 @@
             <DatePicker type="datetime" placeholder="点击选择时间" v-model="formSearch.createdateEnd" size="small" :clearable="false"></DatePicker>
           </FormItem>
         </FormItem>
-        <Button type="ghost" style="margin-right: 8px;margin-top: 5px;" @click="resetSearch('formSearch')" size="small">{{label.clear}}</Button>
-        <Button type="primary" style="margin-right: 8px;margin-top: 5px;" @click="submitSearch('formSearch')" size="small">{{label.search}}</Button>
-        <Button type="error" style="margin-right: 8px;margin-top: 5px;" :disabled="batchDelArr.length==0" @click="batchDel" size="small">批量删除</Button>
-        <Button type="primary" style="margin-right: 8px;margin-top: 5px;" @click="exportData" size="small">导出</Button>
+        <Button type="ghost" style="margin: 5px 8px 24px 0" @click="resetSearch('formSearch')" size="small">{{label.clear}}</Button>
+        <Button type="primary" style="margin: 5px 8px 24px 0" @click="submitSearch('formSearch')" size="small">{{label.search}}</Button>
+        <Button type="error" style="margin: 5px 8px 24px 0" :disabled="batchDelArr.length==0" @click="batchDel" size="small">批量删除</Button>
+        <Button type="primary" style="margin: 5px 8px 24px 0" @click="exportData" size="small">导出</Button>
     </Form>
     <mainTable :columns="columns" :data="pager.data"></mainTable>
     <paging @changePager="changePager" @paging="paging" :total="pager.total" :currPage="pager.currPage"></paging>
@@ -48,18 +48,21 @@
         pager: {
           data: [
             {
+              id: '943008390152093696',
               appId: '937896733121966080',
               nickName: '匿名564d3c8',
               content: '嗯呀啦啦啦☹️☺️☹️嗯呀啦啦啦☹️☺️☹️嗯呀啦啦啦☹️☺️☹️嗯呀啦啦啦☹️☺️☹️嗯呀啦啦啦☹️☺️☹️嗯呀啦啦啦☹️☺️☹️嗯呀啦啦啦☹️☺️☹️嗯呀啦啦啦☹️☺️☹️嗯呀啦啦啦☹️☺️☹️',
               phone: '32165456',
               createTime: '2017-12-19 14:41:35'
             }, {
+              id: '942678248204697600',
               appId: '937962759100559360',
               nickName: '将军Log',
               content: '阿里国际教育',
               phone: '123532545',
               createTime: '2017-12-08 16:20:31'
             }, {
+              id: '942662314802970624',
               appId: '937896169920970752',
               nickName: '测试管理员',
               content: '有问题',
@@ -123,6 +126,7 @@
             'align': 'center',
             'fixed': 'right',
             render: (create, params) => {
+              let vm = this
               return  create('Button', {
                 props: {
                   type: 'error',
@@ -130,7 +134,13 @@
                 },
                 on: {
                   click: () => {
-                    console.log('删除')
+                    vm.$Modal.confirm({
+                      title: '确认',
+                      content: '确认删除这条数据吗？',
+                      onOk: function () {
+                        vm.$store.dispatch('delRow', params.row.id)
+                      }
+                    })
                   }
                 }
               }, '删除')

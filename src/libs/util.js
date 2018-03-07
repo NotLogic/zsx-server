@@ -357,7 +357,6 @@ const util = {
           'vm': vm,
           'name': name
         })
-        vm.resetDialogForm(name)
       }
     })
   }

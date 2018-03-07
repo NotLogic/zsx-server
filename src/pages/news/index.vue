@@ -359,10 +359,12 @@
                   },
                   on: {
                     click: () => {
-                      this.$store.dispatch('delRow', {
-                        'vm': this,
-                        'create': create,
-                        'params': params
+                      vm.$Modal.confirm({
+                        title: '确认',
+                        content: '确认删除这条数据吗？',
+                        onOk: function () {
+                          vm.$store.dispatch('delRow', params.row.id)
+                        }
                       })
                     }
                   }

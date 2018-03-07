@@ -292,26 +292,24 @@
               }
               // params.row.level  菜单级别 0 1 2 
               let leftNum = params.row.level * 20
-              return create('span', [
-                create('Button', {
-                  props: {
-                    type: 'text',
-                    icon: icon[params.row.level]
-                  },
-                  style: {
-                    marginLeft: leftNum + 'px'
-                  },
-                  on: {
-                    click: function () {
-                        vm.$store.commit('editRow', {
-                        'vm': vm,
-                        'data': params.row,
-                        'initDialog': vm.initDialog(params.row)
-                      })
-                    }
+              return  create('Button', {
+                props: {
+                  type: 'text',
+                  icon: icon[params.row.level]
+                },
+                style: {
+                  marginLeft: leftNum + 'px'
+                },
+                on: {
+                  click: function () {
+                      vm.$store.commit('editRow', {
+                      'vm': vm,
+                      'data': params.row,
+                      'initDialog': vm.initDialog(params.row)
+                    })
                   }
-                }, params.row.name)
-              ])
+                }
+              }, params.row.name)
             }
           },
           {
@@ -405,10 +403,7 @@
                         title: '确认',
                         content: '确认删除这条数据吗？',
                         onOk: function () {
-                          vm.$store.dispatch('delRow', {
-                            'vm': vm,
-                            'params': params
-                          })
+                          vm.$store.dispatch('delRow', params.row.id)
                         }
                       })
                     }
