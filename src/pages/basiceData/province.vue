@@ -339,13 +339,9 @@
       },
       resetDialogForm (name) {
         var vm = this
-        // if (vm.formDialog.provinceName) vm.formDialog.provinceName = ''
-        // if (vm.formDialog.cityName) vm.formDialog.cityName = ''
-        // if (vm.formDialog.areaName) vm.formDialog.areaName = ''
-        vm.formDialog.provinceName = ''
-        vm.formDialog.cityName = ''
-        vm.formDialog.areaName = ''
-        // vm.$refs[name].resetFields()
+        if (vm.formDialog.provinceName) vm.formDialog.provinceName = ''
+        if (vm.formDialog.cityName) vm.formDialog.cityName = ''
+        if (vm.formDialog.areaName) vm.formDialog.areaName = ''
       },
       submitDialogForm (name) {
         this.util.submitDialogForm(this, name)

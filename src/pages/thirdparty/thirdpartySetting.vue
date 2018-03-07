@@ -518,7 +518,6 @@
       },
       resetDialogForm (name) {
         let vm = this
-        vm.formDialog.id = '0'
         vm.$refs[name].resetFields()
       },
       submitDialogForm (name) {

@@ -859,7 +859,6 @@
       },
       resetDialogForm (name) {
         let vm = this
-        vm.formDialog.id = ''
         vm.formDialog.provincesId = ''
         vm.formDialog.citiesId = ''
         vm.formDialog.matterIcon = ''
