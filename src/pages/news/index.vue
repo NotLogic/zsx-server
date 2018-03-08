@@ -35,7 +35,7 @@
       <Button type="primary" :disabled="batchOprArr.length==0" style="margin: 5px 8px 24px 0;" @click="batchPublish" size="small">批量发布</Button>
     </Form>
     <!-- <mainTable :columns="columns" :data="pager.data" :height="610"></mainTable> -->
-    <mainTable :columns="columns" :data="pager.data"></mainTable>
+    <mainTable :columns="columns" :data="pager.data" @updateSelect="updateSelect"></mainTable>
     <paging @changePager="changePager" @paging="paging" :total="pager.total" :currPage="pager.currPage"></paging>
     <Modal v-model="dialogShow" :title="label[currDialog]" :mask-closable="false" width="800" @on-cancel="resetDialogForm('formDialog')">
       <Form :model="formDialog" ref="formDialog" :rules="rules" :label-width="80">
@@ -115,7 +115,10 @@
         url: {
           add: 'news/add.do',
           edit: 'news/edit.do',
-          delete: 'news/delete.do'
+          delete: 'news/delete.do',
+          batchDelete: 'news/batchDelete.do',
+          batchPublish: 'news/batchPublish.do',
+          newsSource: 'communal/news/sources.do'
         },
         editor: null,
         editorConfig: {
@@ -179,6 +182,7 @@
         derail_address_arr: [],
         derail_address_obj_s: [],
         batchOprArr: [],
+        newsSource: [], // 新闻来源网站数组 例子： ['南方网', '人民网']
         previewData: {
           title: '',
           newsSrc: '',
@@ -389,6 +393,9 @@
       }
     },
     methods: {
+      updateSelect (selection) {
+        this.batchOprArr = selection
+      },
       resetSearch (name) {
         var vm = this
         vm.derail_address_obj_s = []
@@ -403,10 +410,10 @@
         })
       },
       batchDelete () {
-        console.log('批量删除')
+        console.log('批量删除数据： ',this.batchOprArr)
       },
       batchPublish () {
-        console.log('批量发布')
+        console.log('批量发布数据： ',this.batchOprArr)
       },
       handleSuccess () {},
       resetDialogForm (name) {

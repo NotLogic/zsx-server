@@ -21,11 +21,44 @@
         </FormItem>
         <Button type="ghost" style="margin: 5px 8px 24px 0" @click="resetSearch('formSearch')" size="small">{{label.clear}}</Button>
         <Button type="primary" style="margin: 5px 8px 24px 0" @click="submitSearch('formSearch')" size="small">{{label.search}}</Button>
-        <Button type="error" style="margin: 5px 8px 24px 0" :disabled="batchDelArr.length==0" @click="batchDel" size="small">批量删除</Button>
+        <Button type="error" style="margin: 5px 8px 24px 0" :disabled="batchOprArr.length==0" @click="batchDel" size="small">批量删除</Button>
         <Button type="primary" style="margin: 5px 8px 24px 0" @click="exportData" size="small">导出</Button>
+        <!-- <Button type="primary" style="margin:5px 8px 24px 0;" @click="addRow" size="small">{{label.add}}</Button> -->
     </Form>
-    <mainTable :columns="columns" :data="pager.data"></mainTable>
+    <mainTable :columns="columns" :data="pager.data" @updateSelect="updateSelect"></mainTable>
     <paging @changePager="changePager" @paging="paging" :total="pager.total" :currPage="pager.currPage"></paging>
+    <Modal v-model="dialogShow" :title="label[currDialog]" :mask-closable="false" width="750" @on-cancel="resetDialogForm('formDialog')">
+      <Form :model="formDialog" ref="formDialog" :rules="rules" :label-width="80">
+        <Row>
+          <Col span="12">
+            <FormItem label="app用户id" prop="appId">
+              <Input v-model="formDialog.appId" placeholder="请输入app用户id"></Input>
+            </FormItem>
+          </Col>
+          <Col span="12">
+            <FormItem label="nickName" prop="nickName">
+              <Input v-model="formDialog.nickName" placeholder="请输入nickName"></Input>
+            </FormItem>
+          </Col>
+        </Row>
+        <Row>
+          <Col span="12">
+            <FormItem label="联系方式" prop="phone">
+              <Input v-model="formDialog.phone" placeholder="请输入联系方式"></Input>
+            </FormItem>
+          </Col>
+          <Col span="12">
+            <FormItem label="意见内容" prop="content">
+              <Input v-model="formDialog.content" placeholder="请输入意见内容"></Input>
+            </FormItem>
+          </Col>
+        </Row>
+      </Form>
+      <div slot="footer">
+        <Button @click="resetDialogForm('formDialog')">{{label.clear}}</Button>
+        <Button type="primary" @click="submitDialogForm('formDialog')" :loading="dialogSubmitLoading">{{label.submit}}</Button>
+      </div>
+    </Modal>
   </div>
 </template>
 
@@ -74,7 +107,10 @@
           sort: 'createTime',
           order: 'desc'
         },
-        batchDelArr: [],
+        batchOprArr: [],
+        dialogShow: false,
+        dialogSubmitLoading: false,
+        currDialog: 'add',
         formSearch: {
           createdateStart: '',
           createdateEnd: '',
@@ -147,11 +183,22 @@
             }
           }
         ],
+        formDialog: {
+          id: 0,
+          appId: '',
+          nickName: '',
+          phone: '',
+          content: ''
+        },
+        rules: {}
       }
     },
     methods: {
-      onSelectionChange: function (selection) {
-        this.batchDelArr = selection;
+      addRow () {
+        this.$store.commit('addRow', this)
+      },
+      updateSelect (selection) {
+        this.batchOprArr = selection
       },
       resetSearch (name) {
         this.$refs[name].resetFields()
@@ -164,8 +211,15 @@
           'name': name
         })
       },
+      resetDialogForm (name) {
+        let vm = this
+        vm.$refs[name].resetFields()
+      },
+      submitDialogForm (name) {
+        this.util.submitDialogForm(this, name)
+      },
       batchDel () {
-
+        console.log('批量删除数据： ',this.batchOprArr)
       },
       exportData () {},
       changePager (data) {
@@ -178,6 +232,13 @@
     computed: {
       label () {
         return this.$store.state.label
+      }
+    },
+    watch: {
+      dialogShow (val) {
+        if (!val) {
+          this.currDialog = 'add'
+        }
       }
     }
   }

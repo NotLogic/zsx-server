@@ -1,6 +1,6 @@
 <template>
   <!-- <div class="wrapper-pagination"> -->
-    <Table :columns='columns' :data='data' :height='height' :size='size'></Table>
+    <Table :columns='columns' :data='data' :height='height' :size='size' @on-selection-change="onSelectionChange"></Table>
   <!-- </div>   -->
 </template>
 
@@ -12,6 +12,14 @@ export default {
     data: Array,
     height: [Number, String],
     size: String
+  },
+  data () {
+    return {}
+  },
+  methods: {
+    onSelectionChange (selection) {
+      this.$emit('updateSelect', selection)
+    }
   }
 }
 </script>

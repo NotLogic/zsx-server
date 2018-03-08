@@ -22,7 +22,7 @@
         <Button type="primary" style="margin: 5px 8px 24px 0;" @click="exportData" size="small">导出</Button>
         <!-- <Button type="primary" style="margin: 5px 8px 24px 0;" @click="addRow" size="small">{{label.add}}</Button> -->
     </Form>
-    <mainTable :columns="columns" :data="pager.data"></mainTable>
+    <mainTable :columns="columns" :data="pager.data" @updateSelect="updateSelect"></mainTable>
     <paging @changePager="changePager" @paging="paging" :total="pager.total" :currPage="pager.currPage"></paging>
     <Modal v-model="dialogShow" :title="label[currDialog]" :mask-closable="false" width="750" @on-cancel="resetDialogForm('formDialog')">
       <Form :model="formDialog" ref="formDialog" :rules="rules" :label-width="80">
@@ -119,6 +119,7 @@
           sort: 'createTime',
           order: 'desc'
         },
+        batchOprArr: [],
         chStatus: [
           {
             value: '1',
@@ -263,6 +264,9 @@
       }
     },
     methods: {
+      updateSelect (selection) {
+        this.batchOprArr = selection
+      },
       addRow () {
         this.$store.commit('addRow', this)
       },
@@ -285,9 +289,13 @@
         this.util.submitDialogForm(this, name)
       },
       // 批量忽略
-      batchIgnore () {},
+      batchIgnore () {
+        console.log('批量删除忽略： ',this.batchOprArr)
+      },
       // 批量屏蔽
-      batchLock () {},
+      batchLock () {
+        console.log('批量删除屏蔽： ',this.batchOprArr)
+      },
       exportData () {},
       changePager (data) {
         this.util.changePager(this, data)
