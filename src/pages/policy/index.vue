@@ -95,7 +95,8 @@
           <Col span="24">
             <FormItem label="内容" prop="content">
               <!-- 富文本 -->
-              <ueditor></ueditor>
+              <!-- <ueditor :content="'wswqewqewqe'"></ueditor> -->
+              <script id="policyUeditor" type="text/plain"></script>
               <!-- <editor @updateContent="updateContent" :content="formDialog.content"></editor> -->
             </FormItem>
           </Col>
@@ -145,14 +146,14 @@
   import mainTable from '@/components/mainTable'
   import paging from '@/components/paging'
   // import editor from '@/components/tinymce'
-  import ueditor from '@/components/ueditor'
+  // import ueditor from '@/components/ueditor'
   export default {
     name: 'policy_index',
     components: {
       mainTable,
       paging,
       // editor,
-      ueditor
+      // ueditor
     },
     data: function () {
       return {
@@ -160,6 +161,11 @@
           add: 'policy/add.do',
           edit: 'policy/edit.do',
           delete: 'policy/delete.do'
+        },
+        editor: null,
+        editorConfig: {
+          initialFrameWidth: null,
+          initialFrameHeight: 300,
         },
         pager: {
           url: "policy/dataGrid.do",
@@ -467,7 +473,8 @@
           set = content
         }
         // tinymce.get('tinymceEditer').setContent(set)
-        ue.setContent(set)
+        // ue.setContent(set)
+        this.editor.setContent(set)
       },
       updateContent (content) {
         this.formDialog.content = content
@@ -504,6 +511,7 @@
       vm.paging(vm)
     },
     mounted () {
+      this.editor = UE.getEditor('policyUeditor', this.editorConfig)
     },
     watch: {
       dialogShow (val) {
@@ -527,6 +535,9 @@
           vm.formDialog.areaId = ''
         }
       }
+    },
+    beforeDestory () {
+      this.editor.destory()
     }
   }
 </script>

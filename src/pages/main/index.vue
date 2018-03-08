@@ -27,7 +27,6 @@
       <!-- 单页内容展示区域 -->
       <div class="single-page" :style="{left:hideMenuText?0:'200px'}">
         <div class="single-box">
-          <!-- 不缓存分页 -->
           <keep-alive :include="cachePage">
             <router-view></router-view>
           </keep-alive>

@@ -8,11 +8,18 @@
   export default {
     name: 'ueditor',
     prop: {
-      config: Object
+      config: {
+        type: Object,
+        default: function () {
+          return {}
+        }
+      },
+      content: String
     },
     data () {
       return {
         editor: null,
+        defaultContent: this.content,
         defaultConfig: {
           // toolbars: [
           //   ['fullscreen', 'source','|', 'undo', 'redo','|','bold', 'italic', 'underline', 'fontborder', 'strikethrough',
@@ -37,6 +44,7 @@
       }
     },
     mounted () {
+      console.log(this.defaultContent)
       this.editor = UE.getEditor('ueditor', this.defaultConfig)
       window.ue = this.editor
     },

@@ -94,7 +94,9 @@
           <Col span="24">
             <FormItem label="内容" prop="content">
               <!-- 富文本 -->
-              <editor @updateContent="updateContent" :content="formDialog.content"></editor>
+              <!-- <ueditor></ueditor> -->
+              <script id="goverUeditor" type="text/plain"></script>
+              <!-- <editor @updateContent="updateContent" :content="formDialog.content"></editor> -->
             </FormItem>
           </Col>
         </Row>
@@ -142,13 +144,15 @@
   import tinymce from 'tinymce'
   import mainTable from '@/components/mainTable'
   import paging from '@/components/paging'
-  import editor from '@/components/tinymce'
+  // import editor from '@/components/tinymce'
+  // import ueditor from '@/components/ueditor'
   export default {
     name: 'gover_index',
     components: {
       mainTable,
       paging,
-      editor
+      // editor,
+      // ueditor
     },
     data: function () {
       return {
@@ -156,6 +160,11 @@
           add: 'gover/add.do',
           edit: 'gover/edit.do',
           delete: 'gover/delete.do'
+        },
+        editor: null,
+        editorConfig: {
+          initialFrameWidth: null,
+          initialFrameHeight: 300,
         },
         pager: {
           data: [
@@ -464,7 +473,9 @@
         if (content) {
           set = content
         }
-        tinymce.get('tinymceEditer').setContent(set)
+        // tinymce.get('tinymceEditer').setContent(set)
+        // ue.setContent(set)
+        this.editor.setContent(set)
       },
       updateContent (content) {
         this.formDialog.content = content
@@ -499,7 +510,7 @@
       vm.paging(vm)
     },
     mounted () {
-      
+      this.editor = UE.getEditor('goverUeditor', this.editorConfig)
     },
     watch: {
       dialogShow (val) {
@@ -519,6 +530,9 @@
           vm.formDialog.areaId = ''
         }
       }
+    },
+    beforeDestory () {
+      this.editor.destory()
     }
   }
 </script>

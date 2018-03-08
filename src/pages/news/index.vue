@@ -72,7 +72,8 @@
         <Row>
           <Col span="24">
             <FormItem label="新闻内容" prop="content">
-              <editor @updateContent="updateContent" :content="formDialog.content"></editor>
+              <script id="newsUeditor" type="text/plain"></script>
+              <!-- <editor @updateContent="updateContent" :content="formDialog.content"></editor> -->
             </FormItem>
           </Col>
         </Row>
@@ -115,6 +116,11 @@
           add: 'news/add.do',
           edit: 'news/edit.do',
           delete: 'news/delete.do'
+        },
+        editor: null,
+        editorConfig: {
+          initialFrameWidth: null,
+          initialFrameHeight: 300,
         },
         pager: {
           data: [
@@ -416,7 +422,8 @@
         if (content) {
           set = content
         }
-        tinymce.get('tinymceEditer').setContent(set)
+        // tinymce.get('tinymceEditer').setContent(set)
+        this.editor.setContent(set)
       },
       updateContent (content) {
         this.formDialog.content = content
@@ -444,6 +451,7 @@
       vm.paging(vm)
     },
     mounted () {
+      this.editor = UE.getEditor('newsUeditor', this.editorConfig)
     },
     watch: {
       dialogShow (val) {
@@ -459,6 +467,9 @@
         }
       }
     },
+    beforeDestory () {
+      this.editor.destory()
+    }
   }
 </script>
 
