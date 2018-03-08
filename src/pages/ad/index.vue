@@ -7,7 +7,7 @@
       </FormItem>
       <FormItem label="广告位置" prop="postion">
         <Select v-model="formSearch.postion" placeholder="请选择" size="small" clearable style="width:150px;">
-          <Option v-for="item in adPostionData" :value="item.value" :key="item.value">{{ item.label }}</Option>
+          <Option v-for="item in postion" :value="item.value" :key="item.value">{{ item.label }}</Option>
         </Select>
       </FormItem>
       <FormItem label="广告状态" prop="lockStatus">
@@ -56,24 +56,32 @@
           </Col>
         </Row>
         <Row>
-          <Col span="12">
-            <Col span="12">
-              <FormItem label="主图" prop="imagePath">
-                <div class="image_upload_list" style="width:100px;height:100px;border:1px solid #eee;">
-                  <img v-if="formDialog.imagePath" :src="formDialog.imagePath" style="max-width: 100%;max-height:100%;"/>
-                  <img v-else src="static/images/img-upload-default.png" style="max-width: 100%;max-height:100%;"/>
-                </div>
-              </FormItem>
-            </Col>
-          </Col>
-          <Col span="12">
-            <FormItem>
-              <Upload  name="upfile"
-                       action="ueditor/upload.do"
-                       :show-upload-list="false"
-                       :on-success="handleSuccess">
-                <Button type="ghost" icon="ios-cloud-upload-outline">{{label.uploadImg}}</Button>
-              </Upload>
+          <Col span="24">
+            <FormItem label="主图" prop="imagePath">
+              <Row>
+                <Col span="16">
+                  <Row v-if="formDialog.imageArr">
+                    <Col span="8" v-for="item in formDialog.imageArr" :key="item">
+                      <div class="image-box">  
+                        <img :src="item" class="ad-img">
+                      </div>
+                    </Col>
+                  </Row>
+                  <div v-else class="image-box">
+                    <img v-if="formDialog.imagePath" :src="formDialog.imagePath" class="ad-img"/>
+                    <img v-else src="static/images/img-upload-default.png" class="ad-img"/>
+                  </div>
+                </Col>
+                <Col span="8">
+                  <Upload name="upfile"
+                          action="ueditor/upload.do"
+                          :show-upload-list="false"
+                          :before-upload="beforeUpload"
+                          :on-success="handleSuccess">
+                    <Button type="ghost" icon="ios-cloud-upload-outline">{{label.uploadImg}}</Button>
+                  </Upload>
+                </Col>
+              </Row>
             </FormItem>
           </Col>
         </Row>
@@ -87,7 +95,7 @@
           <Col span="12">
             <FormItem label="广告位置" prop="postion">
               <Select v-model="formDialog.postion" placeholder="请选择"  clearable @on-change="postionChange">
-                <Option v-for="item in adPostionData" :value="item.value" :key="item.value">{{ item.label }}</Option>
+                <Option v-for="item in postion" :value="item.value" :key="item.value">{{ item.label }}</Option>
               </Select>
             </FormItem>
           </Col>
@@ -96,10 +104,7 @@
           <Col span="12">
             <FormItem label="排序" prop="sort" inline>
               <InputNumber :max="10" :min="1" v-model="formDialog.sort" :disabled="formDialog.sort==1&&formDialog.isUp==2"></InputNumber>
-              <Button type="default" v-if="formDialog.sort==1"
-                        @click="formDialog.isUp = formDialog.isUp==1 ?2:1">{{formDialog.isUp==1 ? '置顶' :
-                '取消置顶'}}
-              </Button>
+              <Button type="default" v-if="formDialog.sort==1" @click="formDialog.isUp = formDialog.isUp==1 ?2:1">{{formDialog.isUp==1 ? '置顶' : '取消置顶'}}</Button>
             </FormItem>
           </Col>
           <Col span="12">
@@ -132,8 +137,7 @@
           </Col>
           <Col span="12">
             <FormItem label="关联地区">
-              <Cascader :data="derail_address_arr" v-model="derail_address_obj" placeholder="选择关联地区"
-                        clearabled="false"></Cascader>
+              <Cascader :data="derail_address_arr" v-model="derail_address_obj" placeholder="选择关联地区" :clearabled="false"></Cascader>
             </FormItem>
           </Col>
         </Row>
@@ -169,6 +173,7 @@
               userId: '',
               title: '大溪谷',
               imagePath: 'http://iguangming.sznews.com/images/attachement/png/site640/20171220/IMG889ffafebae246370159022.PNG',
+              imageArr: ['http://ilonghua.sznews.com/images/attachement/jpg/site1011/20171219/IMG74e543574fc54636456847.jpg', 'http://iguangming.sznews.com/images/attachement/jpg/site640/20171220/IMGb083feb941e04637355087.jpg', 'http://iguangming.sznews.com/images/attachement/png/site640/20171220/IMG889ffafebae246370159022.PNG'],
               lockStatus: '1',
               postion: '2',
               href: 'http://www.baidu.com',
@@ -185,6 +190,7 @@
               userId: '',
               title: '特色牛肉面',
               imagePath: 'http://iguangming.sznews.com/images/attachement/jpg/site640/20171220/IMGb083feb941e04637355087.jpg',
+              imageArr: ['http://iguangming.sznews.com/images/attachement/png/site640/20171220/IMG889ffafebae246370159022.PNG', 'http://iguangming.sznews.com/images/attachement/jpg/site640/20171220/IMGb083feb941e04637355087.jpg'],
               lockStatus: '1',
               postion: '1',
               href: 'http://www.baidu.com',
@@ -221,6 +227,7 @@
         currDialog: 'add',
         dialogShow: false,
         dialogSubmitLoading: false,
+        uploadImgMax: 1,
         derail_address_arr: [],
         derail_address_arr_s: [],
         derail_address_obj: [],
@@ -252,7 +259,7 @@
             label: '区级'
           }
         ],
-        adPostionData: [
+        postion: [
           {
             value: '1',
             label: '首页banner'
@@ -302,6 +309,7 @@
           userId: '',
           title: '',
           imagePath: '',
+          imageArr: [],
           lockStatus: '1',
           postion: '1',
           href: '',
@@ -538,8 +546,31 @@
       submitDialogForm (name) {
         this.util.submitDialogForm(this, name)
       },
-      handleSuccess () {},
-      postionChange () {},
+      beforeUpload () {
+        let vm = this
+        if (vm.formDialog.imageArr.length = vm.uploadImgMax) {
+          vm.$Message.error("上传图片数量已达上限！")
+          return false
+        }
+      },
+      handleSuccess (res) {
+        // 返回成功，将返回的imgPath push进 formDialog.imageArr
+      },
+      postionChange (value) {
+        if(value==1 || value==2){
+          this.formDialog.areaType = '1'
+        }else{
+          this.formDialog.areaType = '4'
+        }
+        // 广告位置值为3可以上传2张图片，为4可以上传3张
+        if (value == 3) {
+          this.uploadImgMax = 2
+        } else if (value==4) {
+          this.uploadImgMax = 3
+        } else {
+          this.uploadImgMax = 1
+        }
+      },
       initDialog () {},
       changePager (data) {
         this.util.changePager(this, data)
@@ -616,5 +647,13 @@
 </script>
 
 <style scoped>
-
+.image-box{
+  width:100px;
+  height:100px;
+  border:1px solid #eee;
+}
+.ad-img{
+  max-width: 100px;
+  max-height: 100px;
+}
 </style>
