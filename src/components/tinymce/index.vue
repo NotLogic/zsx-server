@@ -1,35 +1,46 @@
 <template>
   <div>
-    <textarea class='tinymce-textarea' id="tinymceEditer"></textarea>
-    <!-- <Spin fix v-if="spinShow">
-      <Icon type="load-c" size=18 class="demo-spin-icon-load"></Icon>
-      <div>加载组件中...</div>
-    </Spin> -->
+    <textarea class='tinymce-textarea' :id="tinymceId"></textarea>
   </div>
 </template>
 
 <script>
 import tinymce from 'tinymce'
 export default {
-  name: 'ueditor',
+  name: 'tinymce',
+  props: {
+    id: {
+      type: String,
+      required: true
+    },
+    height: {
+      type: Number,
+      default: 300
+    },
+    value: {
+      type: String,
+      default: ''
+    }
+  },
   data () {
     return {
-      // spinShow: true
-      spinShow: false
+      hasInit: false,
+      hasChange: false,
+      tinymceId: this.id
     }
   },
   methods: {
-    init () {
+    initTinymce () {
       let vm = this;
       vm.$nextTick(() => {
-        let height = 300;
         tinymce.init({
-          selector: '#tinymceEditer',
+          selector: `#${this.tinymceId}`,
           branding: false,
           elementpath: false,
-          height: height,
+          height: vm.height,
           language: 'zh_CN.GB2312',
-          menubar: 'edit insert view format table tools',
+          // menubar: 'edit insert view format table tools',
+          menubar: 'file edit insert view format table',
           plugins: [
             'advlist autolink lists link image charmap print preview hr anchor pagebreak imagetools',
             'searchreplace visualblocks visualchars code fullpage',
@@ -37,44 +48,56 @@ export default {
             'emoticons paste textcolor colorpicker textpattern imagetools codesample'
           ],
           toolbar1: ' newnote print preview | undo redo | insert | styleselect | forecolor backcolor bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image emoticons media codesample',
+          menubar: this.menubar,
           autosave_interval: '20s',
           image_advtab: true,
           table_default_styles: {
             width: '100%',
             borderCollapse: 'collapse'
           },
-          setup: function (editor) {
-            // editor.on('init', function (e) {})
-            editor.on('keyup', function (e) {
-              let content = tinymce.get('tinymceEditer').getContent({format: 'raw'})
-              vm.$emit('updateContent', content)
+          init_instance_callback: editor => {
+            if (vm.value) {
+              editor.setContent(vm.value)
+            }
+            vm.hasInit = true
+            editor.on('NodeChange Change KeyUp SetContent', () => {
+              vm.hasChange = true
+              vm.$emit('updateContent', editor.getContent())
             })
           }
         });
       });
+    },
+    destroyTinymce () {
+      if (window.tinymce.get(this.tinymceId)) {
+        window.tinymce.get(this.tinymceId).destroy()
+      }
+    },
+    setContent(value) {
+      window.tinymce.get(this.tinymceId).setContent(value)
+    },
+    getContent() {
+      window.tinymce.get(this.tinymceId).getContent({format: 'raw'})
     }
   },
-  created () {
-
+  watch: {
+    value (val) {
+      if (!this.hasChange && this.hasInit) {
+        this.$nextTick(() => window.tinymce.get(this.tinymceId).setContent(val))
+      }
+    }
   },
   mounted () {
-    this.init()
+    this.initTinymce()
   },
-  watch: {},
-  computed: {},
+  activated() {
+    this.initTinymce()
+  },
+  deactivated() {
+    this.destroyTinymce()
+  },
   destroyed () {
-    tinymce.get('tinymceEditer').destroy();
+    this.destroyTinymce()
   }
 }
 </script>
-
-<style scoped>
-.demo-spin-icon-load{
-    animation: ani-demo-spin 1s linear infinite;
-}
-@keyframes ani-demo-spin {
-    from { transform: rotate(0deg);}
-    50%  { transform: rotate(180deg);}
-    to   { transform: rotate(360deg);}
-}
-</style>

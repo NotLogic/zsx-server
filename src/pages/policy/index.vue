@@ -94,10 +94,7 @@
         <Row>
           <Col span="24">
             <FormItem label="内容" prop="content">
-              <!-- 富文本 -->
-              <!-- <ueditor :content="'wswqewqewqe'"></ueditor> -->
-              <script id="policyUeditor" type="text/plain"></script>
-              <!-- <editor @updateContent="updateContent" :content="formDialog.content"></editor> -->
+              <tinymce :id="tinymceId" @updateContent="updateContent" v-model="formDialog.content"></tinymce>
             </FormItem>
           </Col>
         </Row>
@@ -142,18 +139,15 @@
 </template>
 
 <script>
-  // import tinymce from 'tinymce'
   import mainTable from '@/components/mainTable'
   import paging from '@/components/paging'
-  // import editor from '@/components/tinymce'
-  // import ueditor from '@/components/ueditor'
+  import tinymce from '@/components/tinymce'
   export default {
     name: 'policy_index',
     components: {
       mainTable,
       paging,
-      // editor,
-      // ueditor
+      tinymce
     },
     data: function () {
       return {
@@ -162,11 +156,7 @@
           edit: 'policy/edit.do',
           delete: 'policy/delete.do'
         },
-        editor: null,
-        editorConfig: {
-          initialFrameWidth: null,
-          initialFrameHeight: 300,
-        },
+        tinymceId: 'policy',
         pager: {
           url: "policy/dataGrid.do",
           data: [
@@ -472,9 +462,7 @@
         if (content) {
           set = content
         }
-        // tinymce.get('tinymceEditer').setContent(set)
-        // ue.setContent(set)
-        this.editor.setContent(set)
+        window.tinymce.get(this.tinymceId).setContent(set)
       },
       updateContent (content) {
         this.formDialog.content = content
@@ -501,8 +489,7 @@
     computed: {
       label () {
         return this.$store.state.label
-      },
-      
+      }
     },
     created () {
       let vm = this
@@ -510,9 +497,7 @@
       vm.$store.commit('initPager', vm)
       vm.paging(vm)
     },
-    mounted () {
-      this.editor = UE.getEditor('policyUeditor', this.editorConfig)
-    },
+    mounted () {},
     watch: {
       dialogShow (val) {
         if (!val) {
@@ -535,9 +520,6 @@
           vm.formDialog.areaId = ''
         }
       }
-    },
-    beforeDestory () {
-      this.editor.destory()
     }
   }
 </script>

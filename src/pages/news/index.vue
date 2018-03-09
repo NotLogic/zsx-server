@@ -72,8 +72,7 @@
         <Row>
           <Col span="24">
             <FormItem label="新闻内容" prop="content">
-              <script id="newsUeditor" type="text/plain"></script>
-              <!-- <editor @updateContent="updateContent" :content="formDialog.content"></editor> -->
+              <tinymce :id="tinymceId" @updateContent="updateContent" v-model="formDialog.content"></tinymce>
             </FormItem>
           </Col>
         </Row>
@@ -99,16 +98,15 @@
 </template>
 
 <script>
-  import tinymce from 'tinymce'
   import mainTable from '@/components/mainTable'
   import paging from '@/components/paging'
-  import editor from '@/components/tinymce'
+  import tinymce from '@/components/tinymce'
   export default {
     name: 'news_index',
     components: {
       mainTable,
       paging,
-      editor
+      tinymce
     },
     data: function () {
       return {
@@ -120,11 +118,7 @@
           batchPublish: 'news/batchPublish.do',
           newsSource: 'communal/news/sources.do'
         },
-        editor: null,
-        editorConfig: {
-          initialFrameWidth: null,
-          initialFrameHeight: 300,
-        },
+        tinymceId: 'news',
         pager: {
           data: [
             {
@@ -429,8 +423,7 @@
         if (content) {
           set = content
         }
-        // tinymce.get('tinymceEditer').setContent(set)
-        this.editor.setContent(set)
+        window.tinymce.get(this.tinymceId).setContent(set)
       },
       updateContent (content) {
         this.formDialog.content = content
@@ -457,9 +450,7 @@
       vm.$store.commit('initPager', vm)
       vm.paging(vm)
     },
-    mounted () {
-      this.editor = UE.getEditor('newsUeditor', this.editorConfig)
-    },
+    mounted () {},
     watch: {
       dialogShow (val) {
         if (!val) {
@@ -473,9 +464,6 @@
           this.formSearch.areaId = ''
         }
       }
-    },
-    beforeDestory () {
-      this.editor.destory()
     }
   }
 </script>
