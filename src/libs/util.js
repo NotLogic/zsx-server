@@ -1,16 +1,34 @@
 import { appRoutes } from '@/router/routes'
 import http from './http'
 const util = {
-  extend (data) {
-    if (data.length && typeof data !== 'string' || data.length == 0) {
-      return [].concat(data)
-    } else if (typeof data === 'object') {
-      let obj = {}
-      for (let key in data) {
-        obj[key] = data[key]
-      }
-      return obj
+  deepcopy (source) {
+    if (!source) {
+      return source;
     }
+    let sourceCopy = source instanceof Array ? [] : {};
+    for (let item in source) {
+      sourceCopy[item] = typeof source[item] === 'object' ? deepcopy(source[item]) : source[item];
+    }
+    return sourceCopy;
+  },
+  extend (source) {
+    // if (data.length && typeof data !== 'string' || data.length == 0) {
+    //   return [].concat(data)
+    // } else if (typeof data === 'object') {
+    //   let obj = {}
+    //   for (let key in data) {
+    //     obj[key] = data[key]
+    //   }
+    //   return obj
+    // }
+    if (!source) {
+      return source;
+    }
+    let sourceCopy = source instanceof Array ? [] : {};
+    for (let item in source) {
+      sourceCopy[item] = typeof source[item] === 'object' ? util.extend(source[item]) : source[item];
+    }
+    return sourceCopy;
   },
   arrDiff (a1, a2) {
     let a = []
@@ -109,7 +127,6 @@ const util = {
   },
   getProvinceDataByData(chinaData) {
     let provinceData = []
-    let util = this
     let _chinaData = util.extend(chinaData)
     _chinaData.forEach(item => {
       item.children = []
@@ -320,7 +337,6 @@ const util = {
   },
   // 请求页面table数据
   paging (vm) {
-    let util = this
     // vm.$http({
     //   url: vm.pager.url,
     //   method: vm.pager.method,
@@ -335,7 +351,6 @@ const util = {
   },
   // 修改 pager 请求提交的数据
   changePager (vm, data) {
-    let util = this
     let _data = util.extend(data)
     for (let key in _data) {
       vm.pager[key] = _data[key]
@@ -349,7 +364,7 @@ const util = {
         if (vm.initPostDialog) {
           vm.initPostDialog(vm.formDialog)
         }
-        let ajaxData = vm.util.editAddAjaxData(vm)
+        let ajaxData = util.editAddAjaxData(vm)
         let ajaxUrl = vm.url[vm.currDialog]
         console.log("ajaxData: ",ajaxData)
         console.log("ajaxUrl: ",ajaxUrl)

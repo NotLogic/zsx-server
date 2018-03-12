@@ -266,7 +266,7 @@
           }, {
             title: "所属省",
             key: "provinceId",
-            width: 180,
+            width: 120,
             sortable: true,
             render: (create, params) => {
               var vm = this
@@ -278,7 +278,7 @@
           }, {
             title: "所属市",
             key: "cityId",
-            width: 180,
+            width: 120,
             sortable: true,
             render: (create, params) => {
               var vm = this
@@ -290,7 +290,7 @@
           }, {
             title: "所属区",
             key: "areaId",
-            width: 180,
+            width: 120,
             sortable: true,
             render: (create, params) => {
               var vm = this
