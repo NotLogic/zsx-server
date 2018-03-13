@@ -80,7 +80,8 @@
           title: '确认退出',
           content: '点击“取消”将留在当前页，点击“确定”将转向登录页。',
           onOk: function () {
-            vm.$store.commit('exitToLogin', vm)
+            if (sessionStorage.user) {sessionStorage.removeItem('user')}
+            vm.$router.push({name: 'login'})
             // 清空左侧菜单
             vm.$store.commit('clearOpenedSubmenu')
             // 清空快捷导航菜单数组

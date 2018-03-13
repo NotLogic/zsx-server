@@ -1,15 +1,6 @@
 import util from '@/libs/util'
 import { appRoutes } from '@/router/routes'
 export default {
-  exitToLogin (state, vm) {
-    // localStorage的用户信息只有再用户不保存时删除
-    if (sessionStorage.user) {
-      sessionStorage.removeItem('user')
-    }
-    vm.$router.push({
-      name: 'login'
-    })
-  },
   resetSearch (state, name) {
     this.resetForm(name)
     // 搜索dispatch
