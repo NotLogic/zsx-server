@@ -302,6 +302,10 @@
       }
     },
     methods: {
+      addRow () {
+        // this.$store.commit('addRow', this)
+        this.dialogShow = true
+      },
       resetSearch (name) {
         let vm = this
         vm.derail_address_obj_s = []
@@ -315,9 +319,6 @@
           'vm': vm,
           'name': name
         })
-      },
-      addRow () {
-        this.$store.commit('addRow', this)
       },
       resetDialogForm (name) {
         this.$refs[name].resetFields()

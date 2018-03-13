@@ -268,7 +268,8 @@
         this.batchOprArr = selection
       },
       addRow () {
-        this.$store.commit('addRow', this)
+        // this.$store.commit('addRow', this)
+        this.dialogShow = true
       },
       resetSearch (name) {
         this.$refs[name].resetFields()

@@ -208,7 +208,8 @@
     },
     methods: {
       addRow () {
-        this.$store.commit('addRow', this)
+        // this.$store.commit('addRow', this)
+        this.dialogShow = true
       },
       resetDialogForm (name) {
         this.$refs[name].resetFields()

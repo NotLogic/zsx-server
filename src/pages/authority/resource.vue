@@ -440,7 +440,8 @@
     },
     methods: {
       addRow () {
-        this.$store.commit('addRow', this)
+        // this.$store.commit('addRow', this)
+        this.dialogShow = true
       },
       initDialog (data) {
         

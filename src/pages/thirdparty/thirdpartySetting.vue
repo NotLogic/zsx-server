@@ -511,7 +511,8 @@
     },
     methods: {
       addRow () {
-        this.$store.commit('addRow', this)
+        // this.$store.commit('addRow', this)
+        this.dialogShow = true
       },
       debugging () {
         this.debuggerDialogShow = true

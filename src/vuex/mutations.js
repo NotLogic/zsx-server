@@ -2,8 +2,7 @@ import util from '@/libs/util'
 import { appRoutes } from '@/router/routes'
 export default {
   resetSearch (state, name) {
-    this.resetForm(name)
-    // 搜索dispatch
+    
   },
   addRow (state, vm) {
     vm.dialogShow = true
