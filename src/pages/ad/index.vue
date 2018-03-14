@@ -39,7 +39,7 @@
     <!-- <mainTable :columns="columns" :data="pager.data" :height="610"></mainTable> -->
     <mainTable :columns="columns" :data="pager.data"></mainTable>
     <paging @changePager="changePager" @paging="paging" :total="pager.total" :currPage="pager.currPage"></paging>
-    <Modal v-model="dialogShow" :title="label[currDialog]" :mask-closable="false" width="750" @on-cancel="resetDialogForm('formDialog')">
+    <Modal v-model="dialogShow" :title="label[currDialog]" :mask-closable="false" width="900" @on-cancel="resetDialogForm('formDialog')">
       <Form :model="formDialog" ref="formDialog" :rules="rules" :label-width="80">
         <Row>
           <Col span="24">
@@ -56,33 +56,49 @@
           </Col>
         </Row>
         <Row>
-          <Col span="24">
+          <Col span="12">
             <FormItem label="主图" prop="imagePath">
               <Row>
                 <Col span="16">
-                  <Row v-if="formDialog.imageArr && formDialog.imageArr.length">
-                    <Col span="8" v-for="item in formDialog.imageArr" :key="item">
-                      <div class="image-box">  
-                        <img :src="item" class="ad-img">
-                      </div>
-                    </Col>
-                  </Row>
-                  <div v-else class="image-box">
+                  <div class="image-box">
                     <img v-if="formDialog.imagePath" :src="formDialog.imagePath" class="ad-img"/>
                     <img v-else src="static/images/img-upload-default.png" class="ad-img"/>
                   </div>
                 </Col>
                 <Col span="8">
-                  <template v-if="formDialog.imageArr.length<uploadImgMax">
-                    <Upload name="upfile"
-                            action="ueditor/upload.do"
-                            :show-upload-list="false"
-                            :before-upload="beforeUpload"
-                            :on-success="handleSuccess">
-                      <Button type="ghost" icon="ios-cloud-upload-outline">{{label.uploadImg}}</Button>
-                    </Upload>
-                  </template>  
-                  <span v-else style="color: #ff4d44;">上传数量已达上限！</span>
+                  <Upload name="upfile"
+                          action="ueditor/upload.do"
+                          :show-upload-list="false"
+                          :on-success="handleSuccess">
+                    <Button type="ghost" icon="ios-cloud-upload-outline">上传主图</Button>
+                  </Upload>
+                </Col>
+              </Row>
+            </FormItem>
+          </Col>
+          <Col span="12" v-show="hasExtraImg">
+            <FormItem label="次级图片" prop="imageArr">
+              <Row>
+                <Col span="16">
+                  <Row v-show="imageArr.length">
+                    <Col span="12" v-for="item in imageArr" :key="item">
+                      <div class="image-box">
+                        <img v-show="item" :src="item" class="ad-img">
+                      </div>
+                    </Col>
+                  </Row>
+                  <div v-show="!imageArr.length" class="image-box">
+                    <img src="static/images/img-upload-default.png" class="ad-img">
+                  </div>
+                </Col>
+                <Col span="8">
+                  <Upload name="upfile"
+                          action="ueditor/upload.do"
+                          :show-upload-list="false"
+                          :before-upload="beforeUpload"
+                          :on-success="extraImgHandleSuccess">
+                    <Button type="ghost" icon="ios-cloud-upload-outline">次级图片</Button>
+                  </Upload>
                 </Col>
               </Row>
             </FormItem>
@@ -176,7 +192,7 @@
               imagePath: 'http://iguangming.sznews.com/images/attachement/png/site640/20171220/IMG889ffafebae246370159022.PNG',
               imageArr: ['http://ilonghua.sznews.com/images/attachement/jpg/site1011/20171219/IMG74e543574fc54636456847.jpg', 'http://iguangming.sznews.com/images/attachement/jpg/site640/20171220/IMGb083feb941e04637355087.jpg', 'http://iguangming.sznews.com/images/attachement/png/site640/20171220/IMG889ffafebae246370159022.PNG'],
               lockStatus: '1',
-              postion: '2',
+              postion: '3',
               href: 'http://www.baidu.com',
               sort: 1,
               clickNum: '123',
@@ -193,7 +209,7 @@
               imagePath: 'http://iguangming.sznews.com/images/attachement/jpg/site640/20171220/IMGb083feb941e04637355087.jpg',
               imageArr: ['http://iguangming.sznews.com/images/attachement/png/site640/20171220/IMG889ffafebae246370159022.PNG', 'http://iguangming.sznews.com/images/attachement/jpg/site640/20171220/IMGb083feb941e04637355087.jpg'],
               lockStatus: '1',
-              postion: '1',
+              postion: '4',
               href: 'http://www.baidu.com',
               sort: 1,
               clickNum: '345',
@@ -210,7 +226,24 @@
               imagePath: 'http://ilonghua.sznews.com/images/attachement/jpg/site1011/20171219/IMG74e543574fc54636456847.jpg',
               imageArr: ['http://ilonghua.sznews.com/images/attachement/jpg/site1011/20171219/IMG74e543574fc54636456847.jpg'],
               lockStatus: '1',
-              postion: '3',
+              postion: '1',
+              href: 'http://www.baidu.com',
+              sort: 1,
+              clickNum: '76',
+              detailAddress: '湖北省襄阳市樊城区',
+              startTime: '2017-12-11 00:00:00',
+              endTime: '2017-12-22 00:00:00',
+              isUp: '1',
+              areaType: '3',
+              context: '登革热提前'
+            }, {
+              id: '380699319488545',
+              userId: '',
+              title: '发的两个',
+              imagePath: 'http://ilonghua.sznews.com/images/attachement/jpg/site1011/20171219/IMG74e543574fc54636456847.jpg',
+              imageArr: ['http://ilonghua.sznews.com/images/attachement/jpg/site1011/20171219/IMG74e543574fc54636456847.jpg'],
+              lockStatus: '1',
+              postion: '2',
               href: 'http://www.baidu.com',
               sort: 1,
               clickNum: '76',
@@ -306,6 +339,7 @@
           areaType: '4',
           areaId: ''
         },
+        hasExtraImg: false,
         formDialog: {
           id: '',
           userId: '',
@@ -520,6 +554,9 @@
     computed: {
       label () {
         return this.$store.state.label
+      },
+      imageArr () {
+        return this.formDialog.imageArr.slice(1)
       }
     },
     methods: {
@@ -549,20 +586,24 @@
       submitDialogForm (name) {
         this.util.submitDialogForm(this, name)
       },
+      handleSuccess (res) {
+        this.formDialog.imagePath = res.url;
+      },
       beforeUpload () {
         let vm = this
         let len = vm.formDialog.imageArr.length
-        console.log(len)
-        console.log(vm.uploadImgMax)
-        if (len = vm.uploadImgMax || len > vm.uploadImgMax) {
+        if (len == vm.uploadImgMax || len > vm.uploadImgMax) {
           vm.$Message.error("上传图片数量已达上限！")
           return false
         }
       },
-      handleSuccess (res) {
-        // 返回成功，将返回的imgPath push进 formDialog.imageArr
+      extraImgHandleSuccess (res) {
+        // 次级图片上传成功成功，将返回的url push进 formDialog.imageArr
+        this.formDialog.imageArr.push(res.url)
       },
-      initDialog () {},
+      initDialog () {
+
+      },
       changePager (data) {
         this.util.changePager(this, data)
       },
@@ -638,8 +679,17 @@
         // 指定的几个广告位置可以上传3张图片  现在默认3和4
         if (val==3 || val==4){
           this.uploadImgMax = 3
+          this.hasExtraImg = true
         } else {
           this.uploadImgMax = 1
+          this.hasExtraImg = false
+        }
+      },
+      ['formDialog.imageArr'](val){
+        if (val.length>1) {
+          this.hasExtraImg = true
+        } else {
+          this.hasExtraImg = false
         }
       }
     }
