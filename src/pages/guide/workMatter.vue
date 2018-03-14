@@ -376,7 +376,6 @@
 <script>
   import mainTable from '@/components/mainTable'
   import paging from '@/components/paging'
-  import util from '@/libs/util'
   export default {
     name: 'workMatter',
     components: {
@@ -1134,6 +1133,7 @@
       // 操作
       dataFilterArr: function(data,delimiter){
         // 第一次传的是 string   之后传的是 array
+        let vm = this
         var arr = []
         if(typeof(data) == "string"){
           var str = "" + data
@@ -1145,7 +1145,7 @@
             }
           }
         }else{
-          arr = util.extend(data)
+          arr = vm.util.extend(data)
         }
         return arr
       },

@@ -57,7 +57,6 @@
 </template>
 
 <script>
-  import util from '@/libs/util'
   import mainTable from '@/components/mainTable'
   import axios from 'axios'
   export default {
@@ -315,7 +314,7 @@
       },
       getCityData (provinceId) {
         var vm = this
-        var data = util.extend(vm.chinaJson[provinceId])
+        var data = vm.util.extend(vm.chinaJson[provinceId])
         var dataArr = []
         for (let key in data) {
           dataArr.push({
@@ -327,7 +326,7 @@
       },
       getAreaData (cityId) {
         var vm = this
-        var data = util.extend(vm.chinaJson[cityId])
+        var data = vm.util.extend(vm.chinaJson[cityId])
         var dataArr = []
         for (let key in data) {
           dataArr.push({
@@ -364,10 +363,10 @@
     mounted () {
       let vm = this
       vm.$http.get('/static/data/address.json').then(res => {
-        vm.chinaJson = util.extend(res.data)
-        vm.chinaData = util.getChinaDataByJson(util.extend(res.data))
+        vm.chinaJson = vm.util.extend(res.data)
+        vm.chinaData = vm.util.getChinaDataByJson(vm.util.extend(res.data))
         let provinceData = []
-        util.extend(vm.chinaData).forEach(item => {
+        vm.util.extend(vm.chinaData).forEach(item => {
           provinceData.push({
             'id': item.value,
             'provinceName': item.label

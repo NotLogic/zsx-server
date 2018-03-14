@@ -28,7 +28,7 @@
 </template>
 
 <script>
-  import util from '@/libs/util'
+  import {getParentRouterNameByName} from '@/libs/util'
   export default {
     name: 'tagsPageOpened',
     props: {
@@ -64,7 +64,7 @@
       },
       openPage (name) {
         let vm = this
-        let parentName = util.getParentRouterNameByName(name)
+        let parentName = getParentRouterNameByName(name)
         if (parentName) {
           let parentNameInOpenedSubmenuArr = false
           vm.$store.state.openedSubmenuArr.forEach((item, index) => {

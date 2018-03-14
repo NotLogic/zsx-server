@@ -1,4 +1,4 @@
-import util from '@/libs/util'
+import util from '@/plugins/util'
 import { appRoutes } from '@/router/routes'
 export function resetSearch (state, name) {
     

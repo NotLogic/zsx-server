@@ -49,7 +49,6 @@
 <script>
   import mainTable from '@/components/mainTable'
   import accessTree from '@/components/tree'
-  import util from '@/libs/util'
   import {appRoutes} from '@/router/routes'
   export default {
     name: 'role',
@@ -293,7 +292,7 @@
         }
       },
       getTreeDataByAppRoutes () {
-        let _appRoutes = util.extend(appRoutes)
+        let _appRoutes = this.util.extend(appRoutes)
         let treeData = []
         _appRoutes.forEach((item, index) => {
           treeData.push({
