@@ -88,9 +88,7 @@
         // 登陆之后保存用户信息到sessionStorage
         sessionStorage.user = JSON.stringify(vm.loginForm)
         vm.$Message.success('登陆成功')
-        vm.$router.push({
-          name: 'home'
-        })
+        vm.$router.push({name: 'home'})
       }
     },
     watch: {

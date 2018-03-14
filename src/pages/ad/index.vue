@@ -60,7 +60,7 @@
             <FormItem label="主图" prop="imagePath">
               <Row>
                 <Col span="16">
-                  <Row v-if="formDialog.imageArr">
+                  <Row v-if="formDialog.imageArr && formDialog.imageArr.length">
                     <Col span="8" v-for="item in formDialog.imageArr" :key="item">
                       <div class="image-box">  
                         <img :src="item" class="ad-img">
@@ -73,13 +73,16 @@
                   </div>
                 </Col>
                 <Col span="8">
-                  <Upload name="upfile"
-                          action="ueditor/upload.do"
-                          :show-upload-list="false"
-                          :before-upload="beforeUpload"
-                          :on-success="handleSuccess">
-                    <Button type="ghost" icon="ios-cloud-upload-outline">{{label.uploadImg}}</Button>
-                  </Upload>
+                  <template v-if="formDialog.imageArr.length<uploadImgMax">
+                    <Upload name="upfile"
+                            action="ueditor/upload.do"
+                            :show-upload-list="false"
+                            :before-upload="beforeUpload"
+                            :on-success="handleSuccess">
+                      <Button type="ghost" icon="ios-cloud-upload-outline">{{label.uploadImg}}</Button>
+                    </Upload>
+                  </template>  
+                  <span v-else style="color: #ff4d44;">上传数量已达上限！</span>
                 </Col>
               </Row>
             </FormItem>
@@ -94,7 +97,7 @@
           </Col>
           <Col span="12">
             <FormItem label="广告位置" prop="postion">
-              <Select v-model="formDialog.postion" placeholder="请选择"  clearable @on-change="postionChange">
+              <Select v-model="formDialog.postion" placeholder="请选择"  clearable>
                 <Option v-for="item in postion" :value="item.value" :key="item.value">{{ item.label }}</Option>
               </Select>
             </FormItem>
@@ -108,10 +111,8 @@
             </FormItem>
           </Col>
           <Col span="12">
-            <FormItem label="">
-              <span v-if="true" style="font-size: 80%;color: #ff4d44;padding-left: 3px">
-                数值越小优先级越高
-              </span>
+            <FormItem>
+              <span v-if="true" style="font-size: 80%;color: #ff4d44;padding-left: 3px">数值越小优先级越高</span>
             </FormItem>
           </Col>
         </Row>
@@ -207,6 +208,7 @@
               userId: '',
               title: '古城市新襄阳',
               imagePath: 'http://ilonghua.sznews.com/images/attachement/jpg/site1011/20171219/IMG74e543574fc54636456847.jpg',
+              imageArr: ['http://ilonghua.sznews.com/images/attachement/jpg/site1011/20171219/IMG74e543574fc54636456847.jpg'],
               lockStatus: '1',
               postion: '3',
               href: 'http://www.baidu.com',
@@ -522,8 +524,7 @@
     },
     methods: {
       addRow () {
-        // this.$store.commit('addRow', this)
-        this.dialogShow = true
+        this.$store.commit('addRow', this)
       },
       resetSearch (name) {
         var vm = this
@@ -540,6 +541,7 @@
       },
       resetDialogForm (name) {
         let vm = this
+        vm.formDialog.imageArr = []
         vm.derail_address_arr = vm.countryData
         vm.derail_address_obj = []
         vm.$refs[name].resetFields()
@@ -549,28 +551,16 @@
       },
       beforeUpload () {
         let vm = this
-        if (vm.formDialog.imageArr.length = vm.uploadImgMax) {
+        let len = vm.formDialog.imageArr.length
+        console.log(len)
+        console.log(vm.uploadImgMax)
+        if (len = vm.uploadImgMax || len > vm.uploadImgMax) {
           vm.$Message.error("上传图片数量已达上限！")
           return false
         }
       },
       handleSuccess (res) {
         // 返回成功，将返回的imgPath push进 formDialog.imageArr
-      },
-      postionChange (value) {
-        if(value==1 || value==2){
-          this.formDialog.areaType = '1'
-        }else{
-          this.formDialog.areaType = '4'
-        }
-        // 广告位置值为3可以上传2张图片，为4可以上传3张
-        if (value == 3) {
-          this.uploadImgMax = 2
-        } else if (value==4) {
-          this.uploadImgMax = 3
-        } else {
-          this.uploadImgMax = 1
-        }
       },
       initDialog () {},
       changePager (data) {
@@ -598,11 +588,6 @@
       
     },
     watch: {
-      dialogShow (val) {
-        if (!val) {
-          this.currDialog = 'add'
-        }
-      },
       derail_address_obj_s (val) {
         if (val.length) {
           this.formSearch.areaId = val[2]
@@ -643,6 +628,20 @@
         }
         vm.derail_address_obj = []
       },
+      ['formDialog.postion'](val){
+        // 广告位置是 首页banner和首页新闻列表时投放级别为全国formDialog.areaType==1
+        if(val==1 || val==2){
+          this.formDialog.areaType = '1'
+        }else{
+          this.formDialog.areaType = '4'
+        }
+        // 指定的几个广告位置可以上传3张图片  现在默认3和4
+        if (val==3 || val==4){
+          this.uploadImgMax = 3
+        } else {
+          this.uploadImgMax = 1
+        }
+      }
     }
   }
 </script>

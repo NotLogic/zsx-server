@@ -303,8 +303,7 @@
     },
     methods: {
       addRow () {
-        // this.$store.commit('addRow', this)
-        this.dialogShow = true
+        this.$store.commit('addRow', this)
       },
       resetSearch (name) {
         let vm = this
@@ -347,11 +346,6 @@
     mounted () {
     },
     watch: {
-      dialogShow (val) {
-        if (!val) {
-          this.currDialog = 'add'
-        }
-      },
       derail_address_obj_s (val) {
         if (val.length) {
           this.formSearch.areaId = val[2]

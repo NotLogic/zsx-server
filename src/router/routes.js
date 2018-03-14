@@ -465,4 +465,5 @@ const routes = [
   ...appRoutes,
   errorRoutes
 ]
+export const commonRoutes = [loginRoute, mainRoutes, errorRoutes]
 export default routes

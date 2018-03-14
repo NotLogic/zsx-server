@@ -440,8 +440,7 @@
     },
     methods: {
       addRow () {
-        // this.$store.commit('addRow', this)
-        this.dialogShow = true
+        this.$store.commit('addRow', this)
       },
       initDialog (data) {
         
@@ -471,11 +470,6 @@
       }
     },
     watch: {
-      dialogShow (val) {
-        if (!val) {
-          this.currDialog = 'add'
-        }
-      }
     }
   }
 </script>

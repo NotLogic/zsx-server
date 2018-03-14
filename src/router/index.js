@@ -1,9 +1,11 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import routes from './routes.js'
+import {commonRoutes} from './routes.js'
 import iView from 'iview'
 Vue.use(iView)
 Vue.use(Router)
+console.log('commonRoutes: ',commonRoutes)
 let map = {}
 routes.forEach(item => {
   if (item.children) {
@@ -20,6 +22,7 @@ routes.forEach(item => {
 })
 const router = new Router({
   // mode: 'history',
+  // routes: commonRoutes,
   routes: routes
 })
 router.beforeEach((to, from, next) => {

@@ -15,8 +15,9 @@ Vue.use(iView)
 Vue.prototype.$http = http
 // 将扩展方法挂在到Vue上
 Vue.prototype.util = util
-// Vue.prototype.$tinymce = tinymce
 /* eslint-disable no-new */
+// 新的权限控制应该是在登陆之后动态添加当前用户可以访问的侧边栏菜单，按钮级别的权限控制需要用到mixin
+// 可编辑的权限控制这个要怎么做
 new Vue({
   el: '#app',
   router,
@@ -28,7 +29,7 @@ new Vue({
   computed: {},
   mounted () {
     let vm = this
-    this.$store.commit('getAccessData')
+    vm.$store.dispatch('getAccessData')
     // 初始化 vm.$store.state.menuList
     vm.$store.commit('updateMenulist')
     let tagsList = []
@@ -40,7 +41,7 @@ new Vue({
       }
     })
     // 设置当前用户有权访问的页面
-    this.$store.commit('setTagsList', tagsList)
+    vm.$store.commit('setTagsList', tagsList)
   },
   created () {},
   methods: {}

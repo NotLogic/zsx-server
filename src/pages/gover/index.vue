@@ -398,8 +398,7 @@
     },
     methods: {
       addRow () {
-        // this.$store.commit('addRow', this)
-        this.dialogShow = true
+        this.$store.commit('addRow', this)
       },
       resetDialogForm (name) {
         let vm = this
@@ -500,11 +499,6 @@
     },
     mounted () {},
     watch: {
-      dialogShow (val) {
-        if (!val) {
-          this.currDialog = 'add'
-        }
-      },
       derail_address_obj_sub (val) {
         let vm = this
         if (val.length) {

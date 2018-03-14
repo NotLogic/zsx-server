@@ -326,8 +326,7 @@
     },
     methods: {
       addRow () {
-        // this.$store.commit('addRow', this)
-        this.dialogShow = true
+        this.$store.commit('addRow', this)
       },
       resetDialogForm (name) {
         let vm = this
@@ -376,11 +375,6 @@
     mounted () {
     },
     watch: {
-      dialogShow (val) {
-        if (!val) {
-          this.currDialog = 'add'
-        }
-      },
       derail_address_obj_s_h (val) {
         if (val.length) {
           this.formSearch.homeId = val[2]

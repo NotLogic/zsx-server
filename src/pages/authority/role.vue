@@ -208,8 +208,7 @@
     },
     methods: {
       addRow () {
-        // this.$store.commit('addRow', this)
-        this.dialogShow = true
+        this.$store.commit('addRow', this)
       },
       resetDialogForm (name) {
         this.$refs[name].resetFields()
@@ -350,11 +349,6 @@
       // this.getTreeDataByAppRoutes()
     },
     watch: {
-      dialogShow (val) {
-        if (!val) {
-          this.currDialog = 'add'
-        }
-      }
     }
   }
 </script>

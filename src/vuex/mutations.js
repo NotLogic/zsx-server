@@ -5,6 +5,7 @@ export default {
     
   },
   addRow (state, vm) {
+    vm.currDialog = 'add'
     vm.dialogShow = true
   },
   editRow (state, payload) {
@@ -21,16 +22,11 @@ export default {
   resetDialogForm (state, payload) {
     payload.vm.$refs[payload.name].resetFields()
   },
-  // 获取用户权限数据
-  getAccessData (state) {
-    // http.get('').then(res => {
-    //   console.log('res: ', res)
-    // })
-  },
   // 从路由中初始化左侧菜单数据
   updateMenulist (state) {
     let menuList = []
     let _appRoutes = util.extend(appRoutes)
+    console.log('state.accessArr: ',state.accessArr)
     _appRoutes.forEach((item, index) => {
       // 根据 accessArr 改变item.meta.access
       if (state.accessArr.length) { // 更改所有的父路由
@@ -41,7 +37,7 @@ export default {
         })
       }
       // 父元素access为1
-      if (item.meta.access !== 'undefined' && item.meta.access) {
+      if (item.meta && item.meta.access) {
         if (item.children.length && state.accessArr.length) {
           state.accessArr.forEach(accessArrItem => {
             item.children.forEach(child => {
@@ -60,7 +56,7 @@ export default {
           let len = menuList.push(item) // 为什么这里的menuList.push(item)===length
           let childrenArr = []
           childrenArr = item.children.filter(child => {
-            if (child.meta.access !== 'undefined' && child.meta.access) {
+            if (child.meta && child.meta.access) {
               return child
             }
           })

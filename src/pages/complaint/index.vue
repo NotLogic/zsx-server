@@ -268,8 +268,7 @@
         this.batchOprArr = selection
       },
       addRow () {
-        // this.$store.commit('addRow', this)
-        this.dialogShow = true
+        this.$store.commit('addRow', this)
       },
       resetSearch (name) {
         this.$refs[name].resetFields()
@@ -311,11 +310,6 @@
       }
     },
     watch: {
-      dialogShow (val) {
-        if (!val) {
-          this.currDialog = 'add'
-        }
-      },
     }
   }
 </script>

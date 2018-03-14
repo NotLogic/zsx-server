@@ -21,5 +21,11 @@ export default {
     }
     console.log(delAjaxData)
     commit('delRow')
-  }
+  },
+  // 获取用户权限数据
+  getAccessData ({ commit, state }) {
+    // http.get('').then(res => {
+    //   console.log('res: ', res)
+    // })
+  },
 }

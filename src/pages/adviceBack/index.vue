@@ -195,8 +195,7 @@
     },
     methods: {
       addRow () {
-        // this.$store.commit('addRow', this)
-        this.dialogShow = true
+        this.$store.commit('addRow', this)
       },
       updateSelect (selection) {
         this.batchOprArr = selection
@@ -236,11 +235,7 @@
       }
     },
     watch: {
-      dialogShow (val) {
-        if (!val) {
-          this.currDialog = 'add'
-        }
-      }
+      
     }
   }
 </script>

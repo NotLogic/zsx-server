@@ -349,8 +349,7 @@
       addRow (choice) {
         let vm = this
         vm.choice = choice
-        // vm.$store.commit('addRow', vm)
-        this.dialogShow = true
+        vm.$store.commit('addRow', vm)
       },
       // 校验所有数据
       checkData () {},
