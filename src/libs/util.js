@@ -299,7 +299,8 @@ const util = {
     return parentName
   },
   // 过滤请求提交的数据
-  pagingFiltData(obj) {
+  pagingFiltData(object) {
+    let obj = util.extend(object)
     for (let key in obj) {
       if (typeof obj[key] === 'string' && obj[key].trim() === '') {
         delete obj[key]
@@ -340,9 +341,9 @@ const util = {
     // vm.$http({
     //   url: vm.pager.url,
     //   method: vm.pager.method,
-    //   data: util.pagingFiltData(util.extend(vm.pager))
+    //   data: util.pagingFiltData(vm.pager)
     // }).then(res => {
-    //   if (res.data.code == 1) {
+    //   if (res.data.data.code == 1) {
     //     let _data = util.extend(res.data.data)
     //     vm.pager.data = _data.data
     //     vm.pager.total = _data.total

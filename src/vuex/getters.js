@@ -1,1 +1,3 @@
-export default {}
+export function getRouters(state, getters) {
+    return state.routers
+}
