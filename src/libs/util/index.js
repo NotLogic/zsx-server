@@ -283,7 +283,6 @@ export function pagingFiltData(object) {
   }
   return obj
 }
-
 // 编辑和新增提交的数据不同，新增时不提交id
 export function editAddAjaxData (vm) {
   let ajaxData = {}
@@ -300,7 +299,6 @@ export function editAddAjaxData (vm) {
   }
   return ajaxData
 }
-
 // 请求页面table数据
 export function paging (vm) {
   // vm.$http({
@@ -315,7 +313,6 @@ export function paging (vm) {
   //   }
   // })
 }
-
 // 修改 pager 请求提交的数据
 export function changePager (vm, data) {
   let _data = extend(data)
@@ -324,7 +321,6 @@ export function changePager (vm, data) {
   }
   paging(vm)
 }
-
 // ---------- 提交弹窗表单   -----------------
 export function submitDialogForm (vm, name) {
   vm.$refs[name].validate(function (valid) {

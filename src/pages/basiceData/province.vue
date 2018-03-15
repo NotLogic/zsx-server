@@ -289,13 +289,12 @@
       },
       editRow (data, choice) {
         let vm = this
-        let _data = vm.util.extend(data)
         vm.choice = choice
         vm.editInd = _data["_index"]
         vm.currDialog = 'edit'
         for (let key in vm.formDialog) {
-          if (typeof(_data[key]) != 'undefined') {
-            vm.formDialog[key] = _data[key]
+          if (typeof(data[key]) != 'undefined') {
+            vm.formDialog[key] = data[key]
           }
         }
         vm.dialogShow = true
@@ -364,9 +363,9 @@
       let vm = this
       vm.$http.get('/static/data/address.json').then(res => {
         vm.chinaJson = vm.util.extend(res.data)
-        vm.chinaData = vm.util.getChinaDataByJson(vm.util.extend(res.data))
+        vm.chinaData = vm.util.getChinaDataByJson(res.data)
         let provinceData = []
-        vm.util.extend(vm.chinaData).forEach(item => {
+        vm.chinaData.forEach(item => {
           provinceData.push({
             'id': item.value,
             'provinceName': item.label
