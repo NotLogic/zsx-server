@@ -326,7 +326,7 @@
     },
     methods: {
       addRow () {
-        this.$store.commit('addRow', this)
+        this.util.addRow(this)
       },
       resetDialogForm (name) {
         let vm = this

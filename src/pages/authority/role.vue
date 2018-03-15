@@ -124,23 +124,11 @@
             width: 200,
             render: (create, params) => {
               let vm = this
+              let btnArr = []
               if (params.row.id === '1') {
-                return create('Button', {
-                  props: {
-                    type: 'primary',
-                    size: 'small'
-                  },
-                  on: {
-                    click: () => {
-                      vm.$store.commit('editRow', {
-                        'vm': vm,
-                        'data': params.row
-                      })
-                    }
-                  }
-                }, '编辑')
+                btnArr = [vm.util.createEditBtn(create, params.row, vm)]
               } else {
-                return create('div', [
+                btnArr = [
                   create('Button', {
                     props: {
                       type: 'primary',
@@ -151,50 +139,18 @@
                     },
                     on: {
                       click: () => {
-                        let vm = this
                         // vm.loadTreeData(params.row.id)
-                        vm.getTreeDataByAppRoutes()
-                        vm.selectAll = vm.checkSelectAll() ? true : false
+                        // vm.getTreeDataByAppRoutes()
+                        // vm.selectAll = vm.checkSelectAll() ? true : false
                         vm.grantShow = true
                       }
                     }
                   }, '授权'),
-                  create('Button', {
-                    props: {
-                      type: 'primary',
-                      size: 'small'
-                    },
-                    style: {
-                      marginRight: '5px'
-                    },
-                    on: {
-                      click: () => {
-                        vm.$store.commit('editRow', {
-                          'vm': vm,
-                          'data': params.row
-                        })
-                      }
-                    }
-                  }, '编辑'),
-                  create('Button', {
-                    props: {
-                      type: 'error',
-                      size: 'small'
-                    },
-                    on: {
-                      click: () => {
-                        vm.$Modal.confirm({
-                          title: '确认',
-                          content: '确认删除这条数据吗？',
-                          onOk: function () {
-                            vm.$store.dispatch('delRow', params.row.id)
-                          }
-                        })
-                      }
-                    }
-                  }, '删除')
-                ])
+                  vm.util.createEditBtn(create, params.row, vm),
+                  vm.util.createDelBtn(create, params.row.id, vm)
+                ]
               }
+              return create('div', btnArr)
             }
           }
         ],
@@ -207,7 +163,7 @@
     },
     methods: {
       addRow () {
-        this.$store.commit('addRow', this)
+        this.util.addRow(this)
       },
       resetDialogForm (name) {
         this.$refs[name].resetFields()
@@ -261,24 +217,7 @@
         vm.selectAll = vm.checkSelectAll() ? true : false
       },
       loadTreeData (roleId) {
-        // let vm = this
-        setTimeout(() => {
-          // let res = {
-          //   data: [
-          //     {
-          //       title: 'children',
-          //       loading: false,
-          //       children: []
-          //     },
-          //     {
-          //       title: 'children',
-          //       loading: false,
-          //       children: []
-          //     }
-          //   ]
-          // }
-          // vm.treeData = res.data  // 根据请求返回显示树形
-        }, 1000)
+       
       },
       resetGrantForm (name) {
         this.treeData = []

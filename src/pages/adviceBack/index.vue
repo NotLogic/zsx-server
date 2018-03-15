@@ -163,23 +163,7 @@
             'fixed': 'right',
             render: (create, params) => {
               let vm = this
-              return  create('Button', {
-                props: {
-                  type: 'error',
-                  size: 'small'
-                },
-                on: {
-                  click: () => {
-                    vm.$Modal.confirm({
-                      title: '确认',
-                      content: '确认删除这条数据吗？',
-                      onOk: function () {
-                        vm.$store.dispatch('delRow', params.row.id)
-                      }
-                    })
-                  }
-                }
-              }, '删除')
+              return vm.util.createDelBtn(create, params.row.id, vm)
             }
           }
         ],
@@ -195,7 +179,7 @@
     },
     methods: {
       addRow () {
-        this.$store.commit('addRow', this)
+        this.util.addRow(this)
       },
       updateSelect (selection) {
         this.batchOprArr = selection

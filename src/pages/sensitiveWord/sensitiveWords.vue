@@ -101,36 +101,8 @@
             render: (create, params) => {
               var vm = this
               return create('div', [
-                create('Button', {
-                  props: { type: 'primary', size: 'small' },
-                  style: { marginRight: '5px' },
-                  on: {
-                    click: function () {
-                      vm.$store.commit('editRow', {
-                        'vm': vm,
-                        'data': params.row,
-                        'initDialog': vm.initDialog(params.row)
-                      })
-                    }
-                  }
-                }, '编辑'),
-                create('Button', {
-                  props: {
-                    type: 'error',
-                    size: 'small'
-                  },
-                  on: {
-                    click: () => {
-                      vm.$Modal.confirm({
-                        title: '确认',
-                        content: '确认删除这条数据吗？',
-                        onOk: function () {
-                          vm.$store.dispatch('delRow', params.row.id)
-                        }
-                      })
-                    }
-                  }
-                }, '删除')
+                vm.util.createEditBtn(create, params.row, vm),
+                vm.util.createDelBtn(create, params.row.id, vm)
               ])
             }
           }
@@ -147,7 +119,7 @@
     },
     methods: {
       addRow () {
-        this.$store.commit('addRow', this)
+        this.util.addRow(this)
       },
       upExeclSuccess () {},
       handleFormatError () {},

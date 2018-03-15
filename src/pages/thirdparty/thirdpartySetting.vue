@@ -485,19 +485,7 @@
             fixed: 'right',
             render: (create, params) => {
               var vm = this
-              return create('Button', {
-                props: { type: 'primary', size: 'small' },
-                style: { marginRight: '5px' },
-                on: {
-                  click: function () {
-                    vm.$store.commit('editRow', {
-                      'vm': vm,
-                      'data': params.row,
-                      'initDialog': vm.initDialog(params.row)
-                    })
-                  }
-                }
-              }, '编辑')
+              return vm.util.createEditBtn(create, params.row, vm)
             }
           }
         ],
@@ -511,7 +499,7 @@
     },
     methods: {
       addRow () {
-        this.$store.commit('addRow', this)
+        this.util.addRow(this)
       },
       debugging () {
         this.debuggerDialogShow = true

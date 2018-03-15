@@ -345,9 +345,8 @@
         this.util.submitDialogForm(this, name)
       },
       addRow (choice) {
-        let vm = this
-        vm.choice = choice
-        vm.$store.commit('addRow', vm)
+        this.choice = choice
+        this.util.addRow(this)
       },
       // 校验所有数据
       checkData () {},

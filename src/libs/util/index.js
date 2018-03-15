@@ -339,3 +339,57 @@ export function submitDialogForm (vm, name) {
     }
   })
 }
+
+// -------------  页面按钮  ---------------------------
+export function addRow (vm) {
+  vm.currDialog = 'add'
+  vm.dialogShow = true
+}
+// 创建编辑按钮
+export function createEditBtn (create, data, vm) {
+  return create('Button', {
+    props: {
+      type: 'primary',
+      size: 'small'
+    },
+    style: {
+      marginRight: '5px'
+    },
+    on: {
+      click: () => {
+        for (let key in vm.formDialog) {
+          vm.formDialog[key] = data[key]
+        }
+        if (typeof vm.initDialog === 'function') {
+          vm.initDialog(data)
+        }
+        vm.currDialog = 'edit'
+        vm.dialogShow = true
+      }
+    }
+  }, '编辑')
+}
+// 创建删除按钮
+export function createDelBtn (create, data, vm) {
+  console.log('创建删除按钮')
+  return create('Button', {
+    props: {
+      type: 'error',
+      size: 'small'
+    },
+    on: {
+      click: () => {
+        vm.$Modal.confirm({
+          title: '确认',
+          content: '确认删除这条数据吗？',
+          onOk: function () {
+            vm.$store.dispatch('delRow', data)
+          }
+        })
+      }
+    }
+  }, '删除')
+}
+// export function 
+// export function 
+// export function 

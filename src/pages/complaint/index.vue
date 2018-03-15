@@ -268,7 +268,7 @@
         this.batchOprArr = selection
       },
       addRow () {
-        this.$store.commit('addRow', this)
+        this.util.addRow(this)
       },
       resetSearch (name) {
         this.$refs[name].resetFields()

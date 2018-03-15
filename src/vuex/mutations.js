@@ -3,20 +3,6 @@ import { appRoutes } from '@/router/routes'
 export function resetSearch (state, name) {
     
 }
-export function addRow (state, vm) {
-  vm.currDialog = 'add'
-  vm.dialogShow = true
-}
-export function editRow (state, payload) {
-  for (let key in payload.vm.formDialog) {
-    payload.vm.formDialog[key] = payload.data[key]
-  }
-  if (typeof payload.initDialog === 'function') {
-    payload.initDialog(payload.data)
-  }
-  payload.vm.currDialog = 'edit'
-  payload.vm.dialogShow = true
-}
 // 重置提交表单 预处理 + reset，公共的只有reset只有一行，就不放到vuex中了吧； 提交成功后要调用，从vuex中调用组件中的函数这样好吗？
 export function resetDialogForm (state, payload) {
   payload.vm.$refs[payload.name].resetFields()
