@@ -6,8 +6,8 @@ import tinymce from 'tinymce'
 // 引入'babel-polyfill' 兼容ie 9-11 ie不支持Promise方法
 import 'babel-polyfill'
 import store from './vuex'
-import http from './libs/http.js' // 经过封装的axios
-import util from './libs/util.js'
+import http from './libs/http' // 经过封装的axios
+import util from './plugins/util.js'
 import 'iview/dist/styles/iview.css'
 import './styles/common.css'
 Vue.config.productionTip = false

@@ -93,7 +93,6 @@
 
 <script>
   import mainTable from '@/components/mainTable'
-  import util from '@/libs/util'
   export default {
     name: 'workClass',
     components: {
@@ -284,7 +283,7 @@
         this.$store.commit('addRow', this)
       },
       initDialog (data) {
-        let _data = util.extend(data)
+        let _data = this.util.extend(data)
         this.provinceCity = [_data.cityCode.toString().slice(0, 2) + '0000', _data.cityCode.toString().slice(0, 4) + '00', _data.cityCode.toString()]
       },
       resetSearch (name) {
@@ -326,7 +325,7 @@
         this.$Message.error('文件格式错误，请选择jpg,jpeg或png格式的文件')
       },
       getAddrByCityId (cityId) {
-        let data = util.extend(JSON.parse(sessionStorage.chinaJson))
+        let data = this.util.extend(JSON.parse(sessionStorage.chinaJson))
         let provinceCode = ('' + cityId).slice(0,2) + '0000'
         let cityCode = ('' + cityId).slice(0,4) + '00'
         let txt = data['100000'][provinceCode] + data[provinceCode][cityCode]
@@ -341,13 +340,13 @@
         // 初始化省市数据
         let chinaJson = JSON.parse(sessionStorage.chinaJson)
         let chinaData = JSON.parse(sessionStorage.chinaData)
-        let _chinaData = util.extend(chinaData)
+        let _chinaData = this.util.extend(chinaData)
         _chinaData.forEach(item => {
           item.children.forEach(children => {
             children.children = []
           })
         })
-        vm.provinceCityData = util.extend(_chinaData)
+        vm.provinceCityData = this.util.extend(_chinaData)
         vm.chinaJson = chinaJson
       }
     },

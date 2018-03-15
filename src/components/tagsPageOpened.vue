@@ -28,7 +28,7 @@
 </template>
 
 <script>
-  import util from '@/libs/util'
+  import {getParentRouterNameByName} from '@/libs/util'
   export default {
     name: 'tagsPageOpened',
     props: {
@@ -64,7 +64,7 @@
       },
       openPage (name) {
         let vm = this
-        let parentName = util.getParentRouterNameByName(name)
+        let parentName = getParentRouterNameByName(name)
         if (parentName) {
           let parentNameInOpenedSubmenuArr = false
           vm.$store.state.openedSubmenuArr.forEach((item, index) => {
@@ -90,7 +90,7 @@
         } else if (name === 'closeOther') {
           vm.$store.commit('closeOtherPage', vm.currentPageName)
           // 清空其他，只剩一个展开（效果暂未实现）  这个效果会操控侧边栏组件，形成耦合
-          // let parentName = util.getParentRouterNameByName(vm.currentPageName)
+          // let parentName = getParentRouterNameByName(vm.currentPageName)
           // if (parentName) {
           //   vm.$store.commit('clearOtherOpenedSubmenuArr', parentName)
           // }

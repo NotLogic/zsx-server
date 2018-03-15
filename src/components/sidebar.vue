@@ -25,7 +25,7 @@
 </template>
 
 <script>
-  import util from '@/libs/util'
+  import {setCurrentPath, openNewPage, getParentRouterNameByName} from '@/libs/util'
   export default {
     name: 'sidebar',
     props: {
@@ -49,9 +49,9 @@
       menuSelect (name) {
         let vm = this
         // 更新面包屑
-        util.setCurrentPath(vm, name)
+        setCurrentPath(vm, name)
         // 更新快捷导航
-        util.openNewPage(vm, name)
+        openNewPage(vm, name)
         vm.$router.push({name: name})
       }
     },
@@ -59,7 +59,7 @@
       $route (to) {
         let vm = this
         sessionStorage.currentPageName = to.name
-        util.setCurrentPath(vm, to.name)
+        setCurrentPath(vm, to.name)
       },
       // openedSubmenuArr () {
       //   this.$nextTick(() => {
@@ -81,7 +81,7 @@
     },
     mounted () {
       if (sessionStorage.currentPageName) {
-        let parentName = util.getParentRouterNameByName(sessionStorage.currentPageName)
+        let parentName = getParentRouterNameByName(sessionStorage.currentPageName)
         // 只展开一个
         this.$store.commit('oneOpenedSubmenuArr', parentName)
       }
