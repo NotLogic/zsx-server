@@ -78,24 +78,32 @@ const page = {
         }
       })
     },
-    paging () {
+    paging (currPage) {
       let vm = this
+      if (currPage && Number(currPage)) {
+        vm.changePager(currPage)
+        return
+      }
       // vm.$http({
       //   url: vm.pager.url,
       //   method: vm.pager.method,
       //   data: vm.pagingFiltData(vm.pager)
       // }).then(res => {
       //   if (res.data.data.code == 1) {
-      //     let _data = deepcopy(res.data.data)
+      //     let _data = res.data.data
       //     vm.pager.data = _data.data
       //     vm.pager.total = _data.total
       //   }
       // })
     },
-    changePager (vm, data) {
-      let _data = deepcopy(data)
-      for (let key in _data) {
-        vm.pager[key] = _data[key]
+    changePager (data) {
+      let vm = this
+      if (typeof data === 'object') {
+        for (let key in data) {
+          vm.pager[key] = data[key]
+        }
+      } else {
+        vm.pager.currPage = data
       }
       vm.paging()
     },
