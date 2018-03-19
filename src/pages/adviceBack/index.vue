@@ -65,12 +65,14 @@
 <script>
   import mainTable from '@/components/mainTable'
   import paging from '@/components/paging'
+  import page from '@/mixins/page'
   export default {  
     name: 'adviceBack_index',
     components: {
       mainTable,
       paging
     },
+    mixins: [page],
     data () {
       return {
         url: {
@@ -108,9 +110,9 @@
           order: 'desc'
         },
         batchOprArr: [],
-        dialogShow: false,
-        dialogSubmitLoading: false,
-        currDialog: 'add',
+        // dialogShow: false,
+        // dialogSubmitLoading: false,
+        // currDialog: 'add',
         formSearch: {
           createdateStart: '',
           createdateEnd: '',
@@ -162,8 +164,7 @@
             'align': 'center',
             'fixed': 'right',
             render: (create, params) => {
-              let vm = this
-              return vm.util.createDelBtn(create, params.row.id, vm)
+              return this.createEditBtn(create, params.row)
             }
           }
         ],
@@ -178,9 +179,9 @@
       }
     },
     methods: {
-      addRow () {
-        this.util.addRow(this)
-      },
+      // addRow () {
+      //   this.util.addRow(this)
+      // },
       updateSelect (selection) {
         this.batchOprArr = selection
       },
@@ -188,20 +189,20 @@
         this.$refs[name].resetFields()
         this.submitSearch(name)
       },
-      submitSearch (name) {
-        let vm = this
-        vm.$store.dispatch('submitSearch', {
-          'vm': vm,
-          'name': name
-        })
-      },
+      // submitSearch (name) {
+      //   let vm = this
+      //   vm.$store.dispatch('submitSearch', {
+      //     'vm': vm,
+      //     'name': name
+      //   })
+      // },
       resetDialogForm (name) {
         let vm = this
         vm.$refs[name].resetFields()
       },
-      submitDialogForm (name) {
-        this.util.submitDialogForm(this, name)
-      },
+      // submitDialogForm (name) {
+      //   this.util.submitDialogForm(this, name)
+      // },
       batchDel () {
         console.log('批量删除数据： ',this.batchOprArr)
       },
@@ -209,14 +210,14 @@
       changePager (data) {
         this.util.changePager(this, data)
       },
-      paging () {
-        this.util.paging(this)
-      },
+      // paging () {
+      //   this.util.paging(this)
+      // },
     },
     computed: {
-      label () {
-        return this.$store.state.label
-      }
+      // label () {
+      //   return this.$store.state.label
+      // }
     },
     watch: {
       

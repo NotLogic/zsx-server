@@ -78,11 +78,13 @@
 
 <script>
   import mainTable from '@/components/mainTable'
+  import page from '@/mixins/page'
   export default {
     name: 'resource',
     components: {
       mainTable
     },
+    mixins: [page],
     data () {
       return {
         url: {
@@ -374,8 +376,8 @@
               //   return
               // }
               return create('div', [
-                vm.util.createEditBtn(create, params.row, vm),
-                vm.util.createDelBtn(create, params.row.id, vm)
+                vm.createEditBtn(create, params.row),
+                vm.createDelBtn(create, params.row.id)
               ])
             }
           }
@@ -406,9 +408,6 @@
       }
     },
     methods: {
-      addRow () {
-        this.util.addRow(this)
-      },
       initDialog (data) {
         
       },
@@ -416,28 +415,12 @@
         let vm = this
         vm.$refs[name].resetFields()
       },
-      submitDialogForm (name) {
-        this.util.submitDialogForm(this, name)
-      },
-      paging () {
-        this.util.paging(this)
-      },
       initData () {}
     },
-    created () {
-      let vm = this
-      vm.initData()
-      vm.$store.commit('initPager', vm)
-      vm.paging(vm)
-    },
+    created () {},
     mounted () {},
-    computed: {
-      label () {
-        return this.$store.state.label
-      }
-    },
-    watch: {
-    }
+    computed: {},
+    watch: {}
   }
 </script>
 

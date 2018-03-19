@@ -42,12 +42,14 @@
 <script>
   import mainTable from '@/components/mainTable'
   import paging from '@/components/paging'
+  import page from '@/mixins/page'
   export default {
     name: 'sensitiveWords',
     components: {
       paging,
       mainTable
     },
+    mixins: [page],
     data () {
       return {
         url: {
@@ -72,9 +74,6 @@
           url: 'sensitiveWord/dataGrid.do',
           pagesize: 50
         },
-        currDialog: 'add',
-        dialogShow: false,
-        dialogSubmitLoading: false,
         pageSizeOpts: [50, 100, 150, 200],
         formSearch: {
             word: ""
@@ -101,8 +100,8 @@
             render: (create, params) => {
               var vm = this
               return create('div', [
-                vm.util.createEditBtn(create, params.row, vm),
-                vm.util.createDelBtn(create, params.row.id, vm)
+                vm.createEditBtn(create, params.row),
+                vm.createDelBtn(create, params.row.id)
               ])
             }
           }
@@ -112,33 +111,16 @@
         }
       }
     },
-    computed: {
-      label () {
-        return this.$store.state.label
-      }
-    },
+    computed: {},
     methods: {
-      addRow () {
-        this.util.addRow(this)
-      },
       upExeclSuccess () {},
       handleFormatError () {},
       resetDialogForm (name) {
         this.$refs[name].resetFields()
       },
-      submitDialogForm (name) {
-        this.util.submitDialogForm(this, name)
-      },
       resetSearch (name) {
         this.$refs[name].resetFields()
         this.submitSearch(name)
-      },
-      submitSearch (name) {
-        let vm = this
-        vm.$store.dispatch('submitSearch', {
-          'vm': vm,
-          'name': name
-        })
       },
       // 敏感词库立即生效
       refurbish () {},
@@ -151,20 +133,9 @@
         this.$Message.error('文件格式错误，请选择xlsx格式的文件')
       },
       initDialog (data) {},
-      changePager (data) {
-        this.util.changePager(this, data)
-      },
-      paging () {
-        this.util.paging(this)
-      },
       initData () {}
     },
-    created () {
-      let vm = this
-      vm.initData()
-      vm.$store.commit('initPager', vm)
-      vm.paging(vm)
-    },
+    created () {},
     mounted () {
     },
     watch: {

@@ -156,12 +156,14 @@
 <script>
   import mainTable from '@/components/mainTable'
   import paging from '@/components/paging'
+  import page from '@/mixins/page'
   export default {
     name: 'notes_index',
     components: {
       mainTable,
       paging
     },
+    mixins: [page],
     data () {
       return {
         url: {
@@ -222,9 +224,6 @@
           sort: 'createTime',
           order: 'desc'
         },
-        currDialog: 'add',
-        dialogShow: false,
-        dialogSubmitLoading: false,
         noteDetailModal: false,
         modal_loading: false,
         look_data:{
@@ -455,9 +454,6 @@
       }
     },
     methods: {
-      addRow () {
-        this.util.addRow(this)
-      },
       initDialog (data) {
         let _data = util.extend(data)
         this.provinceCity = [_data.cityCode.toString().slice(0, 2) + '0000', _data.cityCode.toString().slice(0, 4) + '00', _data.cityCode.toString()]
@@ -468,43 +464,17 @@
         vm.$refs[name].resetFields()
         vm.submitSearch(name)
       },
-      submitSearch (name) {
-        let vm = this
-        vm.$store.dispatch('submitSearch', {
-          'vm': vm,
-          'name': name
-        })
-      },
       resetDialogForm (name) {
         let vm = this
         vm.$refs[name].resetFields()
-      },
-      submitDialogForm (name) {
-        this.util.submitDialogForm(this, name)
-      },
-      changePager (data) {
-        this.util.changePager(this, data)
-      },
-      paging () {
-        this.util.paging(this)
       },
       initData () {
         let vm = this        
       }
     },
-    computed: {
-      label () {
-        return this.$store.state.label
-      }
-    },
-    watch: {
-    },
-    created () {
-      let vm = this
-      vm.initData()
-      vm.$store.commit('initPager', vm)
-      vm.paging(vm)
-    },
+    computed: {},
+    watch: {},
+    created () {},
     mounted () {
       
     }

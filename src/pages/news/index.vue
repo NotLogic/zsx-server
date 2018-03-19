@@ -100,6 +100,7 @@
 <script>
   import mainTable from '@/components/mainTable'
   import paging from '@/components/paging'
+  import page from '@/mixins/page'
   import tinymce from '@/components/tinymce'
   export default {
     name: 'news_index',
@@ -108,6 +109,7 @@
       paging,
       tinymce
     },
+    mixins: [page],
     data: function () {
       return {
         url: {
@@ -170,9 +172,6 @@
           order: 'desc'
         },
         previewModal: false,
-        currDialog: 'add',
-        dialogShow: false,
-        dialogSubmitLoading: false,
         derail_address_arr: [],
         derail_address_obj_s: [],
         batchOprArr: [],
@@ -309,7 +308,7 @@
             render: (create, params) => {
               let vm = this
               return create('div', [
-                vm.util.createEditBtn(create, params.row, vm),
+                vm.createEditBtn(create, params.row),
                 create('Button', {
                   props: {
                     type: 'success',
@@ -340,7 +339,7 @@
                     }
                   }
                 }, '发布'),
-                vm.util.createDelBtn(create, params.row.id, vm)
+                vm.createDelBtn(create, params.row.id)
               ])
             }
           }
@@ -348,11 +347,7 @@
         rules: {}
       }
     },
-    computed: {
-      label () {
-        return this.$store.state.label
-      }
-    },
+    computed: {},
     methods: {
       updateSelect (selection) {
         this.batchOprArr = selection
@@ -362,13 +357,6 @@
         vm.derail_address_obj_s = []
         vm.$refs[name].resetFields()
         vm.submitSearch(name)
-      },
-      submitSearch (name) {
-        let vm = this
-        vm.$store.dispatch('submitSearch', {
-          'vm': vm,
-          'name': name
-        })
       },
       batchDelete () {
         console.log('批量删除数据： ',this.batchOprArr)
@@ -381,9 +369,6 @@
         let vm = this
         vm.setContent('')
         vm.$refs[name].resetFields()
-      },
-      submitDialogForm (name) {
-        this.util.submitDialogForm(this, name)
       },
       setContent (content) {
         let set = ''
@@ -400,23 +385,12 @@
         let _data = vm.util.extend(data)
         vm.setContent(_data.content)
       },
-      changePager (data) {
-        this.util.changePager(this, data)
-      },
-      paging () {
-        this.util.paging(this)
-      },
       initData () {
         let vm = this
         vm.derail_address_arr = JSON.parse(sessionStorage.chinaData)
       }
     },
-    created () {
-      let vm = this
-      vm.initData()
-      vm.$store.commit('initPager', vm)
-      vm.paging(vm)
-    },
+    created () {},
     mounted () {},
     watch: {
       derail_address_obj_s (val) {

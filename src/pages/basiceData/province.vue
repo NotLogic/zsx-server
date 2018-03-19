@@ -1,7 +1,7 @@
 <template>
   <div class="province">
     <div style="padding: 10px 0">
-      <Button type="primary" size="small" style="margin-right: 10px;" @click="addRow('province')">{{label.add}}</Button>
+      <Button type="primary" size="small" style="margin-right: 10px;" @click="addRoww('province')">{{label.add}}</Button>
       <Button type="primary" size="small" @click="checkData">校验所有数据</Button>
     </div>
     <!-- <main-table :columns="provinceColumns" :data="provinceData" :height="685"></main-table> -->
@@ -10,7 +10,7 @@
     <!-- 市弹窗 -->
     <Modal v-model="cityDialogShow" title="市" :mask-closable="false" width="750">
       <div style="margin-bottom: 10px;">
-        <Button type="primary" @click="addRow('city')" size="small">{{label.add}}</Button>
+        <Button type="primary" @click="addRoww('city')" size="small">{{label.add}}</Button>
       </div>
       <!-- <main-table :columns="cityColumns" :data="cityData" :height="500" :size="'small'"></main-table> -->
       <main-table :columns="cityColumns" :data="cityData" :size="'small'"></main-table>
@@ -22,7 +22,7 @@
     <!-- 区弹窗 -->
     <Modal v-model="areaDialogShow" title="区" :mask-closable="false" width="750">
       <div style="margin-bottom: 10px;">
-        <Button type="primary" @click="addRow('area')" :size="'small'">{{label.add}}</Button>
+        <Button type="primary" @click="addRoww('area')" :size="'small'">{{label.add}}</Button>
       </div>
       <!-- <main-table :columns="areaColumns" :data="areaData" size="small" :height="500"></main-table> -->
       <main-table :columns="areaColumns" :data="areaData" size="small"></main-table>
@@ -59,11 +59,13 @@
 <script>
   import mainTable from '@/components/mainTable'
   import axios from 'axios'
+  import page from '@/mixins/page'
   export default {
     name: 'province',
     components: {
       mainTable
     },
+    mixins: [page],
     data () {
       return {
         url: {
@@ -71,11 +73,8 @@
           edit: 'province/edit.do',
           delete: 'province/delete.do',
         },
-        currDialog: 'edit',
-        dialogShow: false,
         cityDialogShow: false,
         areaDialogShow: false,
-        dialogSubmitLoading: false,
         editInd: 0,
         formDialog: {
           id: '',
@@ -278,11 +277,7 @@
         }
       }
     },
-    computed: {
-      label () {
-        return this.$store.state.label
-      }
-    },
+    computed: {},
     methods: {
       closeModal (name) {
         this[name] = false
@@ -290,7 +285,7 @@
       editRow (data, choice) {
         let vm = this
         vm.choice = choice
-        vm.editInd = _data["_index"]
+        vm.editInd = data["_index"]
         vm.currDialog = 'edit'
         for (let key in vm.formDialog) {
           if (typeof(data[key]) != 'undefined') {
@@ -341,12 +336,9 @@
         vm.formDialog.cityName = ''
         vm.formDialog.areaName = ''
       },
-      submitDialogForm (name) {
-        this.util.submitDialogForm(this, name)
-      },
-      addRow (choice) {
+      addRoww (choice) {
         this.choice = choice
-        this.util.addRow(this)
+        this.addRow()
       },
       // 校验所有数据
       checkData () {},
@@ -380,9 +372,8 @@
       // }))
     },
     watch: {
-      'dialogShow': function(val,oldVal){
+      'dialogShow': function(val){
             if(!val){
-              this.currDialog = 'add'
               this.editInd = 0
             }
         }

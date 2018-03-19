@@ -77,11 +77,13 @@
 
 <script>
   import mainTable from '@/components/mainTable'
+  import page from '@/mixins/page'
   export default {
     name: 'thirdpartyClass',
     components: {
       mainTable
     },
+    mixins: [page],
     data () {
       return {
         url: {
@@ -117,9 +119,6 @@
           ],
           url: 'thirdpartyClass/dataGrid.do'
         },
-        currDialog: 'add',
-        dialogShow: false,
-        dialogSubmitLoading: false,
         formDialog: {
           id: '',
           name: '',
@@ -190,8 +189,8 @@
             render: (create, params) => {
               var vm = this
               return create('div', [
-                vm.util.createEditBtn(create, params.row, vm),
-                vm.util.createDelBtn(create, params.row.id, vm)
+                vm.createEditBtn(create, params.row),
+                vm.createDelBtn(create, params.row.id)
               ])
             }
           }
@@ -199,38 +198,18 @@
         rules: {}
       }
     },
-    computed: {
-      label () {
-        return this.$store.state.label
-      }
-    },
+    computed: {},
     methods: {
-      addRow () {
-        this.util.addRow(this)
-      },
       resetDialogForm (name) {
         let vm = this
         vm.$refs[name].resetFields()
       },
-      submitDialogForm (name) {
-        this.util.submitDialogForm(this, name)
-      },
       initDialog (data) {},
-      paging () {
-        this.util.paging(this)
-      },
       initData () {}
     },
-    created () {
-      let vm = this
-      vm.initData()
-      vm.$store.commit('initPager', vm)
-      vm.paging(vm)
-    },
-    mounted () {
-    },
-    watch: {
-    }
+    created () {},
+    mounted () {},
+    watch: {}
   }
 </script>
 

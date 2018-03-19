@@ -1,17 +1,9 @@
 import util from '@/plugins/util'
 import { appRoutes } from '@/router/routes'
-export function resetSearch (state, name) {
-    
-}
-// 重置提交表单 预处理 + reset，公共的只有reset只有一行，就不放到vuex中了吧； 提交成功后要调用，从vuex中调用组件中的函数这样好吗？
-export function resetDialogForm (state, payload) {
-  payload.vm.$refs[payload.name].resetFields()
-}
 // 从路由中初始化左侧菜单数据
 export function updateMenulist (state) {
   let menuList = []
   let _appRoutes = util.extend(appRoutes)
-  console.log('state.accessArr: ',state.accessArr)
   _appRoutes.forEach((item, index) => {
     // 根据 accessArr 改变item.meta.access
     if (state.accessArr.length) { // 更改所有的父路由

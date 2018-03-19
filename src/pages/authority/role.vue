@@ -50,12 +50,14 @@
   import mainTable from '@/components/mainTable'
   import accessTree from '@/components/tree'
   import {appRoutes} from '@/router/routes'
+  import page from '@/mixins/page'
   export default {
     name: 'role',
     components: {
       mainTable,
       accessTree
     },
+    mixins: [page],
     data () {
       return {
         url: {
@@ -84,13 +86,10 @@
           ],
           url: 'role/dataGrid.do'
         },
-        currDialog: 'add',
         treeCheckNodeArr: [],
         treeData: [],
         opened: false,
         selectAll: false,
-        dialogShow: false,
-        dialogSubmitLoading: false,
         grantShow: false,
         formDialog: {
           id: '',
@@ -126,7 +125,7 @@
               let vm = this
               let btnArr = []
               if (params.row.id === '1') {
-                btnArr = [vm.util.createEditBtn(create, params.row, vm)]
+                btnArr = [vm.createEditBtn(create, params.row)]
               } else {
                 btnArr = [
                   create('Button', {
@@ -146,8 +145,8 @@
                       }
                     }
                   }, '授权'),
-                  vm.util.createEditBtn(create, params.row, vm),
-                  vm.util.createDelBtn(create, params.row.id, vm)
+                  vm.createEditBtn(create, params.row),
+                  vm.createDelBtn(create, params.row.id)
                 ]
               }
               return create('div', btnArr)
@@ -162,14 +161,8 @@
       }
     },
     methods: {
-      addRow () {
-        this.util.addRow(this)
-      },
       resetDialogForm (name) {
         this.$refs[name].resetFields()
-      },
-      submitDialogForm (name) {
-        this.util.submitDialogForm(this, name)
       },
       // 展开/折叠
       treeExpand () {
@@ -267,27 +260,14 @@
         console.log('treeCheckNodeArr: ', treeCheckNodeArr)
         vm.treeCheckNodeArr = treeCheckNodeArr
       },
-      paging () {
-        this.util.paging(this)
-      },
       initData () {}
     },
-    computed: {
-      label () {
-        return this.$store.state.label
-      }
-    },
-    created () {
-      let vm = this
-      vm.initData()
-      vm.$store.commit('initPager', vm)
-      vm.paging(vm)
-    },
+    computed: {},
+    created () {},
     mounted () {
       // this.getTreeDataByAppRoutes()
     },
-    watch: {
-    }
+    watch: {}
   }
 </script>
 

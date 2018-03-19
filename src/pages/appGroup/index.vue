@@ -94,12 +94,14 @@
 <script>
   import mainTable from '@/components/mainTable'
   import paging from '@/components/paging'
+  import page from '@/mixins/page'
   export default {
     name: 'appGroup_index',
     components: {
       mainTable,
       paging
     },
+    mixins: [page],
     data () {
       return {
         url: {
@@ -283,9 +285,6 @@
       }
     },
     methods: {
-      addRow () {
-        this.util.addRow(this)
-      },
       initDialog (data) {
         
       },
@@ -293,42 +292,17 @@
         this.$refs[name].resetFields()
         this.submitSearch(name)
       },
-      submitSearch (name) {
-        let vm = this
-        vm.$store.dispatch('submitSearch', {
-          'vm': vm,
-          'name': name
-        })
-      },
       resetDialogForm (name) {
         let vm = this
         vm.$refs[name].resetFields()
-      },
-      submitDialogForm (name) {
-        this.util.submitDialogForm(this, name)
-      },
-      changePager (data) {
-        this.util.changePager(this, data)
-      },
-      paging () {
-        this.util.paging(this)
       },
       initData () {
         let vm = this
         vm.derail_address_arr = JSON.parse(sessionStorage.chinaData)
       }
     },
-    computed: {
-      label () {
-        return this.$store.state.label
-      }
-    },
-    created () {
-      let vm = this
-      vm.initData()
-      vm.$store.commit('initPager', vm)
-      vm.paging(vm)
-    },
+    computed: {},
+    created () {},
     watch: {
       derail_address_obj (val) {
         if (val.length) {

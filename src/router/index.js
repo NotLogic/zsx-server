@@ -5,7 +5,6 @@ import {commonRoutes} from './routes.js'
 import iView from 'iview'
 Vue.use(iView)
 Vue.use(Router)
-console.log('commonRoutes: ',commonRoutes)
 let map = {}
 routes.forEach(item => {
   if (item.children) {

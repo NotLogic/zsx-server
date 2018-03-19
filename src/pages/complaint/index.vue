@@ -86,12 +86,14 @@
 <script>
   import mainTable from '@/components/mainTable'
   import paging from '@/components/paging'
+  import page from '@/mixins/page'
   export default {
     name: 'complaint_index',
     components: {
       mainTable,
       paging
     },
+    mixins: [page],
     data () {
       return {
         url: {
@@ -99,9 +101,6 @@
           edit: 'appTips/edit.do',
           delete: 'appTips/delete.do'
         },
-        currDialog: 'add',
-        dialogShow: false,
-        dialogSubmitLoading: false,
         pager: {
           data: [
             {
@@ -267,26 +266,13 @@
       updateSelect (selection) {
         this.batchOprArr = selection
       },
-      addRow () {
-        this.util.addRow(this)
-      },
       resetSearch (name) {
         this.$refs[name].resetFields()
         this.submitSearch(name)
       },
-      submitSearch (name) {
-        let vm = this
-        vm.$store.dispatch('submitSearch', {
-          'vm': vm,
-          'name': name
-        })
-      },
       resetDialogForm (name) {
         let vm = this
         vm.$refs[name].resetFields()
-      },
-      submitDialogForm (name) {
-        this.util.submitDialogForm(this, name)
       },
       // 批量忽略
       batchIgnore () {
@@ -297,20 +283,9 @@
         console.log('批量删除屏蔽： ',this.batchOprArr)
       },
       exportData () {},
-      changePager (data) {
-        this.util.changePager(this, data)
-      },
-      paging () {
-        this.util.paging(this)
-      },
     },
-    computed: {
-      label () {
-        return this.$store.state.label
-      }
-    },
-    watch: {
-    }
+    computed: {},
+    watch: {}
   }
 </script>
 

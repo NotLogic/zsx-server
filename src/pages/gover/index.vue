@@ -140,6 +140,7 @@
 <script>
   import mainTable from '@/components/mainTable'
   import paging from '@/components/paging'
+  import page from '@/mixins/page'
   import tinymce from '@/components/tinymce'
   export default {
     name: 'gover_index',
@@ -148,6 +149,7 @@
       paging,
       tinymce
     },
+    mixins: [page],
     data: function () {
       return {
         url: {
@@ -201,9 +203,6 @@
           ],
           url: 'gover/dataGrid.do'
         },
-        currDialog: 'add',
-        dialogShow: false,
-        dialogSubmitLoading: false,
         previewModal: false,
         previewData: {},
         chinaJson: {},
@@ -359,8 +358,8 @@
                     }
                   }
                 }, '预览'),
-                vm.util.createEditBtn(create, params.row, vm),
-                vm.util.createDelBtn(create, params.row.id, vm)
+                vm.createEditBtn(create, params.row),
+                vm.createDelBtn(create, params.row.id)
               ])
             }
           }
@@ -369,17 +368,11 @@
       }
     },
     methods: {
-      addRow () {
-        this.util.addRow(this)
-      },
       resetDialogForm (name) {
         let vm = this
         vm.derail_address_obj_sub = []
         vm.setContent('')
         vm.$refs[name].resetFields()
-      },
-      submitDialogForm (name) {
-        this.util.submitDialogForm(this, name)
       },
       searchAddrChange (value) {
         this.formSearch.areaId = value[2]
@@ -423,13 +416,6 @@
         vm.$refs[name].resetFields()
         vm.submitSearch(name)
       },
-      submitSearch (name) {
-        let vm = this
-        vm.$store.dispatch('submitSearch', {
-          'vm': vm,
-          'name': name
-        })
-      },
       setContent (content) {
         let set = ''
         if (content) {
@@ -446,29 +432,14 @@
         vm.derail_address_obj_sub = [_data.provinceId, _data.cityId, _data.areaId]
         vm.setContent(_data.content)
       },
-      changePager (data) {
-        this.util.changePager(this, data)
-      },
-      paging () {
-        this.util.paging(this)
-      },
       initData () {
         let vm = this
         vm.chinaJson = JSON.parse(sessionStorage.chinaJson)
         vm.derail_address_arr = JSON.parse(sessionStorage.chinaData)
       }
     },
-    computed: {
-      label () {
-        return this.$store.state.label
-      }
-    },
-    created () {
-      let vm = this
-      vm.initData()
-      vm.$store.commit('initPager', vm)
-      vm.paging(vm)
-    },
+    computed: {},
+    created () {},
     mounted () {},
     watch: {
       derail_address_obj_sub (val) {

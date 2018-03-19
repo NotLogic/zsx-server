@@ -86,12 +86,14 @@
 <script>
   import mainTable from '@/components/mainTable'
   import paging from '@/components/paging'
+  import page from '@/mixins/page'
   export default {
     name: 'user',
     components: {
       mainTable,
       paging
     },
+    mixins: [page],
     data () {
       return {
         url: {
@@ -143,9 +145,6 @@
           sort: 'createTime',
           order: 'desc'
         },
-        currDialog: 'add',
-        dialogShow: false,
-        dialogSubmitLoading: false,
         derail_address_arr: [],
         derail_address_obj_s: [],
         roleIds: [],
@@ -225,8 +224,8 @@
             render: (create, params) => {
               let vm = this
               return create('div', [
-                vm.util.createEditBtn(create, params.row, vm),
-                vm.util.createDelBtn(create, params.row.id, vm)
+                vm.createEditBtn(create, params.row),
+                vm.createDelBtn(create, params.row.id)
               ])
             }
           }
@@ -263,15 +262,7 @@
         }
       }
     },
-    computed: {
-      label () {
-        return this.$store.state.label
-      }
-    },
     methods: {
-      addRow () {
-        this.util.addRow(this)
-      },
       resetSearch (name) {
         let vm = this
         vm.derail_address_obj_s = []
@@ -279,39 +270,18 @@
         vm.$refs[name].resetFields()
         vm.submitSearch(name)
       },
-      submitSearch (name) {
-        let vm = this
-        vm.$store.dispatch('submitSearch', {
-          'vm': vm,
-          'name': name
-        })
-      },
       resetDialogForm (name) {
         this.$refs[name].resetFields()
       },
-      submitDialogForm (name) {
-        this.util.submitDialogForm(this, name)
-      },
       initDialog () {},
-      changePager (data) {
-        this.util.changePager(this, data)
-      },
-      paging () {
-        this.util.paging(this)
-      },
       initData () {
         let vm = this
         vm.derail_address_arr = vm.util.extend(JSON.parse(sessionStorage.chinaData))
       }
     },
-    created () {
-      let vm = this
-      vm.initData()
-      vm.$store.commit('initPager', vm)
-      vm.paging(vm)
-    },
-    mounted () {
-    },
+    computed: {},
+    created () {},
+    mounted () {},
     watch: {
       derail_address_obj_s (val) {
         if (val.length) {

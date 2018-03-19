@@ -98,12 +98,14 @@
 <script>
   import mainTable from '@/components/mainTable'
   import paging from '@/components/paging'
+  import page from '@/mixins/page'
   export default {
     name: 'member_index',
     components: {
       mainTable,
       paging
     },
+    mixins: [page],
     data () {
       return {
         url: {
@@ -163,9 +165,6 @@
         derail_address_obj_s_h: [],
         derail_address_arr: [],
         derail_address_obj_s_c: [],
-        currDialog: 'add',
-        dialogShow: false,
-        dialogSubmitLoading: false,
         formSearch: {
           keyWord: '',
           homeId: '',
@@ -325,15 +324,9 @@
       }
     },
     methods: {
-      addRow () {
-        this.util.addRow(this)
-      },
       resetDialogForm (name) {
         let vm = this
         vm.$refs[name].resetFields()
-      },
-      submitDialogForm (name) {
-        this.util.submitDialogForm(this, name)
       },
       resetSearch (name) {
         this.formSearch.userType = ''
@@ -343,37 +336,14 @@
         this.$refs[name].resetFields()
         this.submitSearch(name)
       },
-      submitSearch (name) {
-        let vm = this
-        vm.$store.dispatch('submitSearch', {
-          'vm': vm,
-          'name': name
-        })
-      },
-      changePager (data) {
-        this.util.changePager(this, data)
-      },
-      paging () {
-        this.util.paging(this)
-      },
       initData () {
         let vm = this
         vm.derail_address_arr = JSON.parse(sessionStorage.chinaData)
       }
     },
-    computed: {
-      label () {
-        return this.$store.state.label
-      }
-    },
-    created () {
-      let vm = this
-      vm.initData()
-      vm.$store.commit('initPager', vm)
-      vm.paging(vm)
-    },
-    mounted () {
-    },
+    computed: {},
+    created () {},
+    mounted () {},
     watch: {
       derail_address_obj_s_h (val) {
         if (val.length) {

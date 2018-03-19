@@ -170,12 +170,14 @@
 <script>
   import mainTable from '@/components/mainTable'
   import paging from '@/components/paging'
+  import page from '@/mixins/page'
   export default {
     name: 'ad_index',
     components: {
       mainTable,
       paging
     },
+    mixins: [page],
     data () {
       return {
         url: {
@@ -259,9 +261,6 @@
           tSort: 'createTime',
           order: 'desc'
         },
-        currDialog: 'add',
-        dialogShow: false,
-        dialogSubmitLoading: false,
         uploadImgMax: 1,
         derail_address_arr: [],
         derail_address_arr_s: [],
@@ -495,7 +494,7 @@
             render: (create, params) => {
               let vm = this
               return create('div', [
-                vm.util.createEditBtn(create, params.row, vm),
+                vm.createEditBtn(create, params.row),
                 create('Button', {
                   props: {
                     type: 'warning',
@@ -510,7 +509,7 @@
                     }
                   }
                 }, '禁用'),
-                vm.util.createDelBtn(create, params.row.id, vm)
+                vm.createDelBtn(create, params.row.id)
               ])
             }
           }
@@ -519,29 +518,16 @@
       }
     },
     computed: {
-      label () {
-        return this.$store.state.label
-      },
       imageArr () {
         return this.formDialog.imageArr.slice(1)
       }
     },
     methods: {
-      addRow () {
-        this.util.addRow(this)
-      },
       resetSearch (name) {
         var vm = this
         vm.derail_address_obj_s = []
         vm.$refs[name].resetFields()
         vm.submitSearch(name)
-      },
-      submitSearch (name) {
-        let vm = this
-        vm.$store.dispatch('submitSearch', {
-          'vm': vm,
-          'name': name
-        })
       },
       resetDialogForm (name) {
         let vm = this
@@ -549,9 +535,6 @@
         vm.derail_address_arr = vm.countryData
         vm.derail_address_obj = []
         vm.$refs[name].resetFields()
-      },
-      submitDialogForm (name) {
-        this.util.submitDialogForm(this, name)
       },
       handleSuccess (res) {
         this.formDialog.imagePath = res.url;
@@ -574,9 +557,6 @@
       changePager (data) {
         this.util.changePager(this, data)
       },
-      paging () {
-        this.util.paging(this)
-      },
       initData () {
         let vm = this
         vm.areaData = JSON.parse(sessionStorage.chinaData)
@@ -586,12 +566,7 @@
         vm.derail_address_arr = vm.countryData
       }
     },
-    created () {
-      let vm = this
-      vm.initData()
-      vm.$store.commit('initPager', vm)
-      vm.paging(vm)
-    },
+    created () {},
     mounted () {
       
     },

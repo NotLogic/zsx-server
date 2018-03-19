@@ -249,12 +249,14 @@
 <script>
   import mainTable from '@/components/mainTable'
   import paging from '@/components/paging'
+  import page from '@/mixins/page'
   export default {
     name: 'thirdpartySetting',
     components: {
       mainTable,
       paging
     },
+    mixins: [page],
     data () {
       return {
         url: {
@@ -305,9 +307,6 @@
           ],
           url: 'thirdpartySetting/dataGrid.do'
         },
-        currDialog: 'add',
-        dialogShow: false,
-        dialogSubmitLoading: false,
         isComm: false,
         onOffDisabled: false,
         thirdpartyClassidMap: {
@@ -485,22 +484,15 @@
             fixed: 'right',
             render: (create, params) => {
               var vm = this
-              return vm.util.createEditBtn(create, params.row, vm)
+              return vm.createEditBtn(create, params.row)
             }
           }
         ],
         rules: {}
       }
     },
-    computed: {
-      label () {
-        return this.$store.state.label
-      }
-    },
+    computed: {},
     methods: {
-      addRow () {
-        this.util.addRow(this)
-      },
       debugging () {
         this.debuggerDialogShow = true
       },
@@ -508,22 +500,12 @@
         let vm = this
         vm.$refs[name].resetFields()
       },
-      submitDialogForm (name) {
-        this.util.submitDialogForm(this, name)
-      },
       uploadSuccess () {},
       resetSearch (name) {
         var vm = this
         vm.formSearch.thirdpartyClassid = ''
         vm.$refs[name].resetFields()
         vm.submitSearch(name)
-      },
-      submitSearch (name) {
-        let vm = this
-        vm.$store.dispatch('submitSearch', {
-          'vm': vm,
-          'name': name
-        })
       },
       closeMessage: function(){
         this.messageShow = false
@@ -651,24 +633,11 @@
         return str;
       },
       initDialog (data) {},
-      changePager (data) {
-          this.util.changePager(this, data)
-      },
-      paging () {
-          this.util.paging(this)
-      },
       initData () {}
     },
-    created () {
-      let vm = this
-      vm.initData()
-      vm.$store.commit('initPager', vm)
-      vm.paging(vm)
-    },
-    mounted () {
-    },
-    watch: {
-    }
+    created () {},
+    mounted () {},
+    watch: {}
   }
 </script>
 

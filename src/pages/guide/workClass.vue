@@ -230,8 +230,8 @@
             render: (create, params) => {
               let vm = this
               return create('div', [
-                vm.createEditBtn(create, params.row, vm),
-                vm.createDelBtn(create, params.row.id, vm)
+                vm.createEditBtn(create, params.row),
+                vm.createDelBtn(create, params.row.id)
               ])
             }
           }

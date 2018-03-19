@@ -51,8 +51,8 @@ const page = {
   },
   methods: {
     addRow () {
-      vm.currDialog = 'add'
-      vm.dialogShow = true
+      this.currDialog = 'add'
+      this.dialogShow = true
     },
     submitSearch (name) {
       this.$store.dispatch('submitSearch', {
@@ -78,7 +78,8 @@ const page = {
         }
       })
     },
-    paging (vm) {
+    paging () {
+      let vm = this
       // vm.$http({
       //   url: vm.pager.url,
       //   method: vm.pager.method,
@@ -96,7 +97,7 @@ const page = {
       for (let key in _data) {
         vm.pager[key] = _data[key]
       }
-      vm.paging(vm)
+      vm.paging()
     },
     pagingFiltData(object) {
       let obj = deepcopy(object)
@@ -136,7 +137,8 @@ const page = {
       return ajaxData
     },
     // 创建编辑按钮
-    createEditBtn (create, data, vm) {
+    createEditBtn (create, data) {
+      let vm = this
       return create('Button', {
         props: {
           type: 'primary',
@@ -160,7 +162,8 @@ const page = {
       }, '编辑')
     },
     // 创建删除按钮
-    createDelBtn (create, data, vm) {
+    createDelBtn (create, data) {
+      let vm = this
       return create('Button', {
         props: {
           type: 'error',
@@ -187,7 +190,7 @@ const page = {
       vm.initData()
     }
     vm.$store.commit('initPager', vm)
-    vm.paging(vm)
+    vm.paging()
   },
   mounted () {}
 }

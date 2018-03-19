@@ -36,11 +36,13 @@
 
 <script>
   import mainTable from '@/components/mainTable'
+  import page from '@/mixins/page'
   export default {
     name: 'sensitiveWordSettting',
     components: {
       mainTable
     },
+    mixins: [page],
     data: function () {
       return {
         url: {
@@ -70,9 +72,6 @@
           ],
           url: 'sensitiveWordSettting/dataGrid.do'
         },
-        currDialog: 'add',
-        dialogShow: false,
-        dialogSubmitLoading: false,
         formDialog: {
           id: '',
           rpWord: "",
@@ -119,7 +118,7 @@
             render: (create, params) => {
               var vm = this
               return create('div', [
-                vm.util.createEditBtn(create, params.row, vm),
+                vm.createEditBtn(create, params.row),
                 (function(){
                   if(params.row.isdefault == '1'){
                     return create('Button', {
@@ -138,7 +137,7 @@
                     }, '设为默认');
                   }
                 })(),
-                vm.util.createDelBtn(create, params.row.id, vm)
+                vm.createDelBtn(create, params.row.id)
               ])
             }
           }
@@ -148,15 +147,8 @@
         }
       }
     },
-    computed: {
-      label () {
-        return this.$store.state.label
-      }
-    },
+    computed: {},
     methods: {
-      addRow () {
-        this.util.addRow(this)
-      },
       upExeclSuccess () {},
       handleFormatError () {},
       resetDialogForm (name) {
@@ -165,26 +157,14 @@
         vm.formDialog.isdefault = "0"
         vm.$refs[name].resetFields()
       },
-      submitDialogForm (name) {
-        this.util.submitDialogForm(this, name)
-      },
       setDefaultRule (index) {
         console.log('设为默认index：',index)
       },
       initDialog () {},
-      paging () {
-        this.util.paging(this)
-      },
       initData () {}
     },
-    created () {
-      let vm = this
-      vm.initData()
-      vm.$store.commit('initPager', vm)
-      vm.paging(vm)
-    },
-    mounted () {
-    }
+    created () {},
+    mounted () {}
   }
 </script>
 
