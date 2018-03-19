@@ -11,9 +11,13 @@ const deepcopy = function (source) {
 const page = {
   data: function () {
     return {
+      // 当前操作是新增还是编辑
       currDialog: 'add',
+      // 主弹出框的显示隐藏
       dialogShow: false,
+      // 主弹出框正在提交数据
       dialogSubmitLoading: false,
+      // 按钮文字map
       label: {
         'edit': '编辑',
         'add': '添加',
@@ -27,6 +31,16 @@ const page = {
         'cancle': '取消',
         'uploadImg': '上传图片',
         'uploadExcel': '导入Excel'
+      },
+      mixinPager: {
+        'url': '',
+        'currPage': 1,
+        'method': 'post',
+        'order': '',
+        'pagesize': 10,
+        'sort': '',
+        'total': 0,
+        'data': []
       },
       map: {
         'sex': {
@@ -50,16 +64,19 @@ const page = {
     }
   },
   methods: {
+    // 添加行
     addRow () {
       this.currDialog = 'add'
       this.dialogShow = true
     },
+    // 搜索提交
     submitSearch (name) {
       this.$store.dispatch('submitSearch', {
         'vm': this,
         'name': name
       })
     },
+    // 新增/编辑主弹出框的提交
     submitDialogForm (name) {
       let vm = this
       vm.$refs[name].validate(function (valid) {
@@ -78,6 +95,7 @@ const page = {
         }
       })
     },
+    // 更新页面的数据
     paging (currPage) {
       let vm = this
       if (currPage && Number(currPage)) {
@@ -96,6 +114,7 @@ const page = {
       //   }
       // })
     },
+    // 分页改变
     changePager (data) {
       let vm = this
       if (typeof data === 'object') {
@@ -107,6 +126,7 @@ const page = {
       }
       vm.paging()
     },
+    // 过滤提交的数据
     pagingFiltData(object) {
       let obj = deepcopy(object)
       for (let key in obj) {
@@ -128,6 +148,7 @@ const page = {
       }
       return obj
     },
+    // 新增时不提交id
     editAddAjaxData (currDialog) {
       let vm = this
       let ajaxData = {}
@@ -189,6 +210,17 @@ const page = {
           }
         }
       }, '删除')
+    },
+    // 初始化pager 组件中pager的键覆盖mixinPager的键
+    initPager (data) {
+      let vm = this
+      let pager = deepcopy(vm.pager)
+      let mixinPager = deepcopy(vm.mixinPager)
+      for(let key in pager) {
+        mixinPager[key] = pager[key]
+      }
+      vm.pager = mixinPager
+      console.log('vm.pager: ',vm.pager)
     }
   },
   computed: {},
@@ -198,6 +230,7 @@ const page = {
       vm.initData()
     }
     vm.$store.commit('initPager', vm)
+    vm.initPager()
     vm.paging()
   },
   mounted () {}

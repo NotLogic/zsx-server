@@ -35,7 +35,7 @@
     <mainTable :columns="columns" :data="pager.data"></mainTable>
     <paging @changePager="changePager" @paging="paging" :total="pager.total" :currPage="pager.currPage"></paging>
     <!-- 弹出框 -->
-    <Modal v-model="dialogShow" :title="label[currDialog]" :mask-closable="false" width="750" @on-cancel="resetDialogForm('formDialog')">
+    <Modal v-model="dialogShow" :title="label[currDialog]" :mask-closable="false" width="750" @on-cancel="resetDialogForm('formDialog')" :styles="{top:'30px'}">
       <Form :model="formDialog" ref="formDialog" :rules="rules" :label-width="80">
         <Row>
           <Col span="12">
@@ -376,12 +376,14 @@
 <script>
   import mainTable from '@/components/mainTable'
   import paging from '@/components/paging'
+  import page from '@/mixins/page'
   export default {
     name: 'workMatter',
     components: {
       mainTable,
       paging
     },
+    mixins: [page],
     data () {
       return {
         url: {
@@ -501,10 +503,7 @@
           ],
           url: 'workMatter/dataGrid.do'
         },
-        currDialog: 'add',
-        dialogShow: false,
         addressList: false,
-        dialogSubmitLoading: false,
         workClassId: [],
         matterStatus: [
           {
@@ -789,16 +788,11 @@
                   style: { marginRight: '5px' },
                   on: {
                     click: function () {
-                      // vm.$store.commit('editRow', {
-                      //   'vm': vm,
-                      //   'data': params.row,
-                      //   'initDialog': vm.initDialog(params.row)
-                      // })
                       vm.editRow(params.row)
                     }
                   }
                 }, vm.label.edit),
-                vm.util.createDelBtn(create, params.row.id, vm)
+                vm.createDelBtn(create, params.row.id)
               ])
             }
           }
@@ -827,9 +821,6 @@
       },
       handleFormatError () {
         this.$Message.error('文件格式错误，请选择xlsx格式的文件')
-      },
-      addRow () {
-        this.util.addRow(this)
       },
       // 编辑行
       editRow (data) {
@@ -1237,13 +1228,6 @@
         vm.addHandleCancle()
       },
       // 操作 end
-      // 当前页或每页个数发生改变
-      changePager (data) {
-        this.util.changePager(this, data)
-      },
-      paging () {
-        this.util.paging(this)
-      },
       initData () {
         let vm = this
         // 初始化所属分类
@@ -1258,8 +1242,8 @@
         //   vm.workClassId = workClassId
         // })
         // 初始化省市区
-        let chinaJson = vm.util.extend(JSON.parse(sessionStorage.chinaJson))
-        let chinaData = vm.util.extend(JSON.parse(sessionStorage.chinaData))
+        let chinaJson = JSON.parse(sessionStorage.chinaJson)
+        let chinaData = JSON.parse(sessionStorage.chinaData)
         let _chinaData = []
         chinaData.forEach(item => {
           let childArr = []
@@ -1281,11 +1265,7 @@
       }
     },
     // 计算属性
-    computed: {
-      label () {
-        return this.$store.state.label
-      }
-    },
+    computed: {},
     watch: {
       derail_address_obj_s (val) {
         if (val.length) {
@@ -1295,18 +1275,8 @@
         }
       }
     },
-    created () {
-      let vm = this
-      // 初始化其他数据
-      vm.initData()
-      // 页面加载时初始化table数据
-      vm.$store.commit('initPager', vm)
-      vm.paging(vm)
-      // 页面加载时初始化table数据  end
-    },
-    mounted () {
-      
-    }
+    created () {},
+    mounted () {}
   }
 </script>
 
