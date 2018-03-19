@@ -93,11 +93,13 @@
 
 <script>
   import mainTable from '@/components/mainTable'
+  import page from '@/mixins/page'
   export default {
     name: 'workClass',
     components: {
       mainTable
     },
+    mixins: [page],
     data: function () {
       return {
         url: {
@@ -132,9 +134,9 @@
           ],
           url: 'workClass/dataGrid.do'
         },
-        currDialog: 'add',
-        dialogShow: false,
-        dialogSubmitLoading: false,
+        // currDialog: 'add',
+        // dialogShow: false,
+        // dialogSubmitLoading: false,
         derail_address_obj_s: [],
         provinceCityData: [],
         provinceCity: [],
@@ -228,8 +230,8 @@
             render: (create, params) => {
               let vm = this
               return create('div', [
-                vm.util.createEditBtn(create, params.row, vm),
-                vm.util.createDelBtn(create, params.row.id, vm)
+                vm.createEditBtn(create, params.row, vm),
+                vm.createDelBtn(create, params.row.id, vm)
               ])
             }
           }
@@ -246,9 +248,6 @@
       }
     },
     methods: {
-      addRow () {
-        this.util.addRow(this)
-      },
       initDialog (data) {
         let _data = this.util.extend(data)
         this.provinceCity = [_data.cityCode.toString().slice(0, 2) + '0000', _data.cityCode.toString().slice(0, 4) + '00', _data.cityCode.toString()]
@@ -259,22 +258,12 @@
         vm.$refs[name].resetFields()
         vm.submitSearch(name)
       },
-      submitSearch (name) {
-        let vm = this
-        vm.$store.dispatch('submitSearch', {
-          'vm': vm,
-          'name': name
-        })
-      },
       resetDialogForm (name) {
         let vm = this
         vm.provinceCity = []
         vm.formDialog.classIcon = ''
         vm.formDialog.cityCode = ''
         vm.$refs[name].resetFields()
-      },
-      submitDialogForm (name) {
-        this.util.submitDialogForm(this, name)
       },
       searchAddrChange (value) {
         this.formSearch.cityCode = value[1]
@@ -298,9 +287,6 @@
         let txt = data['100000'][provinceCode] + data[provinceCode][cityCode]
         return txt
       },
-      paging () {
-        this.util.paging(this)
-      },
       initData () {
         // chinaJson 在main.js中初始化
         let vm = this
@@ -318,23 +304,11 @@
       }
     },
     // 计算属性
-    computed: {
-      label () {
-        return this.$store.state.label
-      }
-    },
-    watch: {
-    },
-    created () {
-      let vm = this
-      vm.initData()
-      vm.$store.commit('initPager', vm)
-      vm.paging(vm)
-    },
+    computed: {},
+    watch: {},
+    created () {},
     // 生命周期钩子函数VNode替换原始dom时触发，钩子函数函数
-    mounted () {
-      
-    }
+    mounted () {}
   }
 </script>
 
