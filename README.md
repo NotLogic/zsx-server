@@ -25,6 +25,15 @@ npm run e2e
 
 # run all tests
 npm test
+
+# 分支说明 2018.03.19
+从下次提交开始
+master分支只用来提交新功能
+dev分支上作为开发新功能的测试分支
+功能分支用来进行开发指定功能 例如 mixin、tinymce等以某一功能作为名称的分支
+
+
+
 ```
 
 For a detailed explanation on how things work, check out the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
