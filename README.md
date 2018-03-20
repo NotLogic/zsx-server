@@ -31,7 +31,7 @@ npm test
 master分支只用来提交新功能
 dev分支上作为开发新功能的测试分支
 功能分支用来进行开发指定功能 例如 mixin、tinymce等以某一功能作为名称的分支
-
+所有功能分支的功能开发完毕后合并到dev分支，当达到某个功能节点时提交到master分支
 
 
 ```
@@ -43,7 +43,7 @@ For a detailed explanation on how things work, check out the [guide](http://vuej
 - [x] 基础页面路由配置
 - [x] 页面基本效果
 - [x] 页面内容填充(无真实数据版本)
-- [ ] 增删改操作的正在处理效果
+- [ ] 增删改查
 - [ ] 页面数据请求、填充
 - [ ] 前后分离权限控制
 - [ ] 用户登录是否失效判断

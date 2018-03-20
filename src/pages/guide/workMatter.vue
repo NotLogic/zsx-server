@@ -756,7 +756,7 @@
                             params.row.citiesId
                         ]
                         vm.formDialog.workMatterAddressesList = params.row.workMatterAddressesList
-                        vm.addrDialog.addressArr = vm.getAddressArr(vm.util.extend(params.row.workMatterAddressesList))
+                        vm.addrDialog.addressArr = vm.getAddressArr(params.row.workMatterAddressesList)
                         vm.seeAddress()
                       }
                     }
@@ -835,7 +835,7 @@
             vm.formDialog[key] = _data[key]
           }
         }
-        vm.addrDialog.addressArr = vm.getAddressArr(vm.util.extend(vm.formDialog.workMatterAddressesList))
+        vm.addrDialog.addressArr = vm.getAddressArr(vm.formDialog.workMatterAddressesList)
         // 对 handleValue 赋值                
         vm.handleValue = {
             requiredConditions: vm.formDialog.requiredConditions,
@@ -951,13 +951,6 @@
         vm.$refs[name].resetFields()
         vm.submitSearch(name)
       },
-      submitSearch (name) {
-        let vm = this
-        vm.$store.dispatch('submitSearch', {
-          'vm': vm,
-          'name': name
-        })
-      },
       searchAddrChange (value) {
         this.formSearch.areaId = value[2]
       },
@@ -1030,7 +1023,7 @@
                 vm.formDialog.workMatterAddressesList[vm.editIndex][key] = vm.addrDialog[key]
               }
             }
-            vm.addrDialog.addressArr = vm.getAddressArr(vm.util.extend(vm.formDialog.workMatterAddressesList))
+            vm.addrDialog.addressArr = vm.getAddressArr(vm.formDialog.workMatterAddressesList)
             vm.resetAddr(name)
           }else{
             vm.$Message.error("请选择区");
@@ -1056,7 +1049,7 @@
         vm.addEdit = false
         vm.editIndex = index
         vm.areasId = vm.getArea(vm.addrDialog.derail_address_obj[1])
-        let data = vm.util.extend(vm.formDialog.workMatterAddressesList[index])
+        let data = vm.formDialog.workMatterAddressesList[index]
         for (let key in data) {
           vm.addrDialog[key] = data[key]
         }
@@ -1260,7 +1253,7 @@
           })
         })
         vm.derail_address_arr_ss = chinaData
-        vm.derail_address_arr = vm.util.extend(_chinaData)
+        vm.derail_address_arr = _chinaData
         vm.chinaJson = chinaJson
       }
     },
