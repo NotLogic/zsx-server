@@ -304,11 +304,7 @@
                 },
                 on: {
                   click: function () {
-                      vm.$store.commit('editRow', {
-                      'vm': vm,
-                      'data': params.row,
-                      'initDialog': vm.initDialog(params.row)
-                    })
+                      vm.editRow(params.row)
                   }
                 }
               }, params.row.name)
@@ -408,6 +404,7 @@
       }
     },
     methods: {
+      // 直接对data进行修改，不用返回值
       initDialog (data) {
         
       },
@@ -415,23 +412,23 @@
         let vm = this
         vm.$refs[name].resetFields()
       },
-      initData () {}
+      initData () {},
+      // 页面数据更新时处理返回数据
+      pagerResult (result) {
+        // 更新上级资源内容
+        let arr = []
+        var _data = this.util.genTreeData(this.util.extend(result))
+        // 更新树形下拉菜单数据
+        this.pid = this.util.formatSelectData(_data.flat);
+        arr = _data.flat
+        return arr
+      }
     },
     created () {},
-    mounted () {},
+    mounted () {
+      this.pagerResult(this.pager.data)
+    },
     computed: {},
     watch: {}
   }
 </script>
-
-<style scoped>
-  .mar-0{
-    margin-right: 0;
-  }
-  .mr-1{
-    margin-right: 10px;
-  }
-  .mr-2{
-    margin-right: 20px;
-  }
-</style>

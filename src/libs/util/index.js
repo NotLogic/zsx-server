@@ -261,6 +261,100 @@ export function getParentRouterNameByName (childName) {
   }
   return parentName
 }
+// 将扁平的无序的无限分类数据整理成：
+// “多维树状（data.unflat）”和“扁平树状（data.flat）”两种数据
+export function genTreeData (data, opt) {
+    var opt = opt || { idField: 'id', parentField: 'pid', textField: 'name' };
+    var idField, textField, parentField, tmpMap = {};
+    idField = opt.idField || 'id';
+    textField = opt.textField || 'name';
+    var unflatten = function () {
+      if (opt.parentField) {
+        parentField = opt.parentField;
+        var i, l, treeData = [];
+        for (i = 0, l = data.length; i < l; i++) {
+          data[i].label = data[i][textField];
+          data[i].value = data[i][idField];
+          tmpMap[data[i][idField]] = data[i];
+        }
+        for (i = 0, l = data.length; i < l; i++) {
+          if (tmpMap[data[i][parentField]] && data[i][idField] != data[i][parentField]) {
+            if (!tmpMap[data[i][parentField]]['children']) {
+              tmpMap[data[i][parentField]]['children'] = [];
+            }
+            data[i]['text'] = data[i][textField];
+            var hasEle = (function () {
+              var ret = false;
+              tmpMap[data[i][parentField]]['children'].forEach(ele=> {
+                if (ele[idField] == data[i][idField]) {
+                  ret = true;
+                  return false;
+                }
+              })
+              return ret;
+            })();
+            if (hasEle == false) {
+              tmpMap[data[i][parentField]]['children'].push(data[i]);
+            }
+          } else {
+            data[i]['text'] = data[i][textField];
+            treeData.push(data[i]);
+          }
+        }
+        return treeData;
+      }
+      return data;
+    };
+    console.log('转换为Select处理的数据unflatten(): ',unflatten())
+    var flatten = function () {
+      var arr = [];
+      var flattenIt = function (data, _level) {
+        for (var i = 0; i < data.length; i++) {
+          var _levelSub = _level + 1;
+          var ele = tmpMap[data[i][idField]];
+          ele.level = _level;
+          arr.push(ele);
+          if ('children' in data[i] && data[i].children.length > 0) {
+            console.log('if')
+            flattenIt(data[i].children, _levelSub);
+          }
+        }
+      };
+      flattenIt(unflatten(), 0);
+      return arr;
+    };
+    return {
+      flat: flatten(),
+      unflat: unflatten()
+    };
+}
+
+// 处理扁平树状数据，为iview的 Select组件 使用
+export function formatSelectData (arr) {
+  var _arr = [];
+  arr.forEach(ele => {
+    var _objItem = {};
+    var label = ele.name || '';
+    var nullStr = '　　';
+    if (typeof(ele.level) != 'undefined' && isNaN(ele.level) == false) {
+        // 生成多个全角空格
+        label = str_repeat(nullStr, ele.level)  + label;
+    }
+    _objItem = {
+        label: label,
+        value: String(ele.id),
+        id: String(ele.id),
+        pId: ele.pId || ''
+    };
+    _arr.push(_objItem);
+  })
+  return _arr;
+}
+
+export function str_repeat (str, num) {
+  return new Array(num + 1).join(str);
+}
+// export function 
 // export function 
 // export function 
 // export function 

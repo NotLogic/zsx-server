@@ -109,6 +109,9 @@ const page = {
       // }).then(res => {
       //   if (res.data.data.code == 1) {
       //     let _data = res.data.data
+      //     if (typeof vm.pagerResult === 'function') {
+      //       _data = vm.pagerResult(_data)
+      //     }
       //     vm.pager.data = _data.data
       //     vm.pager.total = _data.total
       //   }
@@ -178,17 +181,29 @@ const page = {
         },
         on: {
           click: () => {
-            for (let key in vm.formDialog) {
-              vm.formDialog[key] = data[key]
-            }
-            if (typeof vm.initDialog === 'function') {
-              vm.initDialog(data)
-            }
-            vm.currDialog = 'edit'
-            vm.dialogShow = true
+            vm.editRow(data)
           }
         }
       }, '编辑')
+    },
+    editRow (data) {
+      let vm = this
+      let _data = {}
+      for (let key in vm.formDialog) {
+        _data[key] = data[key]
+      }
+      if (typeof vm.initDialog === 'function') {
+        vm.initDialog(_data)
+      }
+      vm.formDialog = _data
+      // for (let key in vm.formDialog) {
+      //   vm.formDialog[key] = data[key]
+      // }
+      // if (typeof vm.initDialog === 'function') {
+      //   vm.initDialog(data)
+      // }
+      vm.currDialog = 'edit'
+      vm.dialogShow = true
     },
     // 创建删除按钮
     createDelBtn (create, data) {
@@ -220,7 +235,6 @@ const page = {
         mixinPager[key] = pager[key]
       }
       vm.pager = mixinPager
-      console.log('vm.pager: ',vm.pager)
     }
   },
   computed: {},

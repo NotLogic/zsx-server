@@ -314,7 +314,3 @@
     }
   }
 </script>
-
-<style scoped>
-
-</style>

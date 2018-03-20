@@ -9,7 +9,3 @@
     name: ''
   }
 </script>
-
-<style scoped>
-
-</style>
