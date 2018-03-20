@@ -71,10 +71,9 @@ const page = {
     },
     // 搜索提交
     submitSearch (name) {
-      this.$store.dispatch('submitSearch', {
-        'vm': this,
-        'name': name
-      })
+      let vm = this
+      console.log('搜索提交数据', vm.formSearch)
+      // 搜索操作
     },
     // 新增/编辑主弹出框的提交
     submitDialogForm (name) {
@@ -88,10 +87,9 @@ const page = {
           let ajaxUrl = vm.url[vm.currDialog]
           console.log("ajaxData: ",ajaxData)
           console.log("ajaxUrl: ",ajaxUrl)
-          vm.$store.dispatch('submitDialogForm', {
-            'vm': vm,
-            'name': name
-          })
+          // 成功之后
+          vm.dialogShow = false
+          vm.resetDialogForm(name)
         }
       })
     },
@@ -219,14 +217,23 @@ const page = {
               title: '确认',
               content: '确认删除这条数据吗？',
               onOk: function () {
-                vm.$store.dispatch('delRow', data)
+                let dispatchData = null
+                if (typeof data === 'object' && typeof vm.delResult === 'function'){
+                  dispatchData = vm.delResult(data)
+                } else if (typeof data === 'string' || typeof data === 'number') {
+                  dispatchData = data
+                }
+                vm.delRow(dispatchData)
               }
             })
           }
         }
       }, '删除')
     },
-    // 初始化pager 组件中pager的键覆盖mixinPager的键
+    delRow (data) {
+      console.log('删除行提交： ',data)
+    },
+    // 初始化pager   组件中pager的键覆盖mixinPager的键
     initPager (data) {
       let vm = this
       let pager = deepcopy(vm.pager)
@@ -243,7 +250,6 @@ const page = {
     if (typeof vm.initData === 'function') {
       vm.initData()
     }
-    vm.$store.commit('initPager', vm)
     vm.initPager()
     vm.paging()
   },

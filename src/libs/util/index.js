@@ -305,7 +305,7 @@ export function genTreeData (data, opt) {
       }
       return data;
     };
-    console.log('转换为Select处理的数据unflatten(): ',unflatten())
+    // console.log('转换为Select处理的数据unflatten(): ',unflatten())
     var flatten = function () {
       var arr = [];
       var flattenIt = function (data, _level) {
@@ -315,7 +315,6 @@ export function genTreeData (data, opt) {
           ele.level = _level;
           arr.push(ele);
           if ('children' in data[i] && data[i].children.length > 0) {
-            console.log('if')
             flattenIt(data[i].children, _levelSub);
           }
         }

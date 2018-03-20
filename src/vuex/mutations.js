@@ -138,21 +138,21 @@ export function clearOtherOpenedSubmenuArr (state, name) {
   })
 }
 // 初始化每页的pager
-export function initPager (state, vm) {
-  let _data = util.extend(vm.pager)
-  vm.pager = util.extend(state.pager)
-  for (let key in _data) {
-    vm.pager[key] = _data[key]
-  }
-}
+// export function initPager (state, vm) {
+//   let _data = util.extend(vm.pager)
+//   vm.pager = util.extend(state.pager)
+//   for (let key in _data) {
+//     vm.pager[key] = _data[key]
+//   }
+// }
 // -----------------------  action 提交的mutation  -------------------------------
-export function submitDialogForm (state) {
-  console.log('state.pager.data: ',state.pager.data)
-  console.log('新增或编辑')
-}
-export function submitSearch (state) {
-  console.log('搜索操作')
-}
-export function delRow (state) {
+// export function submitDialogForm (state) {
+//   console.log('state.pager.data: ',state.pager.data)
+//   console.log('新增或编辑')
+// }
+// export function submitSearch (state) {
+//   console.log('搜索操作')
+// }
+// export function delRow (state) {
     
-}
+// }

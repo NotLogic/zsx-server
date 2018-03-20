@@ -106,7 +106,52 @@
               status: '1',
               opened: '1',
               pid: [],
-              permission: ''
+              permission: '',
+              children: [
+                {
+                  id: '11',
+                  name: '资源管理',
+                  resourceType: '0',
+                  url: '/resource/main.do',
+                  openMode: 'ajax',
+                  icon: '',
+                  level: '1',
+                  seq: 1,
+                  status: '1',
+                  opened: '1',
+                  pid: [],
+                  permission: 'upms:resource:main',
+                  children: [
+                    {
+                      id: '111',
+                      name: '列表',
+                      resourceType: '1',
+                      url: '/resource/treeGrid.do',
+                      openMode: 'ajax',
+                      icon: '',
+                      level: '2',
+                      seq: 1,
+                      status: '1',
+                      opened: '1',
+                      pid: [],
+                      permission: 'upms:resource:treeGrid'
+                    }, {
+                      id: '112',
+                      name: '添加',
+                      resourceType: '1',
+                      url: '/resource/add.do',
+                      openMode: 'ajax',
+                      icon: '',
+                      level: '2',
+                      seq: 1,
+                      status: '1',
+                      opened: '1',
+                      pid: [],
+                      permission: 'upms:resource:add'
+                    }
+                  ]
+                }
+              ]
             }, {
               id: '11',
               name: '资源管理',
@@ -373,7 +418,7 @@
               // }
               return create('div', [
                 vm.createEditBtn(create, params.row),
-                vm.createDelBtn(create, params.row.id)
+                vm.createDelBtn(create, params.row)
               ])
             }
           }
@@ -413,6 +458,32 @@
         vm.$refs[name].resetFields()
       },
       initData () {},
+      delResult (data) {
+        let vm = this
+        let ajaxData = null
+        let idArr = vm.getIdArrFromData(data)
+        if (idArr.length === 1) {
+          ajaxData = idArr[0]
+        } else{
+          ajaxData = {
+            id: idArr
+          }
+        }
+        return ajaxData
+      },
+      getIdArrFromData (data,arr) {
+        let vm = this
+        let newArr = arr || []
+        if (data.id) {
+          newArr.push(data.id)
+          if (data.children && data.children.length) {
+            data.children.forEach(item=>{
+              vm.getIdArrFromData(item, newArr)
+            })
+          }
+        }
+        return newArr
+      },
       // 页面数据更新时处理返回数据
       pagerResult (result) {
         // 更新上级资源内容
