@@ -465,9 +465,7 @@
         if (idArr.length === 1) {
           ajaxData = idArr[0]
         } else{
-          ajaxData = {
-            id: idArr
-          }
+          ajaxData = idArr
         }
         return ajaxData
       },

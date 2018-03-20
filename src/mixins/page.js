@@ -17,6 +17,8 @@ const page = {
       dialogShow: false,
       // 主弹出框正在提交数据
       dialogSubmitLoading: false,
+      // 删除行的key
+      delRowKey: 'id',
       // 按钮文字map
       label: {
         'edit': '编辑',
@@ -217,13 +219,16 @@ const page = {
               title: '确认',
               content: '确认删除这条数据吗？',
               onOk: function () {
-                let dispatchData = null
+                let idObj = {}
+                let key = vm.delRowKey || id
+                let idData = null
                 if (typeof data === 'object' && typeof vm.delResult === 'function'){
-                  dispatchData = vm.delResult(data)
+                  idData = vm.delResult(data)
                 } else if (typeof data === 'string' || typeof data === 'number') {
-                  dispatchData = data
+                  idData = data
                 }
-                vm.delRow(dispatchData)
+                idObj[key] = idData
+                vm.delRow(idObj)
               }
             })
           }
