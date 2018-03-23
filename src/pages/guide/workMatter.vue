@@ -751,13 +751,7 @@
                     props: { type: 'primary', size: 'small' },
                     on: {
                       click: function () {
-                        vm.addrDialog.derail_address_obj = [
-                            params.row.provincesId,
-                            params.row.citiesId
-                        ]
-                        vm.formDialog.workMatterAddressesList = params.row.workMatterAddressesList
-                        vm.addrDialog.addressArr = vm.getAddressArr(params.row.workMatterAddressesList)
-                        vm.seeAddress()
+                        vm.seeAddress(params.row)
                       }
                     }
                   }, '查看地址列表')
@@ -1092,11 +1086,22 @@
         })
       },
       // 查看地址列表
-      seeAddress () {
-        this.addressList = true
+      seeAddress (data) {
+        let vm = this
+        vm.addrDialog.derail_address_obj = [
+            data.provincesId,
+            data.citiesId
+        ]
+        vm.formDialog.workMatterAddressesList = data.workMatterAddressesList
+        vm.addrDialog.addressArr = vm.getAddressArr(data.workMatterAddressesList)
+        vm.addressList = true
       },
       closeAddrList: function(){
-        this.addressList = false
+        let vm = this
+        vm.addrDialog.derail_address_obj = []
+        vm.formDialog.workMatterAddressesList = []
+        vm.addrDialog.addressArr = []
+        vm.addressList = false
       },
       // 操作
       dataFilterArr: function(data,delimiter){
