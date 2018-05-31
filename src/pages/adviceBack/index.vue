@@ -294,7 +294,6 @@
           }
           _data.push(_item)
         }
-        console.log('_data: ',_data)
         return _data
       },
       // submitSearch (name) {

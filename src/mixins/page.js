@@ -19,6 +19,8 @@ const page = {
       dialogSubmitLoading: false,
       // 删除行的key
       delRowKey: 'id',
+      // 需不需要传id
+      needId: false,
       // 按钮文字map
       label: {
         'edit': '编辑',
@@ -129,24 +131,21 @@ const page = {
         vm.changePager(currPage)
         return
       }
-      vm.$http({
+      vm.$http2({
         url: vm.pager.url,
         method: vm.pager.method,
         data: vm.pagingFiltData(vm.pager)
       }).then(res => {
-        // let _data = res.data
-        // if(typeof vm.pagerResult === 'function'){
-        //   _data = vm.pagerResult(_data)
-        // }
-        // vm.pager.data = _data
         if (res.data.code == 1) {
-          let resData = res.data.data
+          let resData = res.data
           if (typeof vm.pagerResult == 'function') {
             // 返回数据预处理
-            resData = vm.pagerResult(resData)
+            resData.data = vm.pagerResult(resData.data)
           }
-          vm.pager.data = resData
-          vm.pager.total = res.data.total
+          setTimeout(function(){
+            vm.pager.data = resData.data
+            vm.pager.total = resData.total
+          },20)
         }
       }).catch(err=>{
 
@@ -190,15 +189,21 @@ const page = {
     editAddAjaxData (currDialog) {
       let vm = this
       let ajaxData = {}
-      if (currDialog === 'add') {
-        for (let key in vm.formDialog) {
-          if (key != 'id') {
-            ajaxData[key] = vm.formDialog[key]
-          }
-        }
-      } else if (currDialog === 'edit') {
+      if(vm.needId){
         for (let key in vm.formDialog) {
           ajaxData[key] = vm.formDialog[key]
+        }
+      }else{
+        if (currDialog === 'add') {
+          for (let key in vm.formDialog) {
+            if (key != 'id') {
+              ajaxData[key] = vm.formDialog[key]
+            }
+          }
+        } else if (currDialog === 'edit') {
+          for (let key in vm.formDialog) {
+            ajaxData[key] = vm.formDialog[key]
+          }
         }
       }
       return ajaxData

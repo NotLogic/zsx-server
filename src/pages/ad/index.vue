@@ -11,7 +11,7 @@
         </Select>
       </FormItem>
       <FormItem label="广告状态" prop="lockStatus">
-        <Select v-model="formSearch.lockStatus" placeholder="请选择" size="small" clearable style="width: 80px;">
+        <Select v-model="formSearch.ls" placeholder="请选择" size="small" clearable style="width: 80px;">
           <Option v-for="item in lockStatus" :key="item.value" :value="item.value">{{item.label}}</Option>
         </Select>
       </FormItem>
@@ -77,32 +77,34 @@
                         :action="url.upload"
                         :multiple="uploadImgMax==1 ? false : true"
                         :before-upload="myBeforeUpload"
+                        :format="['jpg','jpeg','png','gif']"
+                        :on-format-error="handleFormatError"
                         :on-success="myHandleSuccess">
                       <Button type="ghost" icon="ios-cloud-upload-outline">选择图片</Button>
                     </Upload>
                     <Button type="primary" @click="myUpload">上传图片</Button>
                   </Col>
                   <Col span="18">
-                    <Row v-show="fileUrl.length">
-                      <Col span="8" v-for="item in fileUrl" :key="item">
+                    <Row v-if="fileUrl.length">
+                      <Col span="8" v-for="(item, index) in fileUrl" :key="item">
                         <div class="image-box">
-                          <img v-show="item" :src="item" class="ad-img">
+                          <img :src="item" class="ad-img">
                           <div class="demo-upload-list-cover">
-                            <Icon type="ios-eye-outline" @click.native="handleView(item.name)"></Icon>
-                            <Icon type="ios-trash-outline" @click.native="handleRemove(item)"></Icon>
+                            <Icon type="ios-eye-outline" @click.native="handleView(index)"></Icon>
+                            <Icon type="ios-trash-outline" @click.native="handleRemove(index)"></Icon>
                           </div>
                         </div>
                       </Col>
                     </Row>
-                    <!-- <div v-show="!imageArr.length" class="image-box">
+                    <div v-show="!fileUrl.length" class="image-box">
                       <img src="static/images/img-upload-default.png" class="ad-img">
-                    </div> -->
+                    </div>
                   </Col>
                 </Row>
               </Col>
               <Col span="6">
                 <span>只能上传</span>
-                <strong style="color:red;">{{uploadImgMax}}</strong>
+                <strong style="color:red;font-size:20px;">{{uploadImgMax}}</strong>
                 <span>张图片</span>
               </Col>
             </FormItem>
@@ -247,8 +249,9 @@
           search: 'advert/dataSearch',
           disableAd: 'advert/forbidden',
           upload: 'api/fwmp/api/file/440859402723328',
-          sId: 'id/id'
+          sId: 'id/id',
         },
+        needId: true,
         pager: {
           url: 'advert/dataGrid',
           method: 'post',
@@ -258,6 +261,8 @@
           // tSort: 'createTime',
           // order: 'desc',
         },
+        getFtpHostTimes: 0,
+        ftpHost: '',
         uploadImgMax: 1,
         uploadImgArr: [],
         fileUrl: [],
@@ -332,7 +337,7 @@
           // province: 0,
           // city: 0,
           type: '',
-          lockStatus: '',
+          ls: '',
           title: '',
           areaType: '4',
           areaId: ''
@@ -354,6 +359,9 @@
           endTime: '',
           isUp: '1',
           areaType: '1',
+          countryId: '',
+          provincesId: '',
+          cityId: '',
           areaId: '',
           context: ''
         },
@@ -492,31 +500,43 @@
             fixed: 'right',
             render: (create, params) => {
               let vm = this
-              var txt = true ? '禁用' : '解禁'
-              return create('div', [
-                vm.createEditBtn(create, params.row),
-                create('Button', {
-                  props: {
-                    type: 'warning',
-                    size: 'small'
-                  },
-                  style: {
-                    marginRight: '5px'
-                  },
-                  on: {
-                    click: () => {
-                       vm.$Modal.confirm({
-                        title: '确认',
-                        content: '确认禁用这条数据吗？',
-                        onOk: function () {
-                          vm.disableRow({id: params.row.id})
-                        }
-                      })
+              
+              var status = params.row.lockStatus
+              var arr = []
+              if(status==3){
+                arr = [
+                  vm.createEditBtn(create, params.row),
+                  vm.createDelBtn(create, params.row.id)
+                ]
+              }else{
+                var txt = status == 1 ? '禁用' : '启用'
+                var txt2 = status != 1 ? '禁用' : '启用'
+                arr = [
+                  vm.createEditBtn(create, params.row),
+                  create('Button', {
+                    props: {
+                      type: 'warning',
+                      size: 'small'
+                    },
+                    style: {
+                      marginRight: '5px'
+                    },
+                    on: {
+                      click: () => {
+                        vm.$Modal.confirm({
+                          title: '确认',
+                          content: "确认" + txt2 +"这条数据吗？",
+                          onOk: function () {
+                            vm.disableRow({id: params.row.id})
+                          }
+                        })
+                      }
                     }
-                  }
-                }, '禁用'),
-                vm.createDelBtn(create, params.row.id)
-              ])
+                  }, txt),
+                  vm.createDelBtn(create, params.row.id)
+                ]
+              }
+              return create('div', arr)
             }
           }
         ],
@@ -526,7 +546,12 @@
     computed: {
       imageArr () {
         return this.formDialog.imageArr ? this.formDialog.imageArr.slice(1) : []
-      }
+      },
+      // ["formDialog.imagePath"](){
+      //   var len = this.formDialog.imageArr.length
+      //   console.log(len)
+      //   return len ? this.formDialog.imageArr[0] : ''
+      // }
     },
     methods: {
       searchStartTimeChange(date){
@@ -552,17 +577,25 @@
         vm.formDialog.imageArr = []
         vm.derail_address_arr = vm.countryData
         vm.derail_address_obj = []
+        vm.fileUrl = []
+        vm.formDialog.imageArr = []
         vm.$refs[name].resetFields()
       },
       disableRow(data){
         var vm = this
-        vm.$http({
+        vm.$http2({
           url: vm.url.disableAd,
           method: vm.pager.method,
           data: data
         }).then(res => {
           console.log('res: ',res)
-          // vm.paging()
+          var resData = res.data
+          if(resData.code==1){
+            vm.$Message.success('操作成功！')
+            vm.paging()
+          }else{
+            vm.$Message.error(resData.message)
+          }
         }).catch(err=>{
 
         })
@@ -570,16 +603,14 @@
       // 手动上传
       myBeforeUpload(file){
         var vm = this;
-        // vm.uploadImgArr.push(file)
         let reader = new FileReader()
         // readAsDataURL 方法用于读取指定 Blob 或 File 的内容
         // 当读操作完成，readyState 变为 DONE，loadend 被触发，此时 result 属性包含数据：URL（以 base64 编码的字符串表示文件的数据）
         // 读取文件作为 URL 可访问地址
         reader.readAsDataURL(file)
         reader.onloadend = function (e) {
-          debugger
-            vm.fileUrl.push(reader.result) // 这一行将图片转为base64存储到file对象里边
-            vm.uploadImgArr.push(file)
+          vm.fileUrl.push(reader.result) // 这一行将图片转为base64存储到file对象里边
+          vm.uploadImgArr.push(file)
         }
         return false
       },
@@ -589,25 +620,22 @@
       myUpload(){
         // 确认上传
         var vm = this
-        vm.fileUrl = []
-        return
         if(!vm.uploadImgArr.length){
           vm.$Message.error('请先选择上传的图片')
           return
         }
-        console.log(vm.uploadImgArr);
         vm.$http.post(vm.url.sId).then(res=>{
           var resData = res.data
           if(resData.code==1){
             var sId = resData.data;
+            vm.formDialog.id = sId;
             let params = new FormData();
             vm.uploadImgArr.forEach(file =>{
               params.append('file', file)
             });
-            // params.append('file', vm.uploadImgArr)
             params.append('sId',sId)
-            // s   1  用户  2  帖子
-            params.append('s',1)
+            // s   1  用户  2  帖子  3  广告
+            params.append('s',3)
             params.append('p',vm.formDialog.postion)
             var config =  {
                 headers: {
@@ -615,25 +643,56 @@
                 }
             };
             axios.post(vm.url.upload, params, config).then(res=>{
-              console.log('res: ',res)
-              let rd = res.data
+              let rd = res.data;
               if(rd.code==1){
-                // 上传成功  处理返回
-                vm.uploadImgArr = []
+                // 清空已上传数组
+                vm.uploadImgArr = [];
+                vm.$Message.success('上传图片成功！');
+                // 处理返回 todo  为啥调用函数就只执行一行，写if判断不走if也不走else
+                for(let key in rd.data){
+                  vm.formDialog.imageArr.push(rd.data[key]);
+                }
+                vm.formDialog.imagePath = vm.formDialog.imageArr[0] || '';
+
+                
+                // vm.updateUploadImgData(rd.data)
               }else{
-                vm.$Message.error(ed.message)
+                vm.$Message.error(rd.message)
               }
             }).catch(err=>{})
           }
         }).catch(err=>{})
       },
+      ifNullObject(data){
+        for(var key in data){
+          return false
+        }
+        return true
+      },
+      updateUploadImgData(data){
+        if(vm.ifNullObject(data)){
+          vm.formDialog.imageArr = [];
+          vm.formDialog.imagePath = '';
+        }else{
+          for(let key in data){
+            vm.formDialog.imageArr.push(rd.data[key]);
+          }
+          vm.formDialog.imagePath = vm.formDialog.imageArr[0] || '';
+        }
+      },
+      handleFormatError(){
+        this.$Message.error('文件格式错误，请选择jpg、jpeg、png或gif格式的文件！')
+      },
       // 预览
-      handleView(){
-
+      handleView(index){
+        console.log('预览index: ',index)
       },
       // 删除
-      handleRemove(){
-
+      handleRemove(index){
+        console.log('删除index: ',index)
+        var vm = this
+        vm.formDialog.imageArr && vm.formDialog.imageArr.splice(index,1)
+        vm.fileUrl.splice(index,1)
       },
 
       handleSuccess (res, file, fileList) {
@@ -658,8 +717,44 @@
         // 次级图片上传成功成功，将返回的url push进 formDialog.imageArr
         this.formDialog.imageArr.push(res.url)
       },
-      initDialog () {
-
+      // 编辑行是回显的额外操作
+      initDialog (data) {
+        console.log('回显数据：',data)
+        var vm = this
+        if(data.imageArr){
+          vm.fileUrl = data.imageArr
+        }else{
+          vm.fileUrl = data.imagePath ? [data.imagePath] : ''
+        }
+      },
+      timestampToTime(timestamp) {
+        var timeStr = '' + timestamp;
+        var myTimestamp = timeStr.length == 10 ? timestamp*1000 : timestamp;
+        var date = new Date(myTimestamp);//时间戳为10位需*1000，时间戳为13位的话不需乘1000
+        var Y = date.getFullYear() + '-';
+        var M = (date.getMonth()+1 < 10 ? '0'+(date.getMonth()+1) : date.getMonth()+1) + '-';
+        var D = date.getDate() + ' ';
+        var h = date.getHours() + ':';
+        var m = date.getMinutes() + ':';
+        var s = date.getSeconds();
+        return Y+M+D+h+m+s;
+      },
+      pagerResult(data){
+        var vm = this
+        console.log('预处理初始化之前的data：',data)
+        var result = vm.util.deepcopy(data)
+        var len = result.length,item;
+        for(var i=0;i<len;i++){
+          item = result[i]
+          if(typeof item.endTime == 'number'){
+            result.endTime = vm.timestampToTime(result.endTime);
+          }
+          if(typeof item.startTime == 'number'){
+            result.startTime = vm.timestampToTime(result.startTime);
+          }
+        }
+        console.log('预处理初始化之后的data：',result)
+        return result
       },
       initData () {
         let vm = this
@@ -727,14 +822,14 @@
           this.hasExtraImg = false
         }
       },
-      ['formDialog.imageArr'](val){
-        if(!val)return false
-        if (val.length>1) {
-          this.hasExtraImg = true
-        } else {
-          this.hasExtraImg = false
-        }
-      }
+      // ['formDialog.imageArr'](val){
+      //   if(!val)return false
+      //   if (val.length>1) {
+      //     this.hasExtraImg = true
+      //   } else {
+      //     this.hasExtraImg = false
+      //   }
+      // }
     }
   }
 </script>
@@ -742,8 +837,8 @@
 <style scoped>
 .image-box{
   position: relative;
-  width:100px;
-  height:100px;
+  width:102px;
+  height:102px;
   border:1px solid #eee;
   text-align: center;
 }
@@ -754,6 +849,7 @@
 .demo-upload-list-cover{
   display: none;
   position: absolute;
+  padding-top: 40px;
   top: 0;
   bottom: 0;
   left: 0;

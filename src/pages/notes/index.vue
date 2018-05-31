@@ -207,6 +207,9 @@
         pager: {
           data: [],
           url: 'post/dataGrid',
+          method: 'post',
+          current: 1,
+          size: 10,
           // sort: 'createTime',
           // order: 'desc'
         },
@@ -486,7 +489,8 @@
                       console.log('屏蔽')
                     }
                   }
-                }, btn_text)
+                }, btn_text),
+                vm.createDelBtn(create, params.row.id)
               ])
             }
           }

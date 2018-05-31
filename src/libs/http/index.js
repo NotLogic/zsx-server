@@ -1,4 +1,6 @@
 import axios from 'axios'
+import {Message} from 'iview'
+// Message.info('消息测试')
 // import iView from 'iview'
 // import config from '@/config'
 // import qs from 'querystring'
@@ -35,10 +37,6 @@ http.interceptors.request.use(function (config) {
 http.interceptors.response.use(function (response) {
   // 对响应数据做点什么
   console.log('response: ', response)
-  var responseData = response.data
-  if(responseData.code!=1){
-
-  }
   return response
 }, function (error) {
   // 对响应错误做点什么

@@ -38,16 +38,21 @@
           </Col>
         </Row>
         <Row>
-          <Col span="12">
+          <Col span="12" v-if="currDialog=='add'">
             <FormItem label="密码" prop="loginPassword">
-                <Input v-model="formDialog.loginPassword" placeholder="请输入密码" type="password"></Input>
+                <Input v-model="loginPassword" placeholder="请输入密码" type="password"></Input>
             </FormItem>
           </Col>
           <Col span="12">
+            <FormItem label="isAuth" prop="isAuth">
+              <Input v-model="formDialog.isAuth"></Input>
+            </FormItem>
+          </Col>
+          <!-- <Col span="12">
             <FormItem label="salt" prop="salt">
               <Input v-model="formDialog.salt"></Input>
             </FormItem>
-          </Col>
+          </Col> -->
         </Row>
         <Row>
           <Col span="12">
@@ -101,20 +106,8 @@
         </Row>
         <Row>
           <Col span="12">
-            <FormItem label="isAuth" prop="isAuth">
-              <Input v-model="formDialog.isAuth"></Input>
-            </FormItem>
-          </Col>
-          <Col span="12">
             <FormItem label="isConsummate" prop="isConsummate">
               <Input v-model="formDialog.isConsummate"></Input>
-            </FormItem>
-          </Col>
-        </Row>
-        <Row>
-          <Col span="12">
-            <FormItem label="appSoucre" prop="appSoucre">
-              <Input v-model="formDialog.appSoucre"></Input>
             </FormItem>
           </Col>
           <Col span="12">
@@ -125,6 +118,14 @@
             </FormItem>
           </Col>
         </Row>
+        <!-- <Row>
+          <Col span="12">
+            <FormItem label="appSoucre" prop="appSoucre">
+              <Input v-model="formDialog.appSoucre"></Input>
+            </FormItem>
+          </Col>
+          
+        </Row> -->
         <!-- <Row>                 
           <Col span="12">
             <FormItem label="角色" prop="roleIds">                        
@@ -173,11 +174,11 @@
         hometown_address: [], // 家乡
         location_address: [], //  所在地
         roleIds: [],
-        userStatus: [{label:'正常', value:1}, {label:"禁用", value:2}, {label:"封号", value:3}],
-        sex: [{label:'男', value:1}, {label:"女", value:0}],
+        userStatus: [{label:'正常', value:'1'}, {label:"禁用", value:'2'}, {label:"封号", value:'3'}],
+        sex: [{label:'男', value:'1'}, {label:"女", value:'0'}],
         sexMap: {
-          0: '女',
-          1: '男',
+          '0': '女',
+          '1': '男',
           '': '保密'
         },
         formSearch: {
@@ -187,6 +188,7 @@
           areaCode: ''
         },
         birthday: '',
+        loginPassword: '',
         formDialog: {
           id: '',
           loginUsername: '',
@@ -196,7 +198,7 @@
           birthday: '',
           age: '',
           sex: '',
-          appSoucre: '',
+          appSoucre: '3', // 后台管理系统添加的用户appSource永远为3，为了和ios和安卓用户区分
           bgPortrait: '',
           headPortrait: '',
           provincesCode: '',
@@ -226,13 +228,13 @@
           {
             "title": "账号",
             "key": "loginUsername",
-            "width": 240,
+            "width": 150,
             "sortable": true
           },
           {
             "title": "用户名",
             "key": "nickName",
-            "width": 240,
+            "width": 150,
             "sortable": true
           },
           {
@@ -459,6 +461,9 @@
     created () {},
     mounted () {},
     watch: {
+      loginPassword(val){
+        this.formDialog.loginPassword = hex_md5(val)
+      },
       derail_address_obj_s (val) {
         if (val.length) {
           this.formSearch.areaCode = val[2]
