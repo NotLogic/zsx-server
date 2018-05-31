@@ -63,6 +63,10 @@
         let vm = this
         vm.$refs.loginForm.validate((valid) => {
           if (valid) {
+            // 先跳过登录请求
+            vm.fn()
+            return
+
             vm.$http.post(vm.loginUrl, vm.loginForm).then(function (res) {
               if (res.data.code == 1) {
                 vm.fn()

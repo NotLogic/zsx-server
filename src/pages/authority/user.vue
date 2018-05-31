@@ -2,7 +2,7 @@
   <div class="user">
     <Form :model="formSearch" ref="formSearch" inline :label-width="60">
         <FormItem label="用户">
-            <Input v-model="formSearch.name" placeholder="姓名/账号/手机号" size="small"></Input>
+            <Input v-model="formSearch.name" placeholder="用户名/账号/手机号" size="small"></Input>
         </FormItem>
         <FormItem label="管理区域">
             <Cascader :data="derail_address_arr" v-model="derail_address_obj_s" filterable size="small" style="margin-top: 5px"></Cascader>
@@ -27,35 +27,33 @@
       <Form :model="formDialog" ref="formDialog" :rules="rules" :label-width="80">
         <Row>
           <Col span="12">
-            <FormItem label="登录名" prop="loginName">
-                <Input v-model="formDialog.loginName" placeholder="请输入登录名称"></Input>
+            <FormItem label="登录名" prop="loginUsername">
+                <Input v-model="formDialog.loginUsername" placeholder="请输入登录名称"></Input>
             </FormItem>
           </Col>
           <Col span="12">
-            <FormItem label="姓名" prop="name">
-                <Input v-model="formDialog.name" placeholder="请输入姓名"></Input>
+            <FormItem label="用户名" prop="nickName">
+                <Input v-model="formDialog.nickName" placeholder="请输入用户名"></Input>
             </FormItem>
           </Col>
         </Row>
         <Row>
           <Col span="12">
-            <FormItem label="密码" prop="password">
-                <Input v-model="formDialog.password" placeholder="请输入密码" type="password"></Input>
+            <FormItem label="密码" prop="loginPassword">
+                <Input v-model="formDialog.loginPassword" placeholder="请输入密码" type="password"></Input>
             </FormItem>
           </Col>
+          <Col span="12">
+            <FormItem label="salt" prop="salt">
+              <Input v-model="formDialog.salt"></Input>
+            </FormItem>
+          </Col>
+        </Row>
+        <Row>
           <Col span="12">
             <FormItem label="性别" prop="sex">
                 <Select v-model="formDialog.sex">
                     <Option v-for="item in sex" :value="item.value" :key="item.value">{{ item.label }}</Option>
-                </Select>
-            </FormItem>
-          </Col>
-        </Row>
-        <Row>
-          <Col span="12">
-            <FormItem label="用户状态" prop="status">
-                <Select v-model="formDialog.status">
-                  <Option v-for="item in userStatus" :value="item.value" :key="item.value">{{ item.label }}</Option>
                 </Select>
             </FormItem>
           </Col>
@@ -65,7 +63,69 @@
               </FormItem>
           </Col>
         </Row>
-        <Row>                 
+        <Row>
+          <Col span="12">
+            <FormItem label="出生日期" prop="birthday">
+              <DatePicker type="date" placeholder="点击选择出生日期" @on-change="birthChange" v-model="birthday" :clearable="false"></DatePicker>
+            </FormItem>
+          </Col>
+           <Col span="12">
+            <FormItem label="年龄" prop="age">
+              <Input v-model="formDialog.age"></Input>
+            </FormItem>
+          </Col>
+        </Row>
+        <Row>
+          <Col span="12">
+            <FormItem label="头像" prop="headPortrait">
+              <Input v-model="formDialog.headPortrait"></Input>
+            </FormItem>
+          </Col>
+          <Col span="12">
+            <FormItem label="头像背景" prop="bgPortrait">
+              <Input v-model="formDialog.bgPortrait"></Input>
+            </FormItem>
+          </Col>
+        </Row>
+        <Row>
+          <Col span="12">
+            <FormItem label="所在地">
+              <Cascader :data="derail_address_arr" v-model="hometown_address" filterable></Cascader>
+            </FormItem>
+          </Col>
+          <Col span="12">
+            <FormItem label="家乡">
+              <Cascader :data="derail_address_arr" v-model="location_address" filterable></Cascader>
+            </FormItem>
+          </Col>
+        </Row>
+        <Row>
+          <Col span="12">
+            <FormItem label="isAuth" prop="isAuth">
+              <Input v-model="formDialog.isAuth"></Input>
+            </FormItem>
+          </Col>
+          <Col span="12">
+            <FormItem label="isConsummate" prop="isConsummate">
+              <Input v-model="formDialog.isConsummate"></Input>
+            </FormItem>
+          </Col>
+        </Row>
+        <Row>
+          <Col span="12">
+            <FormItem label="appSoucre" prop="appSoucre">
+              <Input v-model="formDialog.appSoucre"></Input>
+            </FormItem>
+          </Col>
+          <Col span="12">
+            <FormItem label="用户状态" prop="userStatus">
+                <Select v-model="formDialog.userStatus">
+                  <Option v-for="item in userStatus" :value="item.value" :key="item.value">{{ item.label }}</Option>
+                </Select>
+            </FormItem>
+          </Col>
+        </Row>
+        <!-- <Row>                 
           <Col span="12">
             <FormItem label="角色" prop="roleIds">                        
               <Select v-model="formDialog.roleIds" multiple>
@@ -73,7 +133,7 @@
               </Select>
             </FormItem>
           </Col>
-        </Row>
+        </Row> -->
       </Form>
       <div slot="footer">
         <Button @click="resetDialogForm('formDialog')">{{label.clear}}</Button>
@@ -97,123 +157,200 @@
     data () {
       return {
         url: {
-          add: 'user/add.do',
-          edit: 'user/edit.do',
-          delete: 'user/delete.do'
+          add: 'user/add',
+          edit: 'user/update',
+          delete: 'user/delete',
+          search: 'user/dataSearch'
         },
         pager: {
-          data: [
-            {
-              id: '123123213',
-              loginName: 'xiayy',
-              name: '夏洋洋',
-              password: 'reterterwt',
-              sex: '1',
-              age: 22,
-              roleIds: [],
-              createTime: '2017-12-20 10:24:52',
-              phone: '123456',
-              status: '1',
-              areaId: ''
-            }, {
-              id: '123123123',
-              loginName: 'chenxiang',
-              name: '陈祥',
-              password: 'fhghmvjk',
-              sex: '2',
-              age: 22,
-              roleIds: [],
-              createTime: '2017-12-20 10:24:22',
-              phone: '123456',
-              status: '1',
-              areaId: ''
-            }, {
-              id: '234234423',
-              loginName: 'liubb',
-              name: '刘彬彬',
-              password: 'hjktytry',
-              sex: '3',
-              age: 22,
-              roleIds: [],
-              createTime: '2017-12-20 10:24:01',
-              phone: '123456',
-              status: '1',
-              areaId: ''
-            }
-          ],
-          url: 'user/dataGrid.do',
-          sort: 'createTime',
-          order: 'desc'
+          data: [],
+          url: 'user/dataGrid',
+          // sort: 'createTime',
+          // order: 'desc'
         },
         derail_address_arr: [],
         derail_address_obj_s: [],
+        hometown_address: [], // 家乡
+        location_address: [], //  所在地
         roleIds: [],
-        userStatus: [{label:'正常', value:"1"}, {label:"停用", value:"2"}],
-        sex: [{label:'男', value:"1"}, {label:"女", value:"2"}, {label:"保密",value:"3"}],
+        userStatus: [{label:'正常', value:1}, {label:"禁用", value:2}, {label:"封号", value:3}],
+        sex: [{label:'男', value:1}, {label:"女", value:0}],
+        sexMap: {
+          0: '女',
+          1: '男',
+          '': '保密'
+        },
         formSearch: {
           name: '',
           createdateStart: '',
           createdateEnd: '',
-          areaId: ''
+          areaCode: ''
         },
+        birthday: '',
         formDialog: {
           id: '',
-          loginName: '',
-          name: '',
-          password: '',
+          loginUsername: '',
+          loginPassword: '',
+          salt: '',
+          nickName: '',
+          birthday: '',
+          age: '',
           sex: '',
-          age: 22,
-          roleIds: [],
-          phone: '',
-          status: '1',
-          areaId: ''
+          appSoucre: '',
+          bgPortrait: '',
+          headPortrait: '',
+          provincesCode: '',
+          cityCode: '',
+          areaCode: '',
+          homeProvincesCode: '',
+          homeCityCode: '',
+          homeAreaCode: '',
+          isAuth: '',
+          isConsummate: '',
+          userStatus: '1',
+          createTime: '',
         },
         columns: [
           {
             "type": 'selection',
-            "width": 80,
             "fixed": 'left',
+            "width": 80,
             "align": 'center'
           },
           {
+            "title": "ID",
+            "key": "id",
+            "width": 240,
+            "sortable": true
+          },
+          {
             "title": "账号",
-            "key": "loginName",
-            // "width": 240,
+            "key": "loginUsername",
+            "width": 240,
             "sortable": true
           },
           {
-            "title": "姓名",
-            "key": "name",
-            // "width": 240,
+            "title": "用户名",
+            "key": "nickName",
+            "width": 240,
             "sortable": true
           },
           {
-            "title": "操作时间",
-            "key": "createTime",
-            // "width": 260,
+            "title": "密码",
+            "key": "loginPassword",
+            "width": 240,
             "sortable": true
           },
           {
-            "title": "电话",
-            "key": "phone",
-            // "width": 240,
+            "title": "salt",
+            "key": "salt",
+            "width": 260,
             "sortable": true
           },
           {
-            "title": "角色",
-            "key": "rolesList",
-            // "width": 230,
+            "title": "出生日期",
+            "key": "birthday",
+            "width": 240,
+            "sortable": true
+          },
+          {
+            "title": "年龄",
+            "key": "age",
+            "width": 80,
+            "sortable": true
+          },
+          {
+            "title": "性别",
+            "key": "sex",
+            "width": 80,
+            "sortable": true,
+            render: (create, params) => {
+              var vm = this
+              var txt = vm.sexMap[params.row.sex]
+              return create('span',txt)
+            }
+          },
+          {
+            "title": "appSoucre",
+            "key": "appSoucre",
+            "width": 240,
+            "sortable": true
+          },
+          {
+            "title": "用户头像",
+            "key": "headPortrait",
+            "width": 240,
+            "sortable": true
+          },
+          {
+            "title": "头像背景",
+            "key": "bgPortrait",
+            "width": 240,
+            "sortable": true
+          },
+          {
+            "title": "省",
+            "key": "provincesCode",
+            "width": 100,
+            "sortable": true
+          },
+          {
+            "title": "市",
+            "key": "cityCode",
+            "width": 100,
+            "sortable": true
+          },
+          {
+            "title": "区",
+            "key": "areaCode",
+            "width": 100,
+            "sortable": true
+          },
+          {
+            "title": "家乡省",
+            "key": "homeProvincesCode",
+            "width": 100,
+            "sortable": true
+          },
+          {
+            "title": "家乡市",
+            "key": "homeCityCode",
+            "width": 100,
+            "sortable": true
+          },
+          {
+            "title": "家乡区",
+            "key": "homeAreaCode",
+            "width": 100,
+            "sortable": true
+          },
+          {
+            "title": "isAuth",
+            "key": "isAuth",
+            "width": 240,
+            "sortable": true
+          },
+          {
+            "title": "isConsummate",
+            "key": "isConsummate",
+            "width": 150,
             "sortable": true
           },
           {
             "title": "状态",
-            "key": "status",
+            "key": "userStatus",
             "width": 100,
             "sortable": true,
-            render: (create, params) => {
-              var map = this.$store.state.map.status
-              return create('span', map[params.row.status]);
-            }
+            // render: (create, params) => {
+            //   var map = this.$store.state.map.status
+            //   return create('span', map[params.row.status]);
+            // }
+          },
+          {
+            "title": "创建时间",
+            "key": "createTime",
+            "width": 200,
+            "sortable": true
           },
           {
             title: '操作',
@@ -231,38 +368,75 @@
           }
         ],
         rules: {
-          loginName: [
+          loginUsername: [
             { required: true, message: '登录名称不能为空', trigger: 'blur' },
             { type: 'string', min: 4, max: 64, message: '登录名须在4-64个字符之间', trigger: 'blur' }
           ],
-          name: [
+          nickName: [
             { required: true, message: '姓名不能为空', trigger: 'blur' }
           ],
-          password: [
+          loginPassword: [
             { required: true, message: '密码不能为空', trigger: 'blur' }
           ],
-          status: [
-            { required: true, message: '用户状态不能为空', trigger: 'change' }
-          ],
+          // userStatus: [
+          //   { required: true, message: '用户状态不能为空', trigger: 'change' }
+          // ],
           // userType: [
           //   { required: true, message: '用户类型不能为空', trigger: 'change' }
           // ],
           // roleIds: [
           //   { required: true, message: '用户角色不能为空', trigger: 'blur' }
           // ],
-          sex: [
-            { required: true, message: '用户性别不能为空', trigger: 'change' }
-          ],
+          // sex: [
+          //   { required: true, message: '用户性别不能为空', trigger: 'change' }
+          // ],
           // detailAddress: [
           //   { required: true, message: '请选择关联地区', trigger: 'change' }
           // ],
-          phone : [
-            { required: true, message: '联系方式不能为空', trigger: 'change' },
-          ]
+          // phone : [
+          //   { required: true, message: '联系方式不能为空', trigger: 'change' },
+          // ]
         }
       }
     },
     methods: {
+      delRow (data) {
+        console.log('删除行提交2： ',data)
+        var vm = this
+        vm.$http2({
+          url: vm.url.delete,
+          method: vm.pager.method,
+          data: data
+        }).then(res => {
+          var resData = res.data
+          if(resData.code==1){
+            vm.$Message.success("删除成功！")
+            vm.paging()
+          }else{
+            vm.$Message.error(resData.message)
+          }
+        }).catch(err=>{
+
+        })
+      },
+      birthChange(date){
+        var vm = this
+        if(date.length){
+          vm.formDialog.birthday = date + ' 00:00:00'
+          var now = new Date();
+          var arr = date.split('-');
+          var year = now.getFullYear(),
+              month = now.getMonth() + 1;
+          var birthYear = Number(arr[0]),
+              birthMonth = Number(arr[1]);
+          var a = year-birthYear,
+              b = month - birthMonth;
+          vm.formDialog.age = b > 0 || b==0 ? a : a-1;
+        }else{
+          vm.formDialog.birthday = ''
+          vm.formDialog.age = 0
+        }
+      },
       resetSearch (name) {
         let vm = this
         vm.derail_address_obj_s = []
@@ -271,12 +445,14 @@
         vm.submitSearch(name)
       },
       resetDialogForm (name) {
-        this.$refs[name].resetFields()
+        var vm = this;
+        vm.formDialog.birthday = ''
+        vm.birthday = ''
+        vm.$refs[name].resetFields()
       },
       initDialog () {},
       initData () {
-        let vm = this
-        vm.derail_address_arr = vm.util.extend(JSON.parse(sessionStorage.chinaData))
+        this.derail_address_arr = JSON.parse(sessionStorage.chinaData)
       }
     },
     computed: {},
@@ -285,9 +461,33 @@
     watch: {
       derail_address_obj_s (val) {
         if (val.length) {
-          this.formSearch.areaId = val[2]
+          this.formSearch.areaCode = val[2]
         } else {
-          this.formSearch.areaId = ''
+          this.formSearch.areaCode = ''
+        }
+      },
+      hometown_address(val){
+        var vm =this;
+        if(val.length){
+          vm.formDialog.provincesCode = val[0]
+          vm.formDialog.cityCode = val[1]
+          vm.formDialog.areaCode = val[2]
+        }else{
+          vm.formDialog.provincesCode = ''
+          vm.formDialog.cityCode = ''
+          vm.formDialog.areaCode = ''
+        }
+      },
+      location_address(val){
+        var vm =this;
+        if(val.length){
+          vm.formDialog.homeProvincesCode = val[0]
+          vm.formDialog.homeCityCode = val[1]
+          vm.formDialog.homeAreaCode = val[2]
+        }else{
+          vm.formDialog.homeProvincesCode = ''
+          vm.formDialog.homeCityCode = ''
+          vm.formDialog.homeAreaCode = ''
         }
       }
     },

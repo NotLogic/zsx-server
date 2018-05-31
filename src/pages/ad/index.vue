@@ -25,11 +25,13 @@
       </FormItem>
       <FormItem label="展示时间">
         <FormItem prop="startTime">
-          <DatePicker type="datetime" placeholder="点击选择时间" v-model="formSearch.startTime" size="small" :clearable="false"></DatePicker>
+          <!-- <DatePicker type="datetime" format="yyyy-MM-dd HH:mm:ss" placeholder="点击选择时间" v-model="formSearch.startTime" size="small" :clearable="false"></DatePicker> -->
+          <DatePicker type="datetime" format="yyyy-MM-dd HH:mm:ss" placeholder="点击选择时间" @on-change="searchStartTimeChange" size="small" :clearable="false"></DatePicker>
         </FormItem>
         <FormItem>至</FormItem>
         <FormItem prop="endTime">
-          <DatePicker type="datetime" placeholder="点击选择时间" v-model="formSearch.endTime" size="small" :clearable="false"></DatePicker>
+          <!-- <DatePicker type="datetime" format="yyyy-MM-dd HH:mm:ss" placeholder="点击选择时间" v-model="formSearch.endTime" size="small" :clearable="false"></DatePicker> -->
+          <DatePicker type="datetime" format="yyyy-MM-dd HH:mm:ss" placeholder="点击选择时间" @on-change="searchEndTimeChange" size="small" :clearable="false"></DatePicker>
         </FormItem>
       </FormItem>
       <Button type="ghost" style="margin:5px 8px 24px 0;" @click="resetSearch('formSearch')" size="small">{{label.clear}}</Button>
@@ -55,7 +57,59 @@
             </FormItem>
           </Col>
         </Row>
+        <!-- 上传图片 -->
+        <!-- 手动上传 -->
         <Row>
+          <Col span="24">
+            <FormItem label="广告图片" prop="imagePath">
+              <Col span="18">
+                <!-- <Button type="primary" @click="myUpload">确认上传</Button>
+                <Upload name="file"
+                    :action="url.upload"
+                    :multiple="uploadImgMax==1 ? false : true"
+                    :before-upload="myBeforeUpload"
+                    :on-success="myHandleSuccess">
+                  <Button type="ghost" icon="ios-cloud-upload-outline">选择图片</Button>
+                </Upload> -->
+                <Row>
+                  <Col span="6">
+                    <Upload name="file"
+                        :action="url.upload"
+                        :multiple="uploadImgMax==1 ? false : true"
+                        :before-upload="myBeforeUpload"
+                        :on-success="myHandleSuccess">
+                      <Button type="ghost" icon="ios-cloud-upload-outline">选择图片</Button>
+                    </Upload>
+                    <Button type="primary" @click="myUpload">上传图片</Button>
+                  </Col>
+                  <Col span="18">
+                    <Row v-show="fileUrl.length">
+                      <Col span="8" v-for="item in fileUrl" :key="item">
+                        <div class="image-box">
+                          <img v-show="item" :src="item" class="ad-img">
+                          <div class="demo-upload-list-cover">
+                            <Icon type="ios-eye-outline" @click.native="handleView(item.name)"></Icon>
+                            <Icon type="ios-trash-outline" @click.native="handleRemove(item)"></Icon>
+                          </div>
+                        </div>
+                      </Col>
+                    </Row>
+                    <!-- <div v-show="!imageArr.length" class="image-box">
+                      <img src="static/images/img-upload-default.png" class="ad-img">
+                    </div> -->
+                  </Col>
+                </Row>
+              </Col>
+              <Col span="6">
+                <span>只能上传</span>
+                <strong style="color:red;">{{uploadImgMax}}</strong>
+                <span>张图片</span>
+              </Col>
+            </FormItem>
+          </Col>
+        </Row>
+        <!-- 自动上传 -->
+        <!-- <Row>
           <Col span="12">
             <FormItem label="主图" prop="imagePath">
               <Row>
@@ -66,10 +120,11 @@
                   </div>
                 </Col>
                 <Col span="8">
-                  <Upload name="upfile"
-                          action="ueditor/upload.do"
-                          :show-upload-list="false"
-                          :on-success="handleSuccess">
+                  <Upload name="file"
+                      :action="url.upload"
+                      multiple
+                      :before-upload="mainImgBeforeUpload"
+                      :on-success="handleSuccess">
                     <Button type="ghost" icon="ios-cloud-upload-outline">上传主图</Button>
                   </Upload>
                 </Col>
@@ -93,7 +148,8 @@
                 </Col>
                 <Col span="8">
                   <Upload name="upfile"
-                          action="ueditor/upload.do"
+                          multiple
+                          :action="url.upload"
                           :show-upload-list="false"
                           :before-upload="beforeUpload"
                           :on-success="extraImgHandleSuccess">
@@ -103,7 +159,8 @@
               </Row>
             </FormItem>
           </Col>
-        </Row>
+        </Row> -->
+
         <Row>
           <Col span="12">
             <FormItem label="链接地址" prop="href">
@@ -135,12 +192,14 @@
         <Row>
           <Col span="12">
             <FormItem label="开始时间" prop="startTime">
-              <DatePicker type="date" placeholder="点击选择时间" v-model="formDialog.startTime" :clearable="false"></DatePicker>
+              <!-- <DatePicker format="yyyy-MM-dd" type="date" placeholder="点击选择时间" v-model="formDialog.startTime" :clearable="false"></DatePicker> -->
+              <DatePicker format="yyyy-MM-dd" type="date" placeholder="点击选择时间" @on-change="startTimeChange" :clearable="false"></DatePicker>
             </FormItem>
           </Col>
           <Col span="12">
             <FormItem label="结束时间" prop="endTime">
-              <DatePicker type="date" placeholder="点击选择时间" v-model="formDialog.endTime" :clearable="false"></DatePicker>
+              <!-- <DatePicker format="yyyy-MM-dd" type="date" placeholder="点击选择时间" v-model="formDialog.endTime" :clearable="false"></DatePicker> -->
+              <DatePicker format="yyyy-MM-dd" type="date" placeholder="点击选择时间" @on-change="endTimeChange" :clearable="false"></DatePicker>
             </FormItem>
           </Col>
         </Row>
@@ -171,6 +230,7 @@
   import mainTable from '@/components/mainTable'
   import paging from '@/components/paging'
   import page from '@/mixins/page'
+  import axios from 'axios'
   export default {
     name: 'ad_index',
     components: {
@@ -181,87 +241,26 @@
     data () {
       return {
         url: {
-          add: 'ad/add.do',
-          edit: 'ad/edit.do',
-          delete: 'ad/delete.do'
+          add: 'advert/add',
+          edit: 'advert/update',
+          delete: 'advert/delete',
+          search: 'advert/dataSearch',
+          disableAd: 'advert/forbidden',
+          upload: 'api/fwmp/api/file/440859402723328',
+          sId: 'id/id'
         },
         pager: {
-          data: [
-            {
-              id: '380700856033280',
-              userId: '',
-              title: '大溪谷',
-              imagePath: 'http://iguangming.sznews.com/images/attachement/png/site640/20171220/IMG889ffafebae246370159022.PNG',
-              imageArr: ['http://ilonghua.sznews.com/images/attachement/jpg/site1011/20171219/IMG74e543574fc54636456847.jpg', 'http://iguangming.sznews.com/images/attachement/jpg/site640/20171220/IMGb083feb941e04637355087.jpg', 'http://iguangming.sznews.com/images/attachement/png/site640/20171220/IMG889ffafebae246370159022.PNG'],
-              lockStatus: '1',
-              postion: '3',
-              href: 'http://www.baidu.com',
-              sort: 1,
-              clickNum: '123',
-              detailAddress: '湖北省襄阳市樊城区',
-              startTime: '2017-12-11 17:55:19',
-              endTime: '2017-12-28 17:55:19',
-              isUp: '1',
-              areaType: '1',
-              context: '按时气味儿13'
-            }, {
-              id: '380700582551552',
-              userId: '',
-              title: '特色牛肉面',
-              imagePath: 'http://iguangming.sznews.com/images/attachement/jpg/site640/20171220/IMGb083feb941e04637355087.jpg',
-              imageArr: ['http://iguangming.sznews.com/images/attachement/png/site640/20171220/IMG889ffafebae246370159022.PNG', 'http://iguangming.sznews.com/images/attachement/jpg/site640/20171220/IMGb083feb941e04637355087.jpg'],
-              lockStatus: '1',
-              postion: '4',
-              href: 'http://www.baidu.com',
-              sort: 1,
-              clickNum: '345',
-              detailAddress: '湖北省襄阳市樊城区',
-              startTime: '2017-12-11 00:00:00',
-              endTime: '2017-12-28 00:00:00',
-              isUp: '1',
-              areaType: '2',
-              context: '按时规范化'
-            }, {
-              id: '380699319488512',
-              userId: '',
-              title: '古城市新襄阳',
-              imagePath: 'http://ilonghua.sznews.com/images/attachement/jpg/site1011/20171219/IMG74e543574fc54636456847.jpg',
-              imageArr: ['http://ilonghua.sznews.com/images/attachement/jpg/site1011/20171219/IMG74e543574fc54636456847.jpg'],
-              lockStatus: '1',
-              postion: '1',
-              href: 'http://www.baidu.com',
-              sort: 1,
-              clickNum: '76',
-              detailAddress: '湖北省襄阳市樊城区',
-              startTime: '2017-12-11 00:00:00',
-              endTime: '2017-12-22 00:00:00',
-              isUp: '1',
-              areaType: '3',
-              context: '登革热提前'
-            }, {
-              id: '380699319488545',
-              userId: '',
-              title: '发的两个',
-              imagePath: 'http://ilonghua.sznews.com/images/attachement/jpg/site1011/20171219/IMG74e543574fc54636456847.jpg',
-              imageArr: ['http://ilonghua.sznews.com/images/attachement/jpg/site1011/20171219/IMG74e543574fc54636456847.jpg'],
-              lockStatus: '1',
-              postion: '2',
-              href: 'http://www.baidu.com',
-              sort: 1,
-              clickNum: '76',
-              detailAddress: '湖北省襄阳市樊城区',
-              startTime: '2017-12-11 00:00:00',
-              endTime: '2017-12-22 00:00:00',
-              isUp: '1',
-              areaType: '3',
-              context: '登革热提前'
-            }
-          ],
-          url: 'ad/dataGrid.do',
-          tSort: 'createTime',
-          order: 'desc'
+          url: 'advert/dataGrid',
+          method: 'post',
+          current: 1,
+          size: 10,
+          data: [], // 声明vue时必须存在，因为vue无法观测动态新增的属性
+          // tSort: 'createTime',
+          // order: 'desc',
         },
         uploadImgMax: 1,
+        uploadImgArr: [],
+        fileUrl: [],
         derail_address_arr: [],
         derail_address_arr_s: [],
         derail_address_obj: [],
@@ -341,7 +340,7 @@
         hasExtraImg: false,
         formDialog: {
           id: '',
-          userId: '',
+          // userId: '',  // 2018.05.29 无此字段
           title: '',
           imagePath: '',
           imageArr: [],
@@ -493,6 +492,7 @@
             fixed: 'right',
             render: (create, params) => {
               let vm = this
+              var txt = true ? '禁用' : '解禁'
               return create('div', [
                 vm.createEditBtn(create, params.row),
                 create('Button', {
@@ -505,7 +505,13 @@
                   },
                   on: {
                     click: () => {
-                      console.log('禁用')
+                       vm.$Modal.confirm({
+                        title: '确认',
+                        content: '确认禁用这条数据吗？',
+                        onOk: function () {
+                          vm.disableRow({id: params.row.id})
+                        }
+                      })
                     }
                   }
                 }, '禁用'),
@@ -519,10 +525,22 @@
     },
     computed: {
       imageArr () {
-        return this.formDialog.imageArr.slice(1)
+        return this.formDialog.imageArr ? this.formDialog.imageArr.slice(1) : []
       }
     },
     methods: {
+      searchStartTimeChange(date){
+        this.formSearch.startTime = date + ' 00:00:00'
+      },
+      searchEndTimeChange(date){
+        this.formSearch.endTime = date + ' 00:00:00'
+      },
+      startTimeChange(date){
+        this.formDialog.startTime = date + ' 00:00:00'
+      },
+      endTimeChange(date){
+        this.formDialog.endTime = date + ' 00:00:00'
+      },
       resetSearch (name) {
         var vm = this
         vm.derail_address_obj_s = []
@@ -536,8 +554,96 @@
         vm.derail_address_obj = []
         vm.$refs[name].resetFields()
       },
-      handleSuccess (res) {
+      disableRow(data){
+        var vm = this
+        vm.$http({
+          url: vm.url.disableAd,
+          method: vm.pager.method,
+          data: data
+        }).then(res => {
+          console.log('res: ',res)
+          // vm.paging()
+        }).catch(err=>{
+
+        })
+      },
+      // 手动上传
+      myBeforeUpload(file){
+        var vm = this;
+        // vm.uploadImgArr.push(file)
+        let reader = new FileReader()
+        // readAsDataURL 方法用于读取指定 Blob 或 File 的内容
+        // 当读操作完成，readyState 变为 DONE，loadend 被触发，此时 result 属性包含数据：URL（以 base64 编码的字符串表示文件的数据）
+        // 读取文件作为 URL 可访问地址
+        reader.readAsDataURL(file)
+        reader.onloadend = function (e) {
+          debugger
+            vm.fileUrl.push(reader.result) // 这一行将图片转为base64存储到file对象里边
+            vm.uploadImgArr.push(file)
+        }
+        return false
+      },
+      myHandleSuccess(){
+
+      },
+      myUpload(){
+        // 确认上传
+        var vm = this
+        vm.fileUrl = []
+        return
+        if(!vm.uploadImgArr.length){
+          vm.$Message.error('请先选择上传的图片')
+          return
+        }
+        console.log(vm.uploadImgArr);
+        vm.$http.post(vm.url.sId).then(res=>{
+          var resData = res.data
+          if(resData.code==1){
+            var sId = resData.data;
+            let params = new FormData();
+            vm.uploadImgArr.forEach(file =>{
+              params.append('file', file)
+            });
+            // params.append('file', vm.uploadImgArr)
+            params.append('sId',sId)
+            // s   1  用户  2  帖子
+            params.append('s',1)
+            params.append('p',vm.formDialog.postion)
+            var config =  {
+                headers: {
+                  'Content-Type': 'multipart/form-data'
+                }
+            };
+            axios.post(vm.url.upload, params, config).then(res=>{
+              console.log('res: ',res)
+              let rd = res.data
+              if(rd.code==1){
+                // 上传成功  处理返回
+                vm.uploadImgArr = []
+              }else{
+                vm.$Message.error(ed.message)
+              }
+            }).catch(err=>{})
+          }
+        }).catch(err=>{})
+      },
+      // 预览
+      handleView(){
+
+      },
+      // 删除
+      handleRemove(){
+
+      },
+
+      handleSuccess (res, file, fileList) {
+        console.log('上传图片res: ',res)
         this.formDialog.imagePath = res.url;
+        this.formDialog.imageArr[0] = res.url;
+      },
+      mainImgBeforeUpload(file){
+        console.log('上传的文件： ',file)
+        // return false
       },
       beforeUpload () {
         let vm = this
@@ -547,15 +653,13 @@
           return false
         }
       },
-      extraImgHandleSuccess (res) {
+      extraImgHandleSuccess (res, file, fileList) {
+        console.log('上传次级图片res: ',res)
         // 次级图片上传成功成功，将返回的url push进 formDialog.imageArr
         this.formDialog.imageArr.push(res.url)
       },
       initDialog () {
 
-      },
-      changePager (data) {
-        this.util.changePager(this, data)
       },
       initData () {
         let vm = this
@@ -565,10 +669,6 @@
         vm.derail_address_arr_s = JSON.parse(sessionStorage.chinaData)
         vm.derail_address_arr = vm.countryData
       }
-    },
-    created () {},
-    mounted () {
-      
     },
     watch: {
       derail_address_obj_s (val) {
@@ -628,6 +728,7 @@
         }
       },
       ['formDialog.imageArr'](val){
+        if(!val)return false
         if (val.length>1) {
           this.hasExtraImg = true
         } else {
@@ -640,12 +741,32 @@
 
 <style scoped>
 .image-box{
+  position: relative;
   width:100px;
   height:100px;
   border:1px solid #eee;
+  text-align: center;
 }
 .ad-img{
   max-width: 100px;
   max-height: 100px;
+}
+.demo-upload-list-cover{
+  display: none;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0,0,0,.6);
+}
+.image-box:hover .demo-upload-list-cover{
+  display: block;
+}
+.demo-upload-list-cover i{
+  color: #fff;
+  font-size: 20px;
+  cursor: pointer;
+  margin: 0 2px;
 }
 </style>

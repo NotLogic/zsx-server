@@ -1,5 +1,6 @@
 import { appRoutes } from '@/router/routes'
 import http from '../http'
+import axios from 'axios'
 export function deepcopy (source) {
   if (!source) {
     return source;
@@ -123,7 +124,7 @@ export function getAddrByAreaId (chinaJson, areaId) {
 }
 // 将省市区数据存入sessionStorage
 export function initChinaDataAndJson() {
-  http.get('/static/data/address.json').then(res => {
+  axios.get('/static/data/address.json').then(res => {
     let chinaJson = extend(res.data)
     let chinaData = getChinaDataByJson(extend(res.data))
     sessionStorage.chinaJson = JSON.stringify(chinaJson)

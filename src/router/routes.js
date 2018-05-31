@@ -88,12 +88,24 @@ export const appRoutes = [
           icon: ''
         },
         component: resolve => { require(['@/pages/authority/role'], resolve) }
-      },
+      }
+    ]
+  },
+  {
+    path: '/user',
+    name: 'user',
+    meta: {
+      title: '用户管理',
+      access: 1,
+      icon: ''
+    },
+    component: main,
+    children: [
       {
-        path: 'user',
-        name: 'user',
+        path: 'app',
+        name: 'app',
         meta: {
-          title: '用户管理',
+          title: 'APP用户',
           access: 1,
           icon: ''
         },

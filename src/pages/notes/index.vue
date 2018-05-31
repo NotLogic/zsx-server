@@ -44,6 +44,30 @@
         <Form :model="formDialog" ref="formDialog" :rules="rules" :label-width="80">
           <Row>
             <Col span="12">
+              <FormItem label="用户ID" prop="userId">
+                <Input type="text" v-model="formDialog.userId" placeholder="请输入用户ID">
+                </Input>
+              </FormItem>
+            </Col>
+            <Col span="12">
+              <FormItem label="帖子状态" prop="postStatus">
+                <Select v-model="formDialog.postStatus" placeholder="请选择"  clearable>
+                  <Option v-for="item in postStatus" :value="item.value" :key="item.value">{{ item.label }}</Option>
+                </Select>
+              </FormItem>
+            </Col>
+          </Row>
+          <Row>
+            <Col span="24">
+              <FormItem label="帖子内容" prop="postContent">
+                <Input type="textarea" :rows="4" v-model="formDialog.postContent" placeholder="请输入帖子内容">
+                </Input>
+              </FormItem>
+            </Col>
+          </Row>
+          
+          <!-- <Row>
+            <Col span="12">
               <FormItem label="app用户id" prop="appId">
                 <Input v-model="formDialog.appId" placeholder="请输入app用户id"></Input>
               </FormItem>
@@ -89,7 +113,7 @@
                 <Input v-model="formDialog.image" placeholder="请输入图片"></Input>
               </FormItem>
             </Col>
-          </Row>
+          </Row> -->
         </Form>
         <div slot="footer">
           <Button @click="resetDialogForm('formDialog')">{{label.clear}}</Button>
@@ -100,21 +124,29 @@
     <Modal v-model="noteDetailModal" title="预览" width="1000">
       <Row>
         <Col span="4" class="rightt"><strong>贴子内容:</strong></Col>
-        <Col span="19"><p>{{look_data.comment}}</p></Col>
+        <Col span="19"><p>{{look_data.postContent}}</p></Col>
+      </Row>
+      <Row>
+        <Col span="4" class="rightt"><strong>用户ID:</strong></Col>
+        <Col span="19" ><p>{{look_data.userId}}</p></Col>
+      </Row>
+      <Row>
+        <Col span="4" class="rightt"><strong>帖子状态:</strong></Col>
+        <Col span="19" ><p>{{look_data.postStatus}}</p></Col>
       </Row>
       <Row>
         <Col span="4" class="rightt"><strong>发布时间:</strong></Col>
         <Col span="19" ><p>{{look_data.createTime}}</p></Col>
       </Row>
-      <Row>
+      <!-- <Row>
         <Col span="4" class="rightt"><strong>图片:</strong></Col>
         <Col span="19">
           <div class="image_upload_list" v-for="item in look_data.images" :key="item">
             <img width="100" :src="item"/>
           </div>
         </Col>
-      </Row>
-      <Row v-if="look_data.type==2">
+      </Row> -->
+      <!-- <Row v-if="look_data.type==2">
         <Col span="4" class="rightt"><strong>参与项目情况:</strong></Col>
         <Col span="19">
           <p v-if="look_data.businessStatus==1">未达成合作</p>
@@ -145,7 +177,7 @@
         <Col span="19">
           <i-table border :columns="vote_people.columns" :data="vote_people.data" size="small"></i-table>
         </Col>
-      </Row>
+      </Row> -->
       <div slot="footer">
         <Button type="primary" size="large"  :loading="modal_loading" @click="noteDetailModal = false">关闭</Button>
       </div>
@@ -167,72 +199,30 @@
     data () {
       return {
         url: {
-          add: 'notes/add.do',
-          edit: 'notes/edit.do',
-          delete: 'notes/delete.do'
+          add: 'post/add',
+          edit: 'post/update',
+          delete: 'post/delete',
+          search: 'post/dataSearch',
         },
         pager: {
-          data: [
-            {
-              id: '948133618341376000',
-              appId:'',
-              nickName:'所谓而微软',
-              comment:'阿斯顿撒旦',
-              upvoteNum:'21',
-              commentNum:'123',
-              shareNum:'12',
-              account: '13697208006',
-              typeText: '商务合作',
-              groupName: '群组名1',
-              createTime: '2017-12-29 14:41:07',
-              status:'',
-              lockStatus: '1',
-              image:'http://img.zcool.cn/community/0142135541fe180000019ae9b8cf86.jpg@1280w_1l_2o_100sh.png'
-            }, {
-              id: '946685465092145152',
-              appId:'',
-              nickName:'儿童',
-              comment:'而登革热',
-              upvoteNum:'23',
-              commentNum:'4123',
-              shareNum:'124',
-              account: '13697208006',
-              typeText: '谈天说地',
-              groupName: '群组名2',
-              createTime: '2017-12-21 17:11:50',
-              status:'',
-              lockStatus: '2',
-              image:'http://img.zcool.cn/community/01690955496f930000019ae92f3a4e.jpg@2o.jpg'
-            }, {
-              id: '946685381910708224',
-              appId:'',
-              nickName:'豆腐干',
-              comment:'瑞特以后',
-              upvoteNum:'421',
-              commentNum:'123',
-              shareNum:'12',
-              account: '13697208006',
-              typeText: '话题贴',
-              groupName: '群组名3',
-              createTime: '2017-12-20 09:29:18',
-              status:'',
-              lockStatus: '1',
-              image:'http://img.taopic.com/uploads/allimg/120727/201995-120HG1030762.jpg'
-            }
-          ],
-          url: 'notes/dataGrid.do',
-          sort: 'createTime',
-          order: 'desc'
+          data: [],
+          url: 'post/dataGrid',
+          // sort: 'createTime',
+          // order: 'desc'
         },
         noteDetailModal: false,
         modal_loading: false,
         look_data:{
-            type:0,  //  1 谈天说地 2 商圈 3 帮衬 4 意见
-            comment:"",
-            createTime:'',
-            images:[],
-            businessStatus:0,
-            radioOrCheck:0,
+          postContent: '',
+          userId: '',
+          postStatus: '',
+          createTime: '',
+            // type:0,  //  1 谈天说地 2 商圈 3 帮衬 4 意见
+            // comment:"",
+            // createTime:'',
+            // images:[],
+            // businessStatus:0,
+            // radioOrCheck:0,
         },
         attend_people:{
           columns: [
@@ -294,6 +284,20 @@
           ],
           data: []
         },
+        postStatus: [
+          {
+            value: '0',
+            label: '正常'
+          },
+          {
+            value: '1',
+            label: '已删除'
+          }
+        ],
+        postStatusMap: {
+          "0": "正常",
+          "1": "已删除"
+        },
         formSearch: {
           id: '',
           groupName:'',
@@ -305,14 +309,18 @@
         },
         formDialog: {
           id: '',
-          appId:'',
-          nickName:'',
-          comment:'',
-          upvoteNum:'',
-          commentNum:'',
-          shareNum:'',
-          status:'',
-          image:''
+          postContent: '',
+          userId: '',
+          postStatus: '',
+          createTime: '',
+          // appId:'',
+          // nickName:'',
+          // comment:'',
+          // upvoteNum:'',
+          // commentNum:'',
+          // shareNum:'',
+          // status:'',
+          // image:''
         },
         columns: [
           {
@@ -323,104 +331,128 @@
             "fixed": "left"
           },
           {
-            "title": "帖子内容",
-            "key": "comment",
-            "width": 200,
-            "sortable": true,
-            render: function (create, params) {
-              if(params.row.comment.length<=50)
-                return params.row.comment
-              return params.row.comment.substring(0, 50)+"..."
-            }
+            'title': '用户ID',
+            'key': 'userId',
+            // 'width': 150,
+            'sortable': true
           },
           {
-            "title": "主图",
-            "key": "image",
-            "width": 120,
-            "sortable": true,
-            render: function (create, params) {
-              var src;
-              if (params.row.image != null)
-                src = params.row.image.split(',')[0];
-              if(typeof(src) =='undefined')
-                src = 'static/img/img-onerror.png';
-              return create("img",{
-                attrs: {
-                  src: src,
-                  width:80,
-                  height:80
-                },
-                style:{
-                  'border': '1px solid transparent',
-                  'border-radius': '4px'
-              }
-              })
-            }
+            'title': '帖子状态',
+            'key': 'postStatus',
+            // 'width': 150,
+            'sortable': true
           },
           {
-            "title": "发帖人账号",
-            "key": "account",
-            "width": 160,
-            "sortable": true
+            'title': '创建时间',
+            'key': 'createTime',
+            // 'width': 150,
+            'sortable': true
           },
           {
-            "title": "发帖人昵称",
-            "key": "nickName",
-            "width": 150,
-            "sortable": true
+            'title': '帖子内容',
+            'key': 'postContent',
+            // 'width': 150,
+            'sortable': true
           },
-          {
-            "title": "点赞数",
-            "key": "upvoteNum",
-            "width": 100,
-            "sortable": true
-          },
-          {
-            "title": "评论数",
-            "key": "commentNum",
-            "width": 100,
-            "sortable": true
-          },
-          {
-            "title": "分享数",
-            "key": "shareNum",
-            "width": 100,
-            "sortable": true
-          },
-          {
-            "title": "帖子类型",
-            "key": "typeText",
-            "width": 150,
-            "sortable": true
-          },
-          {
-            "title": "群组名称",
-            "key": "groupName",
-            "width": 150,
-            "sortable": true
-          },
-          {
-            "title": "帖子状态",
-            "key": "lockStatus",
-            "width": 150,
-            "sortable": true,
-            render: function (create, params) {
-              var map = {
-                '1': '正常', '2': '屏蔽'
-              };
-              return create('span', map[params.row.lockStatus]);
-            }
-          },
-          {
-            "title": "发布时间",
-            "key": "createTime",
-            "width": 160,
-            "sortable": true
-          },
+          // {
+          //   "title": "帖子内容",
+          //   "key": "comment",
+          //   "width": 200,
+          //   "sortable": true,
+          //   render: function (create, params) {
+          //     if(params.row.comment.length<=50)
+          //       return params.row.comment
+          //     return params.row.comment.substring(0, 50)+"..."
+          //   }
+          // },
+          // {
+          //   "title": "主图",
+          //   "key": "image",
+          //   "width": 120,
+          //   "sortable": true,
+          //   render: function (create, params) {
+          //     var src;
+          //     if (params.row.image != null)
+          //       src = params.row.image.split(',')[0];
+          //     if(typeof(src) =='undefined')
+          //       src = 'static/images/img-onerror.png';
+          //     return create("img",{
+          //       attrs: {
+          //         src: src,
+          //         width:80,
+          //         height:80
+          //       },
+          //       style:{
+          //         'border': '1px solid transparent',
+          //         'border-radius': '4px'
+          //     }
+          //     })
+          //   }
+          // },
+          // {
+          //   "title": "发帖人账号",
+          //   "key": "account",
+          //   "width": 160,
+          //   "sortable": true
+          // },
+          // {
+          //   "title": "发帖人昵称",
+          //   "key": "nickName",
+          //   "width": 150,
+          //   "sortable": true
+          // },
+          // {
+          //   "title": "点赞数",
+          //   "key": "upvoteNum",
+          //   "width": 100,
+          //   "sortable": true
+          // },
+          // {
+          //   "title": "评论数",
+          //   "key": "commentNum",
+          //   "width": 100,
+          //   "sortable": true
+          // },
+          // {
+          //   "title": "分享数",
+          //   "key": "shareNum",
+          //   "width": 100,
+          //   "sortable": true
+          // },
+          // {
+          //   "title": "帖子类型",
+          //   "key": "typeText",
+          //   "width": 150,
+          //   "sortable": true
+          // },
+          // {
+          //   "title": "群组名称",
+          //   "key": "groupName",
+          //   "width": 150,
+          //   "sortable": true
+          // },
+          // {
+          //   "title": "帖子状态",
+          //   "key": "lockStatus",
+          //   "width": 150,
+          //   "sortable": true,
+          //   render: function (create, params) {
+          //     var map = {
+          //       '1': '正常', '2': '屏蔽'
+          //     };
+          //     return create('span', map[params.row.lockStatus]);
+          //   }
+          // },
+          // {
+          //   "title": "发布时间",
+          //   "key": "createTime",
+          //   "width": 160,
+          //   "sortable": true
+          // },
           {
             'title': '操作',
             'key': 'action',
-            'width': 140,
+            'width': 200,
             'align': 'center',
             'fixed': 'right',
             render: (create, params) => {
@@ -432,8 +464,17 @@
                   style: { marginRight: '5px' },
                   on: {
                     click: function () {
+                      var look_data = {}
+                      console.log('vm.postStatusMap: ',vm.postStatusMap)
+                      for(var key in vm.look_data){
+                        if(key=='postStatus'){
+                          look_data[key] = vm.postStatusMap[params.row[key].toString()]
+                        }else{
+                          look_data[key] = params.row[key]
+                        }
+                      }
+                      vm.look_data = look_data
                       vm.noteDetailModal = true
-                      console.log('预览')
                     }
                   }
                 }, '预览'),

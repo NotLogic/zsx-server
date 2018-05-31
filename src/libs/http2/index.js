@@ -1,7 +1,6 @@
 import axios from 'axios'
-// import iView from 'iview'
 // import config from '@/config'
-// import qs from 'querystring'
+import qs from 'querystring'
 const TIME_OUT = 5000
 let baseUrl = process.env.NODE_ENV === 'production' ? 'fwmp/api' : 'api/fwmp/api'
 let http = axios.create({
@@ -16,9 +15,9 @@ let http = axios.create({
 // 添加请求拦截器
 http.interceptors.request.use(function (config) {
   // 在发送请求之前做些什么
-  // if (config.method === 'post') {
-  //   config.data = qs.stringify(config.data)
-  // }
+  if (config.method === 'post') {
+    config.data = qs.stringify(config.data)
+  }
   // get请求请求的是本地地址json文件
   // if (config.method === 'get') {
   //   config.baseURL = ''
@@ -35,10 +34,6 @@ http.interceptors.request.use(function (config) {
 http.interceptors.response.use(function (response) {
   // 对响应数据做点什么
   console.log('response: ', response)
-  var responseData = response.data
-  if(responseData.code!=1){
-
-  }
   return response
 }, function (error) {
   // 对响应错误做点什么

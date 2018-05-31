@@ -6,13 +6,15 @@ import tinymce from 'tinymce'
 // 引入'babel-polyfill' 兼容ie 9-11 ie不支持Promise方法
 import 'babel-polyfill'
 import store from './vuex'
-import http from './libs/http' // 经过封装的axios
+import http from './libs/http' // 经过封装的axios 发送数据为对象
+import http2 from './libs/http2' // 经过封装的axios 发送数据为url参数
 import util from './plugins/util'
 import 'iview/dist/styles/iview.css'
 import './styles/common.css'
 Vue.config.productionTip = false
 Vue.use(iView)
 Vue.prototype.$http = http
+Vue.prototype.$http2 = http2
 // 将扩展方法挂在到Vue上
 Vue.prototype.util = util
 /* eslint-disable no-new */

@@ -96,8 +96,9 @@
           }
         })
       },
-      toggleClick () {
+      toggleClick (e) {
         this.hideMenuText = !this.hideMenuText
+        e && e.preventDefault();
       },
       init () {}
     },

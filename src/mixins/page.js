@@ -36,13 +36,13 @@ const page = {
       },
       mixinPager: {
         'url': '',
-        'currPage': 1,
+        // 'currPage': 1,
         'method': 'post',
-        'order': '',
-        'pagesize': 10,
-        'sort': '',
-        'total': 0,
-        'data': []
+        // 'order': '',
+        // 'size': 10,
+        // 'sort': '',
+        // 'total': 0,
+        // 'data': [],
       },
       map: {
         'sex': {
@@ -74,8 +74,21 @@ const page = {
     // 搜索提交
     submitSearch (name) {
       let vm = this
-      console.log('搜索提交数据', vm.formSearch)
       // 搜索操作
+      vm.$http2({
+        url: vm.url.search,
+        method: vm.pager.method,
+        data: vm.formSearch
+      }).then(res => {
+        var resData = res.data
+        if(resData.code==1){
+          vm.pager.data = resData.data
+        }else{
+
+        }
+      }).catch(err=>{
+
+      })
     },
     // 新增/编辑主弹出框的提交
     submitDialogForm (name) {
@@ -87,11 +100,25 @@ const page = {
           }
           let ajaxData = vm.editAddAjaxData(vm.currDialog)
           let ajaxUrl = vm.url[vm.currDialog]
-          console.log("ajaxData: ",ajaxData)
-          console.log("ajaxUrl: ",ajaxUrl)
-          // 成功之后
-          vm.dialogShow = false
-          vm.resetDialogForm(name)
+          console.log('ajaxData: ',ajaxData)
+          vm.dialogSubmitLoading = true
+          vm.$http({
+            url: ajaxUrl,
+            method: vm.pager.method,
+            data: ajaxData
+          }).then(res => {
+            vm.dialogSubmitLoading = false
+            var resData = res.data
+            if(resData.code==1){
+              vm.$Message.success(vm.label[vm.currDialog]+'成功!')
+              vm.paging();
+              vm.dialogShow = false
+            }else{
+              vm.$Message.error(vm.label[vm.currDialog]+'失败: ' + resData.message)
+            }
+          }).catch(err=>{
+    
+          })
         }
       })
     },
@@ -102,20 +129,28 @@ const page = {
         vm.changePager(currPage)
         return
       }
-      // vm.$http({
-      //   url: vm.pager.url,
-      //   method: vm.pager.method,
-      //   data: vm.pagingFiltData(vm.pager)
-      // }).then(res => {
-      //   if (res.data.data.code == 1) {
-      //     let _data = res.data.data
-      //     if (typeof vm.pagerResult === 'function') {
-      //       _data = vm.pagerResult(_data)
-      //     }
-      //     vm.pager.data = _data.data
-      //     vm.pager.total = _data.total
-      //   }
-      // })
+      vm.$http({
+        url: vm.pager.url,
+        method: vm.pager.method,
+        data: vm.pagingFiltData(vm.pager)
+      }).then(res => {
+        // let _data = res.data
+        // if(typeof vm.pagerResult === 'function'){
+        //   _data = vm.pagerResult(_data)
+        // }
+        // vm.pager.data = _data
+        if (res.data.code == 1) {
+          let resData = res.data.data
+          if (typeof vm.pagerResult == 'function') {
+            // 返回数据预处理
+            resData = vm.pagerResult(resData)
+          }
+          vm.pager.data = resData
+          vm.pager.total = res.data.total
+        }
+      }).catch(err=>{
+
+      })
     },
     // 分页改变
     changePager (data) {
@@ -236,7 +271,23 @@ const page = {
       }, '删除')
     },
     delRow (data) {
-      console.log('删除行提交： ',data)
+      console.log('删除行提交1： ',data)
+      var vm = this
+      vm.$http({
+        url: vm.url.delete,
+        method: vm.pager.method,
+        data: data
+      }).then(res => {
+        var resData = res.data
+        if(resData.code==1){
+          vm.$Message.success("删除成功！")
+          vm.paging()
+        }else{
+          vm.$Message.error(resData.message)
+        }
+      }).catch(err=>{
+
+      })
     },
     // 初始化pager   组件中pager的键覆盖mixinPager的键
     initPager (data) {
@@ -249,7 +300,6 @@ const page = {
       vm.pager = mixinPager
     }
   },
-  computed: {},
   created () {
     let vm = this
     if (typeof vm.initData === 'function') {
@@ -257,7 +307,6 @@ const page = {
     }
     vm.initPager()
     vm.paging()
-  },
-  mounted () {}
+  }
 }
 export default page
