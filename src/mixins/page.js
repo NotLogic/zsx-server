@@ -39,7 +39,7 @@ const page = {
       },
       mixinPager: {
         'url': '',
-        'currPage': 1,
+        'current': 1,
         'method': 'post',
         // 'order': '',
         'size': 10,
@@ -304,8 +304,8 @@ const page = {
     if (typeof vm.initData === 'function') {
       vm.initData()
     }
+    // 在这里修改pager会触发一次页面加载函数，所以不需要在下边再请求一次
     vm.initPager()
-    vm.paging()
   }
 }
 export default page

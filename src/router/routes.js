@@ -35,39 +35,7 @@ export const mainRoutes = {
   ]
 }
 export const appRoutes = [
-  // 权限管理
-  {
-    path: '/authority',
-    name: 'authority',
-    meta: {
-      title: '权限管理',
-      access: 1,
-      icon: 'key'
-    },
-    component: main,
-    children: [
-      {
-        path: 'resource',
-        name: 'resource',
-        meta: {
-          title: '资源管理',
-          access: 1,
-          icon: ''
-        },
-        component: resolve => { require(['@/pages/authority/resource'], resolve) }
-      },
-      {
-        path: 'role',
-        name: 'role',
-        meta: {
-          title: '角色管理',
-          access: 1,
-          icon: ''
-        },
-        component: resolve => { require(['@/pages/authority/role'], resolve) }
-      }
-    ]
-  },
+  // 用户
   {
     path: '/user',
     name: 'user',
@@ -146,29 +114,6 @@ export const appRoutes = [
       }
     ]
   },
-  // 会员管理
-  {
-    path: '/member',
-    name: 'member',
-    meta: {
-      title: '会员管理',
-      access: 1,
-      icon: ''
-    },
-    component: main,
-    children: [
-      {
-        path: 'index',
-        name: 'member_index',
-        meta: {
-          title: '会员管理',
-          access: 1,
-          icon: ''
-        },
-        component: resolve => { require(['@/pages/member'], resolve) }
-      }
-    ]
-  },
   // 新闻管理
   {
     path: '/news',
@@ -189,6 +134,62 @@ export const appRoutes = [
           icon: ''
         },
         component: resolve => { require(['@/pages/news'], resolve) }
+      }
+    ]
+  },
+  // 权限管理
+  {
+    path: '/authority',
+    name: 'authority',
+    meta: {
+      title: '权限管理',
+      access: 1,
+      icon: 'key'
+    },
+    component: main,
+    children: [
+      {
+        path: 'resource',
+        name: 'resource',
+        meta: {
+          title: '资源管理',
+          access: 1,
+          icon: ''
+        },
+        component: resolve => { require(['@/pages/authority/resource'], resolve) }
+      },
+      {
+        path: 'role',
+        name: 'role',
+        meta: {
+          title: '角色管理',
+          access: 1,
+          icon: ''
+        },
+        component: resolve => { require(['@/pages/authority/role'], resolve) }
+      }
+    ]
+  },
+  // 会员管理
+  {
+    path: '/member',
+    name: 'member',
+    meta: {
+      title: '会员管理',
+      access: 1,
+      icon: ''
+    },
+    component: main,
+    children: [
+      {
+        path: 'index',
+        name: 'member_index',
+        meta: {
+          title: '会员管理',
+          access: 1,
+          icon: ''
+        },
+        component: resolve => { require(['@/pages/member'], resolve) }
       }
     ]
   },
@@ -215,7 +216,6 @@ export const appRoutes = [
       }
     ]
   },
-  
   // 群组管理
   {
     path: '/appGroup',
@@ -430,17 +430,23 @@ export const appRoutes = [
     ]
   }
 ]
-const errorRoutes = {
-  path: '*',
-  name: 'error_404',
-  component: require('@/pages/error/404.vue')
-}
+const errorRoutes = [
+  {
+    path: '404',
+    name: 'error_404',
+    component: require('@/pages/error/404.vue')
+  },
+  // {
+  //   path: '*',
+  //   redirect: {name: 'error_404'}
+  // }
+]
 
 const routes = [
   loginRoute,
   mainRoutes,
   ...appRoutes,
-  errorRoutes
+  ...errorRoutes
 ]
 export const commonRoutes = [loginRoute, mainRoutes, errorRoutes]
 export default routes

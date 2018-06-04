@@ -21,6 +21,12 @@ export function extend (source) {
   }
   return sourceCopy;
 }
+export function isNumber (data) {
+  return typeof data === 'number' ? true : false
+}
+export function isString (data) {
+  return typeof data === 'string' ? true : false
+}
 // 前置扩展某方法
 export function prependFn (fn, prevfn) {
   return function () {

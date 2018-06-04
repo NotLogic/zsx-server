@@ -14,16 +14,14 @@
     props: {
       total: [Number, String],
       current: {
-        type: [Number, String],
-        // default: 1
+        type: [Number, String]
       },
       placement: {
         type: String,
         default: 'top'
       },
       size: {
-        type: [Number, String],
-        // default: 10
+        type: [Number, String]
       },
       pageSizeOpts: {
         type: Array,

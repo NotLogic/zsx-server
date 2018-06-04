@@ -4,36 +4,6 @@
       <FormItem label="帖子ID" prop="id">
         <Input v-model="formSearch.id" style="width:150px" placeholder="帖子ID" size="small"></Input>
       </FormItem>
-      <!-- <FormItem label="发帖人" prop="postMan">
-        <Input v-model="formSearch.postMan" style="width:150px" placeholder="账号/昵称" size="small"></Input>
-      </FormItem>
-      <FormItem label="群组名称" prop="groupName">
-        <Input v-model="formSearch.groupName" placeholder="群组名称" size="small"></Input>
-      </FormItem>
-      <FormItem label="帖子类型" prop="type">
-        <Select v-model="formSearch.type"  size="small" placeholder="请选择" style="width: 90px;" clearable>
-          <Option value="1">谈天说地</Option>
-          <Option value="2">商务合作</Option>
-          <Option value="3">互助平台</Option>
-          <Option value="4">话题投票</Option>
-          <Option value="5">话题</Option>
-        </Select>
-      </FormItem>
-      <FormItem label="帖子状态" prop="lockStatus">
-        <Select v-model="formSearch.lockStatus" placeholder="请选择" size="small" style="width: 80px;" clearable>
-          <Option value="1">正常</Option>
-          <Option value="2">屏蔽</Option>
-        </Select>
-      </FormItem>
-      <FormItem label="发布时间">
-        <FormItem prop="createdateStart">
-          <DatePicker type="datetime" placeholder="点击选择时间" v-model="formSearch.createdateStart" size="small" :clearable="false"></DatePicker>
-        </FormItem>
-        <FormItem>至</FormItem>
-        <FormItem prop="createdateEnd">
-          <DatePicker type="datetime" placeholder="点击选择时间" v-model="formSearch.createdateEnd" size="small" :clearable="false"></DatePicker>
-        </FormItem>
-      </FormItem> -->
       <Button type="ghost" style="margin:5px 8px 24px 0;" @click="resetSearch('formSearch')" size="small">{{label.clear}}</Button>
       <Button type="primary" style="margin: 5px 8px 24px 0;" @click="submitSearch('formSearch')" size="small">{{label.search}}</Button>
       <Button type="primary" style="margin: 5px 8px 24px 0;" @click="addRow" size="small">{{label.add}}</Button>
@@ -68,7 +38,7 @@
           <!-- 上传图片 -->
           <Row>
             <Col span="24">
-              <FormItem label="广告图片" prop="imagePath">
+              <FormItem label="图片/视频">
                 <Row>
                   <Col span="6">
                     <Upload name="file"
@@ -82,7 +52,7 @@
                         :on-success="myHandleSuccess">
                       <Button type="ghost" icon="ios-cloud-upload-outline">选择文件</Button>
                     </Upload>
-                    <Button type="primary" @click="myUpload" :loading="uploadLoading">上传图片</Button>
+                    <Button type="primary" @click="myUpload" :loading="uploadLoading">确定上传</Button>
                   </Col>
                   <Col span="18">
                     <Row v-if="fileUrl.length">
@@ -140,7 +110,6 @@
   import mainTable from '@/components/mainTable'
   import paging from '@/components/paging'
   import page from '@/mixins/page'
-  import axios from 'axios'
   export default {
     name: 'post_index',
     components: {
@@ -155,17 +124,12 @@
           edit: 'post/update',
           delete: 'post/delete',
           search: 'post/dataSearch',
-          upload: 'api/fwmp/api/file/',
+          upload: 'api/file/',
           sId: 'id/id',
         },
         pager: {
           data: [],
           url: 'post/dataGrid',
-          method: 'post',
-          current: 1,
-          size: 10,
-          // sort: 'createTime',
-          // order: 'desc'
         },
         needId: true,
         noteDetailModal: false,
@@ -176,12 +140,6 @@
           userId: '',
           postStatus: '',
           createTime: '',
-            // type:0,  //  1 谈天说地 2 商圈 3 帮衬 4 意见
-            // comment:"",
-            // createTime:'',
-            // images:[],
-            // businessStatus:0,
-            // radioOrCheck:0,
         },
         postStatus: [
           {
@@ -201,28 +159,15 @@
         uploadImgArr: [],
         formSearch: {
           id: '',
-          // groupName:'',
-          // postMan: '',
-          // type: '',
-          // lockStatus: '',
-          // createdateStart: '',
-          // createdateEnd: ''
         },
         formDialog: {
-          id: '',
+          // id: '',
           postContent: '',
           userId: '441528056573952',
           postStatus: '',
           createTime: '',
           imagePath: [],
-          // appId:'',
-          // nickName:'',
-          // comment:'',
-          // upvoteNum:'',
-          // commentNum:'',
-          // shareNum:'',
-          // status:'',
-          // image:''
+          userheadPortrait: '',
         },
         columns: [
           {
@@ -235,31 +180,84 @@
           {
             'title': '用户ID',
             'key': 'userId',
-            // 'width': 150,
+            'width': 150,
+            'sortable': true
+          },
+          {
+            'title': '收藏数量',
+            'key': 'postCollectionCount',
+            'width': 180,
+            'sortable': true
+          },
+          {
+            'title': '评论数量',
+            'key': 'postCommentsCount',
+            'width': 180,
+            'sortable': true
+          },
+          {
+            'title': '点赞数量',
+            'key': 'postThumbCount',
+            'width': 180,
+            'sortable': true
+          },
+          {
+            'title': '转发数量',
+            'key': 'postTransmitCount',
+            'width': 180,
+            'sortable': true
+          },
+          {
+            'title': 'userIsAuth',
+            'key': 'userIsAuth',
+            'width': 150,
+            'sortable': true
+          },
+          {
+            'title': 'userNickName',
+            'key': 'userNickName',
+            'width': 150,
+            'sortable': true
+          },
+          {
+            'title': 'userSex',
+            'key': 'userSex',
+            'width': 150,
             'sortable': true
           },
           {
             'title': '帖子状态',
             'key': 'postStatus',
-            // 'width': 150,
+            'width': 150,
             'sortable': true
           },
           {
             'title': '创建时间',
             'key': 'createTime',
-            // 'width': 150,
+            'width': 150,
             'sortable': true
           },
           {
             'title': '帖子内容',
             'key': 'postContent',
-            // 'width': 150,
+            'width': 250,
+            'ellipsis': true,
+            'sortable': true
+          },
+          {
+            'title': '用户头像',
+            'key': 'userheadPortrait',
+            'width': 250,
             'sortable': true
           },
           {
             'title': '帖子图片',
-            'key': 'imagePath',
-            'sortable': true
+            'key': 'fileManageList',
+            'width': 250,
+            'sortable': true,
+            render(create,params){
+              return create('span','图片数据')
+            }
           },
           {
             'title': '操作',
@@ -278,11 +276,7 @@
                     click: function () {
                       var look_data = {}
                       for(var key in vm.look_data){
-                        if(key=='postStatus'){
-                          look_data[key] = vm.postStatusMap[params.row[key].toString()]
-                        }else{
-                          look_data[key] = params.row[key]
-                        }
+                        look_data[key] = vm.util.isNumber(params.row[key]) ? params.row[key].toString() : params.row[key]
                       }
                       vm.look_data = look_data
                       vm.noteDetailModal = true
@@ -358,7 +352,7 @@
                 }
             };
             var url = vm.url.upload + vm.formDialog.userId;
-            axios.post(url, params, config).then(res=>{
+            vm.$http.post(url, params, config).then(res=>{
               let rd = res.data;
               if(rd.code==1){
                 // 清空已上传数组

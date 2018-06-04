@@ -15,18 +15,17 @@ let http = axios.create({
 // 添加请求拦截器
 http.interceptors.request.use(function (config) {
   // 在发送请求之前做些什么
+  if(config.method=='post' && typeof config.data == 'undefined'){
+    config.data = {}
+  }
   if (config.method === 'post') {
     config.data = qs.stringify(config.data)
   }
-  // get请求请求的是本地地址json文件
-  // if (config.method === 'get') {
-  //   config.baseURL = ''
-  // }
   console.log('config: ', config)
   return config
 }, function (error) {
   // 对请求错误做些什么
-  console.log('请求error: ', error)
+  // console.log('请求error: ', error)
   return Promise.reject(error)
 })
 
@@ -37,8 +36,9 @@ http.interceptors.response.use(function (response) {
   return response
 }, function (error) {
   // 对响应错误做点什么
-  console.log('返回error: ', error)
-  return Promise.reject(error)
+  Message.error('请求错误: ',error.message || String(error))
+  return 
+  // return Promise.reject(error)
 })
 export default http
 // application/json;charset=UTF-8

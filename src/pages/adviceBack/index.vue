@@ -4,7 +4,7 @@
         <FormItem label="关键词" prop="key">
             <Input v-model="formSearch.key" placeholder="昵称/内容" size="small"></Input>
         </FormItem>
-        <FormItem label="反馈人ID" prop="userId">
+        <!-- <FormItem label="反馈人ID" prop="userId">
             <Input v-model="formSearch.userId" placeholder="反馈人ID" size="small"></Input>
         </FormItem>
         <FormItem label="联系方式" prop="phone">
@@ -18,7 +18,7 @@
           <FormItem prop="et">
             <DatePicker type="datetime" placeholder="点击选择时间" v-model="formSearch.et" size="small" :clearable="false"></DatePicker>
           </FormItem>
-        </FormItem>
+        </FormItem> -->
         <Button type="ghost" style="margin: 5px 8px 24px 0" @click="resetSearch('formSearch')" size="small">{{label.clear}}</Button>
         <Button type="primary" style="margin: 5px 8px 24px 0" @click="submitSearch('formSearch')" size="small">{{label.search}}</Button>
         <Button type="error" style="margin: 5px 8px 24px 0" :disabled="batchOprArr.length==0" @click="batchDel" size="small">批量删除</Button>
@@ -30,11 +30,6 @@
     <Modal v-model="dialogShow" :title="label[currDialog]" :mask-closable="false" width="750" @on-cancel="resetDialogForm('formDialog')">
       <Form :model="formDialog" ref="formDialog" :rules="rules" :label-width="80">
         <Row>
-          <!-- <Col span="12">
-            <FormItem label="id" prop="id">
-              <Input v-model="formDialog.id" placeholder="id"></Input>
-            </FormItem>
-          </Col> -->
           <Col span="12">
             <FormItem label="parentId" prop="parentId">
               <Input v-model="formDialog.parentId" placeholder="请输入parentId"></Input>
@@ -109,8 +104,6 @@
         pager: {
           data: [],
           url: 'feedback/dataGrid',
-          // sort: 'createTime',
-          // order: 'desc'
         },
         status: [
           {

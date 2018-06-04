@@ -1,5 +1,5 @@
 <template>
-  <div class="zsx-login" @keydown.enter="handleSubmit">
+  <div class="zsx-login" @keydown.enter="handleSubmit" style="background: url('static/images/login-bg.jpg') no-repeat center">
     <div class="login-con">
       <Card :bordered="false">
         <p slot="title">
@@ -119,7 +119,6 @@
   .zsx-login{
     width: 100%;
     height: 100%;
-    background: url("../../assets/images/login-bg.jpg");
     background-size: cover;
   }
   .login-con{

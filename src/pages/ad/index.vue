@@ -1,11 +1,10 @@
 <template>
   <div class="ad">
-    <!-- 高级搜索 -->
     <Form :model="formSearch" ref="formSearch" inline :label-width="60">
       <FormItem label="关键字" prop="title">
         <Input v-model="formSearch.title" placeholder="标题" size="small"></Input>
       </FormItem>
-      <FormItem label="广告位置" prop="postion">
+      <!-- <FormItem label="广告位置" prop="postion">
         <Select v-model="formSearch.postion" placeholder="请选择" size="small" clearable style="width:150px;">
           <Option v-for="item in postion" :value="item.value" :key="item.value">{{ item.label }}</Option>
         </Select>
@@ -25,20 +24,17 @@
       </FormItem>
       <FormItem label="展示时间">
         <FormItem prop="startTime">
-          <!-- <DatePicker type="datetime" format="yyyy-MM-dd HH:mm:ss" placeholder="点击选择时间" v-model="formSearch.startTime" size="small" :clearable="false"></DatePicker> -->
           <DatePicker type="datetime" format="yyyy-MM-dd HH:mm:ss" placeholder="点击选择时间" @on-change="searchStartTimeChange" size="small" :clearable="false"></DatePicker>
         </FormItem>
         <FormItem>至</FormItem>
         <FormItem prop="endTime">
-          <!-- <DatePicker type="datetime" format="yyyy-MM-dd HH:mm:ss" placeholder="点击选择时间" v-model="formSearch.endTime" size="small" :clearable="false"></DatePicker> -->
           <DatePicker type="datetime" format="yyyy-MM-dd HH:mm:ss" placeholder="点击选择时间" @on-change="searchEndTimeChange" size="small" :clearable="false"></DatePicker>
         </FormItem>
-      </FormItem>
+      </FormItem> -->
       <Button type="ghost" style="margin:5px 8px 24px 0;" @click="resetSearch('formSearch')" size="small">{{label.clear}}</Button>
       <Button type="primary" style="margin: 5px 8px 24px 0;" @click="submitSearch('formSearch')" size="small">{{label.search}}</Button>
       <Button type="primary" style="margin: 5px 8px 24px 0;" @click="addRow" size="small">{{label.add}}</Button>
     </Form>
-    <!-- <mainTable :columns="columns" :data="pager.data" :height="610"></mainTable> -->
     <mainTable :columns="columns" :data="pager.data"></mainTable>
     <paging @changePager="changePager" @paging="paging" :total="pager.total" :currPage="pager.currPage"></paging>
     <Modal v-model="dialogShow" :title="label[currDialog]" :mask-closable="false" width="900" @on-cancel="resetDialogForm('formDialog')">
@@ -57,8 +53,6 @@
             </FormItem>
           </Col>
         </Row>
-        <!-- 上传图片 -->
-        <!-- 手动上传 -->
         <Row>
           <Col span="24">
             <FormItem label="广告图片" prop="imagePath">
@@ -133,13 +127,11 @@
         <Row>
           <Col span="12">
             <FormItem label="开始时间" prop="startTime">
-              <!-- <DatePicker format="yyyy-MM-dd" type="date" placeholder="点击选择时间" v-model="formDialog.startTime" :clearable="false"></DatePicker> -->
               <DatePicker format="yyyy-MM-dd" type="date" placeholder="点击选择时间" @on-change="startTimeChange" v-model="startTime" :clearable="false"></DatePicker>
             </FormItem>
           </Col>
           <Col span="12">
             <FormItem label="结束时间" prop="endTime">
-              <!-- <DatePicker format="yyyy-MM-dd" type="date" placeholder="点击选择时间" v-model="formDialog.endTime" :clearable="false"></DatePicker> -->
               <DatePicker format="yyyy-MM-dd" :start-date="new Date()" type="date" placeholder="点击选择时间" @on-change="endTimeChange" v-model="endTime" :clearable="false"></DatePicker>
             </FormItem>
           </Col>
@@ -171,7 +163,6 @@
   import mainTable from '@/components/mainTable'
   import paging from '@/components/paging'
   import page from '@/mixins/page'
-  import axios from 'axios'
   export default {
     name: 'ad_index',
     components: {
@@ -187,18 +178,14 @@
           delete: 'advert/delete',
           search: 'advert/dataSearch',
           disableAd: 'advert/forbidden',
-          upload: 'api/fwmp/api/file/440859402723328',
+          upload: 'file/440859402723328',
           sId: 'id/id',
         },
         needId: true,
         pager: {
           url: 'advert/dataGrid',
-          method: 'post',
-          current: 1,
           size: 20,
           data: [], // 声明vue时必须存在，因为vue无法观测动态新增的属性
-          // tSort: 'createTime',
-          // order: 'desc',
         },
         getFtpHostTimes: 0,
         ftpHost: '',
@@ -338,14 +325,14 @@
             render: function (create, params) {
               return create('img', {
                 attrs: {
-                  src: params.row.imagePath,
-                  width: 80,
-                  height: 80
+                  src: params.row.imagePath
                 },
                 style: {
                   'border': '1px solid transparent',
                   'border-radius': '4px',
-                  'margin': '10px 0'
+                  'margin': '10px 0',
+                  'max-width': '100px',
+                  'max-height': '100px'
                 }
               })
             }
@@ -572,7 +559,7 @@
                   'Content-Type': 'multipart/form-data'
                 }
             };
-            axios.post(vm.url.upload, params, config).then(res=>{
+            vm.$http.post(vm.url.upload, params, config).then(res=>{
               let rd = res.data;
               if(rd.code==1){
                 // 清空已上传数组
@@ -631,12 +618,14 @@
       },
       initData () {
         let vm = this
-        var chinaData = JSON.parse(sessionStorage.chinaData)
-        vm.areaData = chinaData
-        vm.cityData = vm.util.getCityDataByData(chinaData)
-        vm.provinceData = vm.util.getProvinceDataByData(chinaData)
-        vm.derail_address_arr_s = chinaData
-        vm.derail_address_arr = vm.countryData
+        if(sessionStorage.chinaData){
+          var chinaData = JSON.parse(sessionStorage.chinaData)
+          vm.areaData = chinaData
+          vm.cityData = vm.util.getCityDataByData(chinaData)
+          vm.provinceData = vm.util.getProvinceDataByData(chinaData)
+          vm.derail_address_arr_s = chinaData
+          vm.derail_address_arr = vm.countryData
+        }
       }
     },
     watch: {

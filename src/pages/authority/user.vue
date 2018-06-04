@@ -181,8 +181,6 @@
         pager: {
           data: [],
           url: 'user/dataGrid',
-          // sort: 'createTime',
-          // order: 'desc'
         },
         derail_address_arr: [],
         derail_address_obj_s: [],
@@ -492,7 +490,10 @@
         console.log('data: ',data)
       },
       initData () {
-        this.derail_address_arr = JSON.parse(sessionStorage.chinaData)
+        var vm = this
+        if(sessionStorage.chinaData){
+          vm.derail_address_arr = JSON.parse(sessionStorage.chinaData)
+        }
       }
     },
     watch: {

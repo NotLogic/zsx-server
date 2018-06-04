@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import App from './App'
 import router from './router'
+import {Message} from 'iview'
 import iView from 'iview'
 import tinymce from 'tinymce'
 // 引入'babel-polyfill' 兼容ie 9-11 ie不支持Promise方法
@@ -9,7 +10,6 @@ import store from './vuex'
 import http from './libs/http' // 经过封装的axios 发送数据为对象
 import http2 from './libs/http2' // 经过封装的axios 发送数据为url参数
 import util from './plugins/util'
-import 'iview/dist/styles/iview.css'
 import './styles/common.css'
 Vue.config.productionTip = false
 Vue.use(iView)
@@ -51,9 +51,13 @@ new Vue({
 // 初始化时将地址数据存入 sessionStorage
 if (!sessionStorage.chinaJson || !sessionStorage.chinaData) {
   http.post('area/areas').then(res => {
-    let chinaData = res.data.data
-    let chinaJson = util.getChinaJsonByData(chinaData)
-    sessionStorage.chinaJson = JSON.stringify(chinaJson)
-    sessionStorage.chinaData = JSON.stringify(chinaData)
+    if(res){
+      let chinaData = res.data.data
+      let chinaJson = util.getChinaJsonByData(chinaData)
+      sessionStorage.chinaJson = JSON.stringify(chinaJson)
+      sessionStorage.chinaData = JSON.stringify(chinaData)
+    }else{
+      Message.error('省市区基础数据获取失败，请在需要使用前刷新页面重试')
+    }
   })
 }
