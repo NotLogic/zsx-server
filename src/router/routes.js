@@ -35,29 +35,6 @@ export const mainRoutes = {
   ]
 }
 export const appRoutes = [
-  // 富文本
-  // {
-  //   path: '/ueditor',
-  //   name: 'ueditor',
-  //   meta: {
-  //     title: '富文本',
-  //     access: 1,
-  //     icon: ''
-  //   },
-  //   component: main,
-  //   children: [
-  //     {
-  //       path: 'index',
-  //       name: 'ueditor_index',
-  //       meta: {
-  //         title: '富文本',
-  //         access: 1,
-  //         icon: ''
-  //       },
-  //       component: resolve => { require(['@/pages/ueditor'], resolve) }
-  //     }
-  //   ]
-  // },
   // 权限管理
   {
     path: '/authority',
@@ -110,6 +87,62 @@ export const appRoutes = [
           icon: ''
         },
         component: resolve => { require(['@/pages/authority/user'], resolve) }
+      },
+      {
+        path: 'post',
+        name: 'post',
+        meta: {
+          title: 'APP帖子',
+          access: 1,
+          icon: ''
+        },
+        component: resolve => { require(['@/pages/post'], resolve) }
+      }
+    ]
+  },
+  // 广告管理
+  {
+    path: '/ad',
+    name: 'ad',
+    meta: {
+      title: '广告管理',
+      access: 1,
+      icon: ''
+    },
+    component: main,
+    children: [
+      {
+        path: 'index',
+        name: 'ad_index',
+        meta: {
+          title: '广告管理',
+          access: 1,
+          icon: ''
+        },
+        component: resolve => { require(['@/pages/ad'], resolve) }
+      }
+    ]
+  },
+  // 意见反馈
+  {
+    path: '/adviceBack',
+    name: 'adviceBack',
+    meta: {
+      title: '意见反馈',
+      access: 1,
+      icon: ''
+    },
+    component: main,
+    children: [
+      {
+        path: 'index',
+        name: 'adviceBack_index',
+        meta: {
+          title: '意见反馈',
+          access: 1,
+          icon: ''
+        },
+        component: resolve => { require(['@/pages/adviceBack'], resolve) }
       }
     ]
   },
@@ -159,29 +192,6 @@ export const appRoutes = [
       }
     ]
   },
-  // 帖子管理
-  {
-    path: '/notes',
-    name: 'notes',
-    meta: {
-      title: '帖子管理',
-      access: 1,
-      icon: ''
-    },
-    component: main,
-    children: [
-      {
-        path: 'index',
-        name: 'notes_index',
-        meta: {
-          title: '帖子管理',
-          access: 1,
-          icon: ''
-        },
-        component: resolve => { require(['@/pages/notes'], resolve) }
-      }
-    ]
-  },
   // 评论管理
   {
     path: '/comment',
@@ -205,29 +215,7 @@ export const appRoutes = [
       }
     ]
   },
-  // 广告管理
-  {
-    path: '/ad',
-    name: 'ad',
-    meta: {
-      title: '广告管理',
-      access: 1,
-      icon: ''
-    },
-    component: main,
-    children: [
-      {
-        path: 'index',
-        name: 'ad_index',
-        meta: {
-          title: '广告管理',
-          access: 1,
-          icon: ''
-        },
-        component: resolve => { require(['@/pages/ad'], resolve) }
-      }
-    ]
-  },
+  
   // 群组管理
   {
     path: '/appGroup',
@@ -248,29 +236,6 @@ export const appRoutes = [
           icon: ''
         },
         component: resolve => { require(['@/pages/appGroup'], resolve) }
-      }
-    ]
-  },
-  // 意见反馈
-  {
-    path: '/adviceBack',
-    name: 'adviceBack',
-    meta: {
-      title: '意见反馈',
-      access: 1,
-      icon: ''
-    },
-    component: main,
-    children: [
-      {
-        path: 'index',
-        name: 'adviceBack_index',
-        meta: {
-          title: '意见反馈',
-          access: 1,
-          icon: ''
-        },
-        component: resolve => { require(['@/pages/adviceBack'], resolve) }
       }
     ]
   },

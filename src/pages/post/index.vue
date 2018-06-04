@@ -1,10 +1,10 @@
 <template>
-  <div class="notes">
+  <div class="post">
     <Form :model="formSearch" ref="formSearch" inline :label-width="60">
       <FormItem label="帖子ID" prop="id">
         <Input v-model="formSearch.id" style="width:150px" placeholder="帖子ID" size="small"></Input>
       </FormItem>
-      <FormItem label="发帖人" prop="postMan">
+      <!-- <FormItem label="发帖人" prop="postMan">
         <Input v-model="formSearch.postMan" style="width:150px" placeholder="账号/昵称" size="small"></Input>
       </FormItem>
       <FormItem label="群组名称" prop="groupName">
@@ -33,7 +33,7 @@
         <FormItem prop="createdateEnd">
           <DatePicker type="datetime" placeholder="点击选择时间" v-model="formSearch.createdateEnd" size="small" :clearable="false"></DatePicker>
         </FormItem>
-      </FormItem>
+      </FormItem> -->
       <Button type="ghost" style="margin:5px 8px 24px 0;" @click="resetSearch('formSearch')" size="small">{{label.clear}}</Button>
       <Button type="primary" style="margin: 5px 8px 24px 0;" @click="submitSearch('formSearch')" size="small">{{label.search}}</Button>
       <Button type="primary" style="margin: 5px 8px 24px 0;" @click="addRow" size="small">{{label.add}}</Button>
@@ -65,55 +65,46 @@
               </FormItem>
             </Col>
           </Row>
-          
-          <!-- <Row>
-            <Col span="12">
-              <FormItem label="app用户id" prop="appId">
-                <Input v-model="formDialog.appId" placeholder="请输入app用户id"></Input>
-              </FormItem>
-            </Col>
-            <Col span="12">
-              <FormItem label="昵称" prop="nickName">
-                <Input v-model="formDialog.nickName" placeholder="请输入昵称"></Input>
+          <!-- 上传图片 -->
+          <Row>
+            <Col span="24">
+              <FormItem label="广告图片" prop="imagePath">
+                <Row>
+                  <Col span="6">
+                    <Upload name="file"
+                        :action="url.upload"
+                        multiple
+                        :before-upload="myBeforeUpload"
+                        :format="['jpg','jpeg','png','gif','mp4']"
+                        :on-format-error="handleFormatError"
+                        :max-size="20000"
+                        :on-exceeded-size="handleMaxSize"
+                        :on-success="myHandleSuccess">
+                      <Button type="ghost" icon="ios-cloud-upload-outline">选择文件</Button>
+                    </Upload>
+                    <Button type="primary" @click="myUpload" :loading="uploadLoading">上传图片</Button>
+                  </Col>
+                  <Col span="18">
+                    <Row v-if="fileUrl.length">
+                      <Col span="8" v-for="(item, index) in fileUrl" :key="item">
+                        <div class="image-box">
+                          <video :src="item" v-if="isVideo(item)" controls="controls" @click="toggle(index)"></video>
+                          <img :src="item" v-else class="ad-img">
+                          <div class="demo-upload-list-cover">
+                            <Icon type="ios-eye-outline" @click.native="handleView(index)"></Icon>
+                            <Icon type="ios-trash-outline" @click.native="handleRemove(index)"></Icon>
+                          </div>
+                        </div>
+                      </Col>
+                    </Row>
+                    <div v-show="!fileUrl.length" class="image-box">
+                      <img src="static/images/img-upload-default.png" class="ad-img">
+                    </div>
+                  </Col>
+                </Row>
               </FormItem>
             </Col>
           </Row>
-          <Row>
-            <Col span="12">
-              <FormItem label="发表内容" prop="comment">
-                <Input v-model="formDialog.comment" placeholder="请输入发表内容"></Input>
-              </FormItem>
-            </Col>
-            <Col span="12">
-              <FormItem label="点赞数" prop="upvoteNum">
-                <Input v-model="formDialog.upvoteNum" placeholder="请输入点赞数"></Input>
-              </FormItem>
-            </Col>
-          </Row>
-          <Row>
-            <Col span="12">
-              <FormItem label="评论数" prop="commentNum">
-                <Input v-model="formDialog.commentNum" placeholder="请输入评论数"></Input>
-              </FormItem>
-            </Col>
-            <Col span="12">
-              <FormItem label="分享数" prop="shareNum">
-                <Input v-model="formDialog.shareNum" placeholder="请输入分享数"></Input>
-              </FormItem>
-            </Col>
-          </Row>
-          <Row>
-            <Col span="12">
-              <FormItem label="状态" prop="status">
-                <Input v-model="formDialog.status" placeholder="请输入0:正常,1:广告,2:政治敏感,3:不适宜公开,4:骂人,5:色情等违法"></Input>
-              </FormItem>
-            </Col>
-            <Col span="12">
-              <FormItem label="图片" prop="image">
-                <Input v-model="formDialog.image" placeholder="请输入图片"></Input>
-              </FormItem>
-            </Col>
-          </Row> -->
         </Form>
         <div slot="footer">
           <Button @click="resetDialogForm('formDialog')">{{label.clear}}</Button>
@@ -135,49 +126,9 @@
         <Col span="19" ><p>{{look_data.postStatus}}</p></Col>
       </Row>
       <Row>
-        <Col span="4" class="rightt"><strong>发布时间:</strong></Col>
+        <Col span="4" class="rightt"><strong>创建时间:</strong></Col>
         <Col span="19" ><p>{{look_data.createTime}}</p></Col>
       </Row>
-      <!-- <Row>
-        <Col span="4" class="rightt"><strong>图片:</strong></Col>
-        <Col span="19">
-          <div class="image_upload_list" v-for="item in look_data.images" :key="item">
-            <img width="100" :src="item"/>
-          </div>
-        </Col>
-      </Row> -->
-      <!-- <Row v-if="look_data.type==2">
-        <Col span="4" class="rightt"><strong>参与项目情况:</strong></Col>
-        <Col span="19">
-          <p v-if="look_data.businessStatus==1">未达成合作</p>
-          <p v-if="look_data.businessStatus==2">已达成合作</p>
-        </Col>
-      </Row>
-      <br v-if="look_data.type==2">
-      <Row v-if="look_data.type==2">
-        <Col span="4" class="rightt"><strong>参与人员:</strong></Col>
-        <Col span="19">
-          <i-table border :columns="attend_people.columns" :data="attend_people.data" size="small"></i-table>
-          <div class="wrapper-pagination">
-            <Page :total="attend_people.pager.total" :current="attend_people.pager.nowpage" :page-size="attend_people.pager.pagesize" @on-change="attendPeoplePageNumChange" show-total></Page>
-          </div>
-        </Col>
-      </Row>
-      <br v-if="look_data.type==2">
-      <Row v-if="look_data.type==4">
-        <Col span="4" class="rightt"><strong>投票类型:</strong></Col>
-        <Col span="19">
-          <p v-if="look_data.radioOrCheck==1">单选</p>
-          <p v-if="look_data.radioOrCheck==2">多选</p>
-        </Col>
-      </Row>
-      <br v-if="look_data.type==4">
-      <Row v-if="look_data.type==4">
-        <Col span="4" class="rightt"><strong>投票:</strong></Col>
-        <Col span="19">
-          <i-table border :columns="vote_people.columns" :data="vote_people.data" size="small"></i-table>
-        </Col>
-      </Row> -->
       <div slot="footer">
         <Button type="primary" size="large"  :loading="modal_loading" @click="noteDetailModal = false">关闭</Button>
       </div>
@@ -189,8 +140,9 @@
   import mainTable from '@/components/mainTable'
   import paging from '@/components/paging'
   import page from '@/mixins/page'
+  import axios from 'axios'
   export default {
-    name: 'notes_index',
+    name: 'post_index',
     components: {
       mainTable,
       paging
@@ -203,6 +155,8 @@
           edit: 'post/update',
           delete: 'post/delete',
           search: 'post/dataSearch',
+          upload: 'api/fwmp/api/file/',
+          sId: 'id/id',
         },
         pager: {
           data: [],
@@ -213,8 +167,10 @@
           // sort: 'createTime',
           // order: 'desc'
         },
+        needId: true,
         noteDetailModal: false,
         modal_loading: false,
+        uploadLoading: false,
         look_data:{
           postContent: '',
           userId: '',
@@ -226,66 +182,6 @@
             // images:[],
             // businessStatus:0,
             // radioOrCheck:0,
-        },
-        attend_people:{
-          columns: [
-            {
-              title: '类型',
-              key: 'type',
-              render: function (create, params) {
-                var map = {
-                  1: '看好的人', 2: '洽谈的人'
-                };
-                return create('span', map[params.row.type]);
-              }
-            },
-            {
-              title: '账户',
-              key: 'account',
-              width: 130
-            },
-            {
-              title: '姓名',
-              key: 'userName'
-            },
-            {
-              title:'联系方式',
-              key: 'phone',
-              width: 130
-            },
-            {
-              title:'个人介绍',
-              key:'personIntr',
-              width: 120
-            },
-            {
-              title:'参与时间',
-              key:'createTime',
-              width:150
-            }
-          ],
-          data: [],
-          pager: {
-            nowpage: 1,
-            pagesize: 6,
-            sort: '',
-            order: '',
-            total: 0,
-            vbsId: 0
-          }
-        },
-        vote_people:{
-          columns: [
-            {
-              title: '选项',
-              key: 'title'
-            },
-            {
-              title: '票数',
-              key: 'voteNum'
-            }
-          ],
-          data: []
         },
         postStatus: [
           {
@@ -301,21 +197,24 @@
           "0": "正常",
           "1": "已删除"
         },
+        fileUrl: [],
+        uploadImgArr: [],
         formSearch: {
           id: '',
-          groupName:'',
-          postMan: '',
-          type: '',
-          lockStatus: '',
-          createdateStart: '',
-          createdateEnd: ''
+          // groupName:'',
+          // postMan: '',
+          // type: '',
+          // lockStatus: '',
+          // createdateStart: '',
+          // createdateEnd: ''
         },
         formDialog: {
           id: '',
           postContent: '',
-          userId: '',
+          userId: '441528056573952',
           postStatus: '',
           createTime: '',
+          imagePath: [],
           // appId:'',
           // nickName:'',
           // comment:'',
@@ -357,101 +256,11 @@
             // 'width': 150,
             'sortable': true
           },
-          // {
-          //   "title": "帖子内容",
-          //   "key": "comment",
-          //   "width": 200,
-          //   "sortable": true,
-          //   render: function (create, params) {
-          //     if(params.row.comment.length<=50)
-          //       return params.row.comment
-          //     return params.row.comment.substring(0, 50)+"..."
-          //   }
-          // },
-          // {
-          //   "title": "主图",
-          //   "key": "image",
-          //   "width": 120,
-          //   "sortable": true,
-          //   render: function (create, params) {
-          //     var src;
-          //     if (params.row.image != null)
-          //       src = params.row.image.split(',')[0];
-          //     if(typeof(src) =='undefined')
-          //       src = 'static/images/img-onerror.png';
-          //     return create("img",{
-          //       attrs: {
-          //         src: src,
-          //         width:80,
-          //         height:80
-          //       },
-          //       style:{
-          //         'border': '1px solid transparent',
-          //         'border-radius': '4px'
-          //     }
-          //     })
-          //   }
-          // },
-          // {
-          //   "title": "发帖人账号",
-          //   "key": "account",
-          //   "width": 160,
-          //   "sortable": true
-          // },
-          // {
-          //   "title": "发帖人昵称",
-          //   "key": "nickName",
-          //   "width": 150,
-          //   "sortable": true
-          // },
-          // {
-          //   "title": "点赞数",
-          //   "key": "upvoteNum",
-          //   "width": 100,
-          //   "sortable": true
-          // },
-          // {
-          //   "title": "评论数",
-          //   "key": "commentNum",
-          //   "width": 100,
-          //   "sortable": true
-          // },
-          // {
-          //   "title": "分享数",
-          //   "key": "shareNum",
-          //   "width": 100,
-          //   "sortable": true
-          // },
-          // {
-          //   "title": "帖子类型",
-          //   "key": "typeText",
-          //   "width": 150,
-          //   "sortable": true
-          // },
-          // {
-          //   "title": "群组名称",
-          //   "key": "groupName",
-          //   "width": 150,
-          //   "sortable": true
-          // },
-          // {
-          //   "title": "帖子状态",
-          //   "key": "lockStatus",
-          //   "width": 150,
-          //   "sortable": true,
-          //   render: function (create, params) {
-          //     var map = {
-          //       '1': '正常', '2': '屏蔽'
-          //     };
-          //     return create('span', map[params.row.lockStatus]);
-          //   }
-          // },
-          // {
-          //   "title": "发布时间",
-          //   "key": "createTime",
-          //   "width": 160,
-          //   "sortable": true
-          // },
+          {
+            'title': '帖子图片',
+            'key': 'imagePath',
+            'sortable': true
+          },
           {
             'title': '操作',
             'key': 'action',
@@ -468,7 +277,6 @@
                   on: {
                     click: function () {
                       var look_data = {}
-                      console.log('vm.postStatusMap: ',vm.postStatusMap)
                       for(var key in vm.look_data){
                         if(key=='postStatus'){
                           look_data[key] = vm.postStatusMap[params.row[key].toString()]
@@ -486,7 +294,7 @@
                   style: {marginRight: '5px'},
                   on: {
                     click: function () {
-                      console.log('屏蔽')
+                      vm.$Message.info(vm.label.wait)
                     }
                   }
                 }, btn_text),
@@ -499,6 +307,86 @@
       }
     },
     methods: {
+      myBeforeUpload(file){
+        var vm = this;
+        let reader = new FileReader()
+        reader.readAsDataURL(file)
+        reader.onloadend = function (e) {
+          vm.fileUrl.push(reader.result)
+          vm.uploadImgArr.push(file)
+        }
+        return false
+      },
+      handleFormatError(){
+        this.$Message.error('文件格式错误，请选择jpg、jpeg、png或gif格式的文件！')
+      },
+      myHandleSuccess(){},
+      handleView(index){},
+      handleRemove(index){
+        console.log('删除index: ',index)
+        var vm = this
+        vm.fileUrl.splice(index,1)
+      },
+      myUpload(){
+        var vm = this
+        if(!vm.uploadImgArr.length){
+          vm.$Message.error('请先选择上传的图片')
+          return
+        }
+        if(!vm.formDialog.userId){
+          vm.$Message.error('请先选择发帖用户')
+          return
+        }
+        vm.uploadLoading = true;
+        vm.$http.post(vm.url.sId).then(res=>{
+          var resData = res.data
+          if(resData.code==1){
+            var sId = resData.data;
+            vm.formDialog.id = sId;
+            let params = new FormData();
+            vm.uploadImgArr.forEach(file =>{
+              params.append('file', file)
+            });
+            params.append('sId',sId)
+            // s   1  用户  2  帖子  3  广告
+            params.append('s',2)
+            // 使用位置 1：用户头像 2：帖子列表 3：帖子回复 4:创建群头像 5:编辑群头像
+            params.append('p',2)
+            var config =  {
+                headers: {
+                  'Content-Type': 'multipart/form-data'
+                }
+            };
+            var url = vm.url.upload + vm.formDialog.userId;
+            axios.post(url, params, config).then(res=>{
+              let rd = res.data;
+              if(rd.code==1){
+                // 清空已上传数组
+                vm.uploadLoading = false;
+                vm.uploadImgArr = [];
+                vm.$Message.success('上传成功！');
+                for(let key in rd.data){
+                  vm.formDialog.imagePath.push(rd.data[key]);
+                }
+              }else{
+                vm.$Message.error(rd.message)
+              }
+            }).catch(err=>{})
+          }
+        }).catch(err=>{})
+      },
+      handleMaxSize(){
+        this.$Message.error('请选择小于20000KB的文件')
+      },
+      isVideo(fileUrl){
+        var str = ('' + fileUrl).split('base64')[0];
+        var isVideo = false
+        if(str.indexOf('.mp4') != -1){
+          isVideo = true
+        }
+        return isVideo
+      },
+
       initDialog (data) {
         let _data = util.extend(data)
         this.provinceCity = [_data.cityCode.toString().slice(0, 2) + '0000', _data.cityCode.toString().slice(0, 4) + '00', _data.cityCode.toString()]
@@ -510,18 +398,17 @@
         vm.submitSearch(name)
       },
       resetDialogForm (name) {
+        name = name || 'formDialog'
         let vm = this
+        vm.fileUrl = []
+        vm.uploadImgArr = []
+        vm.uploadLoading = false;
+        vm.dialogSubmitLoading = false;
         vm.$refs[name].resetFields()
       },
       initData () {
         let vm = this        
       }
-    },
-    computed: {},
-    watch: {},
-    created () {},
-    mounted () {
-      
     }
   }
 </script>
@@ -531,5 +418,36 @@
     text-align: right;
     padding-right: 20px;
     font-size: 120%;
+  }
+  .image-box{
+    position: relative;
+    width:102px;
+    height:102px;
+    margin-bottom: 10px;
+    border:1px solid #eee;
+    text-align: center;
+  }
+  .ad-img{
+    max-width: 100px;
+    max-height: 100px;
+  }
+  .demo-upload-list-cover{
+    display: none;
+    position: absolute;
+    padding-top: 40px;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0,0,0,.6);
+  }
+  .image-box:hover .demo-upload-list-cover{
+    display: block;
+  }
+  .demo-upload-list-cover i{
+    color: #fff;
+    font-size: 20px;
+    cursor: pointer;
+    margin: 0 2px;
   }
 </style>

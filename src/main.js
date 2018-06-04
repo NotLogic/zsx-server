@@ -50,5 +50,10 @@ new Vue({
 })
 // 初始化时将地址数据存入 sessionStorage
 if (!sessionStorage.chinaJson || !sessionStorage.chinaData) {
-  util.initChinaDataAndJson()
+  http.post('area/areas').then(res => {
+    let chinaData = res.data.data
+    let chinaJson = util.getChinaJsonByData(chinaData)
+    sessionStorage.chinaJson = JSON.stringify(chinaJson)
+    sessionStorage.chinaData = JSON.stringify(chinaData)
+  })
 }

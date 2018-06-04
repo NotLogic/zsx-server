@@ -15,7 +15,7 @@ const page = {
       currDialog: 'add',
       // 主弹出框的显示隐藏
       dialogShow: false,
-      // 主弹出框正在提交数据
+      // 主弹出框是否正在提交数据
       dialogSubmitLoading: false,
       // 删除行的key
       delRowKey: 'id',
@@ -34,17 +34,18 @@ const page = {
         'close': '关闭',
         'cancle': '取消',
         'uploadImg': '上传图片',
-        'uploadExcel': '导入Excel'
+        'uploadExcel': '导入Excel',
+        'wait': '还没做好请稍等'
       },
       mixinPager: {
         'url': '',
-        // 'currPage': 1,
+        'currPage': 1,
         'method': 'post',
         // 'order': '',
-        // 'size': 10,
+        'size': 10,
         // 'sort': '',
         // 'total': 0,
-        // 'data': [],
+        'data': [],
       },
       map: {
         'sex': {
@@ -86,11 +87,9 @@ const page = {
         if(resData.code==1){
           vm.pager.data = resData.data
         }else{
-
+          vm.$Message.error('搜索失败: ' + resData.message)
         }
-      }).catch(err=>{
-
-      })
+      }).catch(err=>{})
     },
     // 新增/编辑主弹出框的提交
     submitDialogForm (name) {
@@ -115,6 +114,9 @@ const page = {
               vm.$Message.success(vm.label[vm.currDialog]+'成功!')
               vm.paging();
               vm.dialogShow = false
+              if(typeof vm.resetDialogForm == 'function'){
+                vm.resetDialogForm()
+              }
             }else{
               vm.$Message.error(vm.label[vm.currDialog]+'失败: ' + resData.message)
             }
@@ -136,8 +138,9 @@ const page = {
         method: vm.pager.method,
         data: vm.pagingFiltData(vm.pager)
       }).then(res => {
-        if (res.data.code == 1) {
-          let resData = res.data
+        let resData = res.data
+        resData = typeof resData == 'object' ? resData : JSON.parse(resData)
+        if (resData.code == 1) {
           if (typeof vm.pagerResult == 'function') {
             // 返回数据预处理
             resData.data = vm.pagerResult(resData.data)
@@ -147,9 +150,7 @@ const page = {
             vm.pager.total = resData.total
           },20)
         }
-      }).catch(err=>{
-
-      })
+      }).catch(err=>{})
     },
     // 分页改变
     changePager (data) {
@@ -236,12 +237,6 @@ const page = {
         vm.initDialog(_data)
       }
       vm.formDialog = _data
-      // for (let key in vm.formDialog) {
-      //   vm.formDialog[key] = data[key]
-      // }
-      // if (typeof vm.initDialog === 'function') {
-      //   vm.initDialog(data)
-      // }
       vm.currDialog = 'edit'
       vm.dialogShow = true
     },
@@ -276,9 +271,8 @@ const page = {
       }, '删除')
     },
     delRow (data) {
-      console.log('删除行提交1： ',data)
       var vm = this
-      vm.$http({
+      vm.$http2({
         url: vm.url.delete,
         method: vm.pager.method,
         data: data

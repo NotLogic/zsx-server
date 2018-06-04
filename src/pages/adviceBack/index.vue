@@ -23,21 +23,26 @@
         <Button type="primary" style="margin: 5px 8px 24px 0" @click="submitSearch('formSearch')" size="small">{{label.search}}</Button>
         <Button type="error" style="margin: 5px 8px 24px 0" :disabled="batchOprArr.length==0" @click="batchDel" size="small">批量删除</Button>
         <Button type="primary" style="margin: 5px 8px 24px 0" @click="exportData" size="small">导出</Button>
-        <Button type="primary" style="margin:5px 8px 24px 0;" @click="addRow" size="small">{{label.add}}</Button>
+        <!-- <Button type="primary" style="margin:5px 8px 24px 0;" @click="addRow" size="small">{{label.add}}</Button> -->
     </Form>
     <mainTable :columns="columns" :data="pager.data" @updateSelect="updateSelect"></mainTable>
     <paging @changePager="changePager" @paging="paging" :total="pager.total" :currPage="pager.currPage"></paging>
     <Modal v-model="dialogShow" :title="label[currDialog]" :mask-closable="false" width="750" @on-cancel="resetDialogForm('formDialog')">
       <Form :model="formDialog" ref="formDialog" :rules="rules" :label-width="80">
         <Row>
-          <Col span="12">
+          <!-- <Col span="12">
             <FormItem label="id" prop="id">
               <Input v-model="formDialog.id" placeholder="id"></Input>
             </FormItem>
-          </Col>
+          </Col> -->
           <Col span="12">
             <FormItem label="parentId" prop="parentId">
               <Input v-model="formDialog.parentId" placeholder="请输入parentId"></Input>
+            </FormItem>
+          </Col>
+          <Col span="12">
+            <FormItem label="跳转URL" prop="skipUrl">
+              <Input v-model="formDialog.skipUrl" placeholder="请输入跳转URL"></Input>
             </FormItem>
           </Col>
         </Row>
@@ -65,16 +70,11 @@
               </Select>
             </FormItem>
           </Col>
-          <Col span="12">
-            <FormItem label="跳转URL" prop="skipUrl">
-              <Input v-model="formDialog.skipUrl" placeholder="请输入跳转URL"></Input>
-            </FormItem>
-          </Col>
         </Row>
         <Row>
           <Col span="24">
             <FormItem label="反馈内容" prop="text">
-              <Input v-model="formDialog.text" placeholder="请输入反馈内容"></Input>
+              <Input type="textarea" v-model="formDialog.text" placeholder="请输入反馈内容"></Input>
             </FormItem>
           </Col>
         </Row>
@@ -296,35 +296,15 @@
         }
         return _data
       },
-      // submitSearch (name) {
-      //   let vm = this
-      //   vm.$store.dispatch('submitSearch', {
-      //     'vm': vm,
-      //     'name': name
-      //   })
-      // },
       resetDialogForm (name) {
+        name = name || 'formDialog'
         let vm = this
         vm.$refs[name].resetFields()
       },
-      // submitDialogForm (name) {
-      //   this.util.submitDialogForm(this, name)
-      // },
       batchDel () {
         console.log('批量删除数据： ',this.batchOprArr)
       },
       exportData () {},
-      // paging () {
-      //   this.util.paging(this)
-      // },
     },
-    computed: {
-      // label () {
-      //   return this.$store.state.label
-      // }
-    },
-    watch: {
-      
-    }
   }
 </script>

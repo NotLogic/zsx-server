@@ -4,7 +4,7 @@
         <FormItem label="用户">
             <Input v-model="formSearch.name" placeholder="用户名/账号/手机号" size="small"></Input>
         </FormItem>
-        <FormItem label="管理区域">
+        <!-- <FormItem label="管理区域">
             <Cascader :data="derail_address_arr" v-model="derail_address_obj_s" filterable size="small" style="margin-top: 5px"></Cascader>
         </FormItem>
         <FormItem label="创建时间">
@@ -15,44 +15,40 @@
             <FormItem prop="createdateEnd">
                 <DatePicker type="datetime" placeholder="点击选择时间" style="width: 160px;" v-model="formSearch.createdateEnd" size="small" :clearable="false"></DatePicker>
             </FormItem>
-        </FormItem>
+        </FormItem> -->
         <Button type="ghost" style="margin:5px 8px 24px 0;" @click="resetSearch('formSearch')" size="small">{{label.clear}}</Button>
         <Button type="primary" style="margin: 5px 8px 24px 0;" @click="submitSearch('formSearch')" size="small">{{label.search}}</Button>
         <Button type="primary" style="margin: 5px 8px 24px 0;" @click="addRow" size="small">{{label.add}}</Button>
     </Form>
-    <!-- <mainTable :columns="columns" :data="pager.data" :height="672"></mainTable> -->
     <mainTable :columns="columns" :data="pager.data"></mainTable>
     <paging @changePager="changePager" @paging="paging" :total="pager.total" :currPage="pager.currPage"></paging>
     <Modal v-model="dialogShow" :title="label[currDialog]" :mask-closable="false" width="750" @on-cancel="resetDialogForm('formDialog')">
       <Form :model="formDialog" ref="formDialog" :rules="rules" :label-width="80">
-        <Row>
+        <Row v-if="currDialog=='add'">
           <Col span="12">
-            <FormItem label="登录名" prop="loginUsername">
-                <Input v-model="formDialog.loginUsername" placeholder="请输入登录名称"></Input>
+            <FormItem label="账号" prop="loginUsername">
+                <Input v-model="formDialog.loginUsername" placeholder="请输入账号"></Input>
             </FormItem>
           </Col>
-          <Col span="12">
-            <FormItem label="用户名" prop="nickName">
-                <Input v-model="formDialog.nickName" placeholder="请输入用户名"></Input>
-            </FormItem>
-          </Col>
-        </Row>
-        <Row>
-          <Col span="12" v-if="currDialog=='add'">
+          <Col span="12" >
             <FormItem label="密码" prop="loginPassword">
                 <Input v-model="loginPassword" placeholder="请输入密码" type="password"></Input>
             </FormItem>
           </Col>
+        </Row>
+        <Row>
           <Col span="12">
             <FormItem label="isAuth" prop="isAuth">
-              <Input v-model="formDialog.isAuth"></Input>
+              <Select v-model="formDialog.isAuth">
+                  <Option v-for="item in isAuth" :value="item.value" :key="item.value">{{ item.label }}</Option>
+                </Select>
             </FormItem>
           </Col>
-          <!-- <Col span="12">
-            <FormItem label="salt" prop="salt">
-              <Input v-model="formDialog.salt"></Input>
+          <Col span="12">
+            <FormItem label="昵称" prop="nickName">
+                <Input v-model="formDialog.nickName" placeholder="请输入昵称"></Input>
             </FormItem>
-          </Col> -->
+          </Col>
         </Row>
         <Row>
           <Col span="12">
@@ -84,6 +80,38 @@
           <Col span="12">
             <FormItem label="头像" prop="headPortrait">
               <Input v-model="formDialog.headPortrait"></Input>
+              <!-- <Row>
+                <Col span="6">
+                  <Upload name="file"
+                      :action="url.upload"
+                      multiple
+                      :before-upload="myBeforeUpload"
+                      :format="['jpg','jpeg','png','gif']"
+                      :on-format-error="handleFormatError"
+                      :max-size="3000"
+                      :on-exceeded-size="handleMaxSize"
+                      :on-success="myHandleSuccess">
+                    <Button type="ghost" icon="ios-cloud-upload-outline">选择图片</Button>
+                  </Upload>
+                  <Button type="primary" @click="myUpload" :loading="uploadLoading">上传图片</Button>
+                </Col>
+                <Col span="18">
+                  <Row v-if="fileUrl.length">
+                    <Col span="8" v-for="(item, index) in fileUrl" :key="item">
+                      <div class="image-box">
+                        <img :src="item" class="ad-img">
+                        <div class="demo-upload-list-cover">
+                          <Icon type="ios-eye-outline" @click.native="handleView(index)"></Icon>
+                          <Icon type="ios-trash-outline" @click.native="handleRemove(index)"></Icon>
+                        </div>
+                      </div>
+                    </Col>
+                  </Row>
+                  <div v-show="!fileUrl.length" class="image-box">
+                    <img src="static/images/img-upload-default.png" class="ad-img">
+                  </div>
+                </Col>
+              </Row> -->
             </FormItem>
           </Col>
           <Col span="12">
@@ -107,7 +135,9 @@
         <Row>
           <Col span="12">
             <FormItem label="isConsummate" prop="isConsummate">
-              <Input v-model="formDialog.isConsummate"></Input>
+              <Select v-model="formDialog.isConsummate">
+                  <Option v-for="item in isConsummate" :value="item.value" :key="item.value">{{ item.label }}</Option>
+                </Select>
             </FormItem>
           </Col>
           <Col span="12">
@@ -118,23 +148,6 @@
             </FormItem>
           </Col>
         </Row>
-        <!-- <Row>
-          <Col span="12">
-            <FormItem label="appSoucre" prop="appSoucre">
-              <Input v-model="formDialog.appSoucre"></Input>
-            </FormItem>
-          </Col>
-          
-        </Row> -->
-        <!-- <Row>                 
-          <Col span="12">
-            <FormItem label="角色" prop="roleIds">                        
-              <Select v-model="formDialog.roleIds" multiple>
-                <Option v-for="item in roleIds" :value="item.value" :key="item.value">{{ item.label }}</Option>
-              </Select>
-            </FormItem>
-          </Col>
-        </Row> -->
       </Form>
       <div slot="footer">
         <Button @click="resetDialogForm('formDialog')">{{label.clear}}</Button>
@@ -161,7 +174,9 @@
           add: 'user/add',
           edit: 'user/update',
           delete: 'user/delete',
-          search: 'user/dataSearch'
+          search: 'user/dataSearch',
+          upload: 'api/fwmp/api/file/',
+          sId: 'id/id',
         },
         pager: {
           data: [],
@@ -175,6 +190,21 @@
         location_address: [], //  所在地
         roleIds: [],
         userStatus: [{label:'正常', value:'1'}, {label:"禁用", value:'2'}, {label:"封号", value:'3'}],
+        userStatusMap: {
+          "1": "正常",
+          "2": "禁用",
+          "3": "封号"
+        },
+        isAuth: [{label:'否', value:'0'}, {label:"是", value:'1'}],
+        isAuthMap: {
+          '0': '否',
+          '1': '是',
+        },
+        isConsummate: [{label:'否', value:'0'}, {label:"是", value:'1'}],
+        isConsummateMap: {
+          '0': '否',
+          '1': '是',
+        },
         sex: [{label:'男', value:'1'}, {label:"女", value:'0'}],
         sexMap: {
           '0': '女',
@@ -183,9 +213,9 @@
         },
         formSearch: {
           name: '',
-          createdateStart: '',
-          createdateEnd: '',
-          areaCode: ''
+          // createdateStart: '',
+          // createdateEnd: '',
+          // areaCode: ''
         },
         birthday: '',
         loginPassword: '',
@@ -193,7 +223,6 @@
           id: '',
           loginUsername: '',
           loginPassword: '',
-          salt: '',
           nickName: '',
           birthday: '',
           age: '',
@@ -222,7 +251,7 @@
           {
             "title": "ID",
             "key": "id",
-            "width": 240,
+            "width": 200,
             "sortable": true
           },
           {
@@ -232,22 +261,24 @@
             "sortable": true
           },
           {
-            "title": "用户名",
+            "title": "用户昵称",
             "key": "nickName",
             "width": 150,
             "sortable": true
           },
           {
-            "title": "密码",
-            "key": "loginPassword",
-            "width": 240,
-            "sortable": true
-          },
-          {
-            "title": "salt",
-            "key": "salt",
-            "width": 260,
-            "sortable": true
+            "title": "appSoucre",
+            "key": "appSoucre",
+            "width": 150,
+            "sortable": true,
+            render(create,params){
+              var map = {
+                "1": 'IOS',
+                "2": "Android",
+                "3": "Web"
+              }
+              return create('span',map[params.row.appSoucre])
+            }
           },
           {
             "title": "出生日期",
@@ -271,12 +302,6 @@
               var txt = vm.sexMap[params.row.sex]
               return create('span',txt)
             }
-          },
-          {
-            "title": "appSoucre",
-            "key": "appSoucre",
-            "width": 240,
-            "sortable": true
           },
           {
             "title": "用户头像",
@@ -327,26 +352,34 @@
             "sortable": true
           },
           {
-            "title": "isAuth",
+            "title": "是否认证",
             "key": "isAuth",
-            "width": 240,
-            "sortable": true
+            "width": 150,
+            "sortable": true,
+            render: (create, params) => {
+              var status = params.row.isAuth.toString();
+              return create('span', this.isAuthMap[status]);
+            }
           },
           {
-            "title": "isConsummate",
+            "title": "是否完成资料",
             "key": "isConsummate",
             "width": 150,
-            "sortable": true
+            "sortable": true,
+            render: (create, params) => {
+              var status = params.row.isConsummate.toString();
+              return create('span', this.isConsummateMap[status]);
+            }
           },
           {
             "title": "状态",
             "key": "userStatus",
             "width": 100,
             "sortable": true,
-            // render: (create, params) => {
-            //   var map = this.$store.state.map.status
-            //   return create('span', map[params.row.status]);
-            // }
+            render: (create, params) => {
+              var status = params.row.userStatus.toString();
+              return create('span', this.userStatusMap[status]);
+            }
           },
           {
             "title": "创建时间",
@@ -362,10 +395,13 @@
             fixed: 'right',
             render: (create, params) => {
               let vm = this
-              return create('div', [
-                vm.createEditBtn(create, params.row),
-                vm.createDelBtn(create, params.row.id)
-              ])
+              var arr = []
+              if(params.row.appSoucre=='3'){
+                arr = [vm.createEditBtn(create, params.row),vm.createDelBtn(create, params.row)]
+              }else{
+                arr = [vm.createEditBtn(create, params.row)]
+              }
+              return create('div',arr)
             }
           }
         ],
@@ -403,7 +439,6 @@
     },
     methods: {
       delRow (data) {
-        console.log('删除行提交2： ',data)
         var vm = this
         vm.$http2({
           url: vm.url.delete,
@@ -447,19 +482,19 @@
         vm.submitSearch(name)
       },
       resetDialogForm (name) {
+        name = name || 'formDialog'
         var vm = this;
         vm.formDialog.birthday = ''
         vm.birthday = ''
         vm.$refs[name].resetFields()
       },
-      initDialog () {},
+      initDialog (data) {
+        console.log('data: ',data)
+      },
       initData () {
         this.derail_address_arr = JSON.parse(sessionStorage.chinaData)
       }
     },
-    computed: {},
-    created () {},
-    mounted () {},
     watch: {
       loginPassword(val){
         this.formDialog.loginPassword = hex_md5(val)
@@ -498,3 +533,35 @@
     },
   }
 </script>
+<style scoped>
+.image-box{
+  position: relative;
+  width:102px;
+  height:102px;
+  border:1px solid #eee;
+  text-align: center;
+}
+.ad-img{
+  max-width: 100px;
+  max-height: 100px;
+}
+.demo-upload-list-cover{
+  display: none;
+  position: absolute;
+  padding-top: 40px;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0,0,0,.6);
+}
+.image-box:hover .demo-upload-list-cover{
+  display: block;
+}
+.demo-upload-list-cover i{
+  color: #fff;
+  font-size: 20px;
+  cursor: pointer;
+  margin: 0 2px;
+}
+</style>

@@ -354,7 +354,19 @@ export function formatSelectData (arr) {
 export function str_repeat (str, num) {
   return new Array(num + 1).join(str);
 }
-// export function 
+// 时间戳转时间
+export function timestampToTime(timestamp) {
+  var timeStr = '' + timestamp;
+  var myTimestamp = timeStr.length == 10 ? timestamp*1000 : timestamp;
+  var date = new Date(myTimestamp);//时间戳为10位需*1000，时间戳为13位的话不需乘1000
+  var Y = date.getFullYear() + '-';
+  var M = (date.getMonth()+1 < 10 ? '0'+(date.getMonth()+1) : date.getMonth()+1) + '-';
+  var D = (date.getDate()<10 ? '0'+date.getDate() : date.getDate()) + ' ';
+  var h = (date.getHours()<10 ? '0'+date.getHours() : date.getHours()) + ':';
+  var m = (date.getMinutes()<10 ? '0'+date.getMinutes() : date.getMinutes()) + ':';
+  var s = (date.getSeconds()<10 ? '0'+date.getSeconds() : date.getSeconds());
+  return Y+M+D+h+m+s;
+}
 // export function 
 // export function 
 // export function 

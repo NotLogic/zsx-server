@@ -63,14 +63,6 @@
           <Col span="24">
             <FormItem label="广告图片" prop="imagePath">
               <Col span="18">
-                <!-- <Button type="primary" @click="myUpload">确认上传</Button>
-                <Upload name="file"
-                    :action="url.upload"
-                    :multiple="uploadImgMax==1 ? false : true"
-                    :before-upload="myBeforeUpload"
-                    :on-success="myHandleSuccess">
-                  <Button type="ghost" icon="ios-cloud-upload-outline">选择图片</Button>
-                </Upload> -->
                 <Row>
                   <Col span="6">
                     <Upload name="file"
@@ -110,59 +102,6 @@
             </FormItem>
           </Col>
         </Row>
-        <!-- 自动上传 -->
-        <!-- <Row>
-          <Col span="12">
-            <FormItem label="主图" prop="imagePath">
-              <Row>
-                <Col span="16">
-                  <div class="image-box">
-                    <img v-if="formDialog.imagePath" :src="formDialog.imagePath" class="ad-img"/>
-                    <img v-else src="static/images/img-upload-default.png" class="ad-img"/>
-                  </div>
-                </Col>
-                <Col span="8">
-                  <Upload name="file"
-                      :action="url.upload"
-                      multiple
-                      :before-upload="mainImgBeforeUpload"
-                      :on-success="handleSuccess">
-                    <Button type="ghost" icon="ios-cloud-upload-outline">上传主图</Button>
-                  </Upload>
-                </Col>
-              </Row>
-            </FormItem>
-          </Col>
-          <Col span="12" v-show="hasExtraImg">
-            <FormItem label="次级图片" prop="imageArr">
-              <Row>
-                <Col span="16">
-                  <Row v-show="imageArr.length">
-                    <Col span="12" v-for="item in imageArr" :key="item">
-                      <div class="image-box">
-                        <img v-show="item" :src="item" class="ad-img">
-                      </div>
-                    </Col>
-                  </Row>
-                  <div v-show="!imageArr.length" class="image-box">
-                    <img src="static/images/img-upload-default.png" class="ad-img">
-                  </div>
-                </Col>
-                <Col span="8">
-                  <Upload name="upfile"
-                          multiple
-                          :action="url.upload"
-                          :show-upload-list="false"
-                          :before-upload="beforeUpload"
-                          :on-success="extraImgHandleSuccess">
-                    <Button type="ghost" icon="ios-cloud-upload-outline">次级图片</Button>
-                  </Upload>
-                </Col>
-              </Row>
-            </FormItem>
-          </Col>
-        </Row> -->
-
         <Row>
           <Col span="12">
             <FormItem label="链接地址" prop="href">
@@ -195,13 +134,13 @@
           <Col span="12">
             <FormItem label="开始时间" prop="startTime">
               <!-- <DatePicker format="yyyy-MM-dd" type="date" placeholder="点击选择时间" v-model="formDialog.startTime" :clearable="false"></DatePicker> -->
-              <DatePicker format="yyyy-MM-dd" type="date" placeholder="点击选择时间" @on-change="startTimeChange" :clearable="false"></DatePicker>
+              <DatePicker format="yyyy-MM-dd" type="date" placeholder="点击选择时间" @on-change="startTimeChange" v-model="startTime" :clearable="false"></DatePicker>
             </FormItem>
           </Col>
           <Col span="12">
             <FormItem label="结束时间" prop="endTime">
               <!-- <DatePicker format="yyyy-MM-dd" type="date" placeholder="点击选择时间" v-model="formDialog.endTime" :clearable="false"></DatePicker> -->
-              <DatePicker format="yyyy-MM-dd" type="date" placeholder="点击选择时间" @on-change="endTimeChange" :clearable="false"></DatePicker>
+              <DatePicker format="yyyy-MM-dd" :start-date="new Date()" type="date" placeholder="点击选择时间" @on-change="endTimeChange" v-model="endTime" :clearable="false"></DatePicker>
             </FormItem>
           </Col>
         </Row>
@@ -256,7 +195,7 @@
           url: 'advert/dataGrid',
           method: 'post',
           current: 1,
-          size: 10,
+          size: 20,
           data: [], // 声明vue时必须存在，因为vue无法观测动态新增的属性
           // tSort: 'createTime',
           // order: 'desc',
@@ -327,10 +266,21 @@
             label: '帖子详情'
           }
         ],
+        postionMap: {
+          '1': '首页banner',
+          '2': '首页新闻列表',
+          '3': '首页新闻详情',
+          '4': '政务banner',
+          '5': '招商banner',
+          '6': '办事指南详情',
+          '7': '便民工具',
+          '8': '广场帖子列表',
+          '9': '帖子详情'
+        },
         provinceData: [],
         cityData: [],
         areaData: [],
-        countryData: [{label: "中国", value: "000000", children: []}],
+        countryData: [{label: "中国", value: "1", children: []}],
         formSearch: {
           startTime: '',
           endTime: '',
@@ -343,12 +293,13 @@
           areaId: ''
         },
         hasExtraImg: false,
+        startTime: '',
+        endTime: '',
         formDialog: {
           id: '',
           // userId: '',  // 2018.05.29 无此字段
           title: '',
           imagePath: '',
-          imageArr: [],
           lockStatus: '1',
           postion: '1',
           href: '',
@@ -417,18 +368,7 @@
             'width': 120,
             'sortable': true,
             render: (create, params) => {
-              var map = {
-                '1': '首页banner',
-                '2': '首页新闻列表',
-                '3': '首页新闻详情',
-                '4': '政务banner',
-                '5': '招商banner',
-                '6': '办事指南详情',
-                '7': '便民工具',
-                '8': '广场帖子列表',
-                '9': '帖子详情'
-              }
-              return create('span', map[params.row.postion])
+              return create('span', this.postionMap[params.row.postion])
             }
           },
           {
@@ -472,14 +412,12 @@
             'width': 120,
             'sortable': true
           },
-
           {
             'title': '开始时间',
             'key': 'startTime',
             'width': 160,
             'sortable': true
           },
-
           {
             'title': '结束时间',
             'key': 'endTime',
@@ -500,7 +438,6 @@
             fixed: 'right',
             render: (create, params) => {
               let vm = this
-              
               var status = params.row.lockStatus
               var arr = []
               if(status==3){
@@ -523,13 +460,14 @@
                     },
                     on: {
                       click: () => {
-                        vm.$Modal.confirm({
-                          title: '确认',
-                          content: "确认" + txt2 +"这条数据吗？",
-                          onOk: function () {
-                            vm.disableRow({id: params.row.id})
-                          }
-                        })
+                        vm.$Message.info(vm.label.wait)
+                        // vm.$Modal.confirm({
+                        //   title: '确认',
+                        //   content: "确认" + txt2 +"这条数据吗？",
+                        //   onOk: function () {
+                        //     vm.disableRow({id: params.row.id})
+                        //   }
+                        // })
                       }
                     }
                   }, txt),
@@ -542,16 +480,6 @@
         ],
         rules: {}
       }
-    },
-    computed: {
-      imageArr () {
-        return this.formDialog.imageArr ? this.formDialog.imageArr.slice(1) : []
-      },
-      // ["formDialog.imagePath"](){
-      //   var len = this.formDialog.imageArr.length
-      //   console.log(len)
-      //   return len ? this.formDialog.imageArr[0] : ''
-      // }
     },
     methods: {
       searchStartTimeChange(date){
@@ -573,12 +501,13 @@
         vm.submitSearch(name)
       },
       resetDialogForm (name) {
+        name = name || 'formDialog'
         let vm = this
-        vm.formDialog.imageArr = []
+        vm.endTime = ''
+        vm.startTime = ''
         vm.derail_address_arr = vm.countryData
         vm.derail_address_obj = []
         vm.fileUrl = []
-        vm.formDialog.imageArr = []
         vm.$refs[name].resetFields()
       },
       disableRow(data){
@@ -636,6 +565,7 @@
             params.append('sId',sId)
             // s   1  用户  2  帖子  3  广告
             params.append('s',3)
+            // 使用位置 1：用户头像 2：帖子列表 3：帖子回复 4:创建群头像 5:编辑群头像 
             params.append('p',vm.formDialog.postion)
             var config =  {
                 headers: {
@@ -648,37 +578,17 @@
                 // 清空已上传数组
                 vm.uploadImgArr = [];
                 vm.$Message.success('上传图片成功！');
-                // 处理返回 todo  为啥调用函数就只执行一行，写if判断不走if也不走else
+                var arr = []
                 for(let key in rd.data){
-                  vm.formDialog.imageArr.push(rd.data[key]);
+                  arr.push(rd.data[key]);
                 }
-                vm.formDialog.imagePath = vm.formDialog.imageArr[0] || '';
-
-                
-                // vm.updateUploadImgData(rd.data)
+                vm.formDialog.imagePath = arr[0] || '';
               }else{
                 vm.$Message.error(rd.message)
               }
             }).catch(err=>{})
           }
         }).catch(err=>{})
-      },
-      ifNullObject(data){
-        for(var key in data){
-          return false
-        }
-        return true
-      },
-      updateUploadImgData(data){
-        if(vm.ifNullObject(data)){
-          vm.formDialog.imageArr = [];
-          vm.formDialog.imagePath = '';
-        }else{
-          for(let key in data){
-            vm.formDialog.imageArr.push(rd.data[key]);
-          }
-          vm.formDialog.imagePath = vm.formDialog.imageArr[0] || '';
-        }
       },
       handleFormatError(){
         this.$Message.error('文件格式错误，请选择jpg、jpeg、png或gif格式的文件！')
@@ -689,79 +599,43 @@
       },
       // 删除
       handleRemove(index){
-        console.log('删除index: ',index)
         var vm = this
-        vm.formDialog.imageArr && vm.formDialog.imageArr.splice(index,1)
         vm.fileUrl.splice(index,1)
       },
-
-      handleSuccess (res, file, fileList) {
-        console.log('上传图片res: ',res)
-        this.formDialog.imagePath = res.url;
-        this.formDialog.imageArr[0] = res.url;
-      },
-      mainImgBeforeUpload(file){
-        console.log('上传的文件： ',file)
-        // return false
-      },
-      beforeUpload () {
-        let vm = this
-        let len = vm.formDialog.imageArr.length
-        if (len == vm.uploadImgMax || len > vm.uploadImgMax) {
-          vm.$Message.error("上传图片数量已达上限！")
-          return false
-        }
-      },
-      extraImgHandleSuccess (res, file, fileList) {
-        console.log('上传次级图片res: ',res)
-        // 次级图片上传成功成功，将返回的url push进 formDialog.imageArr
-        this.formDialog.imageArr.push(res.url)
-      },
-      // 编辑行是回显的额外操作
+      // 编辑行时回显的额外操作  
       initDialog (data) {
-        console.log('回显数据：',data)
         var vm = this
         if(data.imageArr){
           vm.fileUrl = data.imageArr
         }else{
           vm.fileUrl = data.imagePath ? [data.imagePath] : ''
         }
+        vm.startTime = data.startTime
+        vm.endTime = data.endTime
       },
-      timestampToTime(timestamp) {
-        var timeStr = '' + timestamp;
-        var myTimestamp = timeStr.length == 10 ? timestamp*1000 : timestamp;
-        var date = new Date(myTimestamp);//时间戳为10位需*1000，时间戳为13位的话不需乘1000
-        var Y = date.getFullYear() + '-';
-        var M = (date.getMonth()+1 < 10 ? '0'+(date.getMonth()+1) : date.getMonth()+1) + '-';
-        var D = date.getDate() + ' ';
-        var h = date.getHours() + ':';
-        var m = date.getMinutes() + ':';
-        var s = date.getSeconds();
-        return Y+M+D+h+m+s;
-      },
+      // 对返回的原始数据的预处理
       pagerResult(data){
         var vm = this
-        console.log('预处理初始化之前的data：',data)
         var result = vm.util.deepcopy(data)
         var len = result.length,item;
         for(var i=0;i<len;i++){
           item = result[i]
           if(typeof item.endTime == 'number'){
-            result.endTime = vm.timestampToTime(result.endTime);
+            item.endTime = vm.util.timestampToTime(item.endTime);
           }
           if(typeof item.startTime == 'number'){
-            result.startTime = vm.timestampToTime(result.startTime);
+            item.startTime = vm.util.timestampToTime(item.startTime);
           }
         }
-        console.log('预处理初始化之后的data：',result)
         return result
       },
       initData () {
         let vm = this
-        vm.areaData = JSON.parse(sessionStorage.chinaData)
-        vm.cityData = vm.util.getCityDataByData(JSON.parse(sessionStorage.chinaData))
-        vm.provinceData = vm.util.getProvinceDataByData(JSON.parse(sessionStorage.chinaData))
-        vm.derail_address_arr_s = JSON.parse(sessionStorage.chinaData)
+        var chinaData = JSON.parse(sessionStorage.chinaData)
+        vm.areaData = chinaData
+        vm.cityData = vm.util.getCityDataByData(chinaData)
+        vm.provinceData = vm.util.getProvinceDataByData(chinaData)
+        vm.derail_address_arr_s = chinaData
         vm.derail_address_arr = vm.countryData
       }
     },
@@ -822,14 +696,6 @@
           this.hasExtraImg = false
         }
       },
-      // ['formDialog.imageArr'](val){
-      //   if(!val)return false
-      //   if (val.length>1) {
-      //     this.hasExtraImg = true
-      //   } else {
-      //     this.hasExtraImg = false
-      //   }
-      // }
     }
   }
 </script>
