@@ -228,6 +228,7 @@ const page = {
       }, '编辑')
     },
     editRow (data) {
+      console.log('编辑行原始数据： ',data)
       let vm = this
       let _data = {}
       for (let key in vm.formDialog) {
@@ -236,6 +237,7 @@ const page = {
       if (typeof vm.initDialog === 'function') {
         vm.initDialog(_data)
       }
+      console.log('_data: ',_data)
       vm.formDialog = _data
       vm.currDialog = 'edit'
       vm.dialogShow = true

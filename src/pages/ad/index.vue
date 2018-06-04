@@ -525,8 +525,13 @@
         // 读取文件作为 URL 可访问地址
         reader.readAsDataURL(file)
         reader.onloadend = function (e) {
-          vm.fileUrl.push(reader.result) // 这一行将图片转为base64存储到file对象里边
-          vm.uploadImgArr.push(file)
+          if(vm.uploadImgMax==1){
+            vm.fileUrl = [reader.result]
+            vm.uploadImgArr = [file]
+          }else{
+            vm.fileUrl.push(reader.result) // 这一行将图片转为base64存储到file对象里边
+            vm.uploadImgArr.push(file)
+          }
         }
         return false
       },
@@ -540,40 +545,49 @@
           vm.$Message.error('请先选择上传的图片')
           return
         }
-        vm.$http.post(vm.url.sId).then(res=>{
-          var resData = res.data
-          if(resData.code==1){
-            var sId = resData.data;
-            vm.formDialog.id = sId;
-            let params = new FormData();
-            vm.uploadImgArr.forEach(file =>{
-              params.append('file', file)
-            });
-            params.append('sId',sId)
-            // s   1  用户  2  帖子  3  广告
-            params.append('s',3)
-            // 使用位置 1：用户头像 2：帖子列表 3：帖子回复 4:创建群头像 5:编辑群头像 
-            params.append('p',vm.formDialog.postion)
-            var config =  {
-                headers: {
-                  'Content-Type': 'multipart/form-data'
-                }
-            };
-            vm.$http.post(vm.url.upload, params, config).then(res=>{
-              let rd = res.data;
-              if(rd.code==1){
-                // 清空已上传数组
-                vm.uploadImgArr = [];
-                vm.$Message.success('上传图片成功！');
-                var arr = []
-                for(let key in rd.data){
-                  arr.push(rd.data[key]);
-                }
-                vm.formDialog.imagePath = arr[0] || '';
-              }else{
-                vm.$Message.error(rd.message)
-              }
-            }).catch(err=>{})
+        if(vm.currDialog=='add'){
+          vm.$http.post(vm.url.sId).then(res=>{
+            var resData = res.data
+            if(resData.code==1){
+              var sId = resData.data;
+              vm.formDialog.id = sId;
+              vm.uploadFile(sId)
+            }
+          }).catch(err=>{})
+        }else{
+          var sId = vm.formDialog.id
+          vm.uploadFile(sId)
+        }
+      },
+      uploadFile(sId){
+        var vm = this;
+        let params = new FormData();
+        vm.uploadImgArr.forEach(file =>{
+          params.append('file', file)
+        });
+        params.append('sId',sId)
+        // s   1  用户  2  帖子  3  广告
+        params.append('s',3)
+        // 使用位置 1：用户头像 2：帖子列表 3：帖子回复 4:创建群头像 5:编辑群头像 
+        params.append('p',vm.formDialog.postion)
+        var config =  {
+            headers: {
+              'Content-Type': 'multipart/form-data'
+            }
+        };
+        vm.$http.post(vm.url.upload, params, config).then(res=>{
+          let rd = res.data;
+          if(rd.code==1){
+            // 清空已上传数组
+            vm.uploadImgArr = [];
+            vm.$Message.success('上传图片成功！');
+            var arr = []
+            for(let key in rd.data){
+              arr.push(rd.data[key]);
+            }
+            vm.formDialog.imagePath = arr[0] || '';
+          }else{
+            vm.$Message.error(rd.message)
           }
         }).catch(err=>{})
       },
@@ -591,7 +605,22 @@
       },
       // 编辑行时回显的额外操作  
       initDialog (data) {
-        var vm = this
+        var vm = this,arr=[],areaId,cityId,provincesId
+        if(data.areaId){
+          areaId = data.areaId
+          cityId = parseInt(parseInt(areaId/100) + '00')
+          provincesId = parseInt(parseInt(areaId/10000) + '0000')
+          arr = [provincesId, cityId, areaId]
+        }else if(data.cityId){
+          cityId = data.cityId
+          provincesId = parseInt(areaId/10000) + '0000'
+          arr = [provinceId, cityId]
+        }else if(data.provincesId){
+          provincesId = data.provincesId
+          arr = [provincesId]
+        }
+        data.postion.toString()
+        vm.derail_address_obj = arr
         if(data.imageArr){
           vm.fileUrl = data.imageArr
         }else{

@@ -124,7 +124,7 @@
           edit: 'post/update',
           delete: 'post/delete',
           search: 'post/dataSearch',
-          upload: 'api/file/',
+          upload: 'file/',
           sId: 'id/id',
         },
         pager: {
@@ -155,6 +155,16 @@
           "0": "正常",
           "1": "已删除"
         },
+        isAuth: [{label:'否', value:'0'}, {label:"是", value:'1'}],
+        isAuthMap: {
+          '0': '否',
+          '1': '是',
+        },
+        sexMap: {
+          '0': '女',
+          '1': '男',
+          '': '保密'
+        },
         fileUrl: [],
         uploadImgArr: [],
         formSearch: {
@@ -163,7 +173,7 @@
         formDialog: {
           // id: '',
           postContent: '',
-          userId: '441528056573952',
+          userId: '1002440918111801345',
           postStatus: '',
           createTime: '',
           imagePath: [],
@@ -180,41 +190,44 @@
           {
             'title': '用户ID',
             'key': 'userId',
-            'width': 150,
+            'width': 180,
             'sortable': true
           },
           {
             'title': '收藏数量',
             'key': 'postCollectionCount',
-            'width': 180,
+            'width': 120,
             'sortable': true
           },
           {
             'title': '评论数量',
             'key': 'postCommentsCount',
-            'width': 180,
+            'width': 120,
             'sortable': true
           },
           {
             'title': '点赞数量',
             'key': 'postThumbCount',
-            'width': 180,
+            'width': 120,
             'sortable': true
           },
           {
             'title': '转发数量',
             'key': 'postTransmitCount',
-            'width': 180,
+            'width': 120,
             'sortable': true
           },
           {
-            'title': 'userIsAuth',
+            'title': '是否认证',
             'key': 'userIsAuth',
             'width': 150,
-            'sortable': true
+            'sortable': true,
+            render: (create, params) => {
+              return create('span', this.isAuthMap[params.row.userIsAuth.toString()]);
+            }
           },
           {
-            'title': 'userNickName',
+            'title': '昵称',
             'key': 'userNickName',
             'width': 150,
             'sortable': true
@@ -223,13 +236,19 @@
             'title': 'userSex',
             'key': 'userSex',
             'width': 150,
-            'sortable': true
+            'sortable': true,
+            render: (create, params) => {
+              return create('span',this.sexMap[params.row.userSex])
+            }
           },
           {
             'title': '帖子状态',
             'key': 'postStatus',
             'width': 150,
-            'sortable': true
+            'sortable': true,
+            render: (create, params) => {
+              return create('span',this.postStatusMap[params.row.postStatus])
+            }
           },
           {
             'title': '创建时间',
@@ -248,7 +267,21 @@
             'title': '用户头像',
             'key': 'userheadPortrait',
             'width': 250,
-            'sortable': true
+            'sortable': true,
+            render: function (create, params) {
+              return create('img', {
+                attrs: {
+                  src: params.row.userheadPortrait
+                },
+                style: {
+                  'border': '1px solid transparent',
+                  'border-radius': '4px',
+                  'margin': '10px 0',
+                  'max-width': '100px',
+                  'max-height': '100px'
+                }
+              })
+            }
           },
           {
             'title': '帖子图片',
@@ -306,8 +339,13 @@
         let reader = new FileReader()
         reader.readAsDataURL(file)
         reader.onloadend = function (e) {
-          vm.fileUrl.push(reader.result)
-          vm.uploadImgArr.push(file)
+          if(vm.uploadImgMax==1){
+            vm.fileUrl = [reader.result]
+            vm.uploadImgArr = [file]
+          }else{
+            vm.fileUrl.push(reader.result)
+            vm.uploadImgArr.push(file)
+          }
         }
         return false
       },
@@ -332,40 +370,49 @@
           return
         }
         vm.uploadLoading = true;
-        vm.$http.post(vm.url.sId).then(res=>{
-          var resData = res.data
-          if(resData.code==1){
-            var sId = resData.data;
-            vm.formDialog.id = sId;
-            let params = new FormData();
-            vm.uploadImgArr.forEach(file =>{
-              params.append('file', file)
-            });
-            params.append('sId',sId)
-            // s   1  用户  2  帖子  3  广告
-            params.append('s',2)
-            // 使用位置 1：用户头像 2：帖子列表 3：帖子回复 4:创建群头像 5:编辑群头像
-            params.append('p',2)
-            var config =  {
-                headers: {
-                  'Content-Type': 'multipart/form-data'
-                }
-            };
-            var url = vm.url.upload + vm.formDialog.userId;
-            vm.$http.post(url, params, config).then(res=>{
-              let rd = res.data;
-              if(rd.code==1){
-                // 清空已上传数组
-                vm.uploadLoading = false;
-                vm.uploadImgArr = [];
-                vm.$Message.success('上传成功！');
-                for(let key in rd.data){
-                  vm.formDialog.imagePath.push(rd.data[key]);
-                }
-              }else{
-                vm.$Message.error(rd.message)
-              }
-            }).catch(err=>{})
+        if(vm.currDialog=='add'){
+          vm.$http.post(vm.url.sId).then(res=>{
+            var resData = res.data
+            if(resData.code==1){
+              var sId = resData.data;
+              vm.formDialog.id = sId;
+              vm.uploadFile(sId)
+            }
+          }).catch(err=>{})
+        }else{
+          var sId = vm.formDialog.id
+          vm.uploadFile(sId)
+        }
+      },
+      uploadFile(sId){
+        var vm = this;
+        let params = new FormData();
+        vm.uploadImgArr.forEach(file =>{
+          params.append('file', file)
+        });
+        params.append('sId',sId)
+        // s   1  用户  2  帖子  3  广告
+        params.append('s',2)
+        // 使用位置 1：用户头像 2：帖子列表 3：帖子回复 4:创建群头像 5:编辑群头像
+        params.append('p',2)
+        var config =  {
+            headers: {
+              'Content-Type': 'multipart/form-data'
+            }
+        };
+        var url = vm.url.upload + sId;
+        vm.$http.post(url, params, config).then(res=>{
+          let rd = res.data;
+          if(rd.code==1){
+            // 清空已上传数组
+            vm.uploadLoading = false;
+            vm.uploadImgArr = [];
+            vm.$Message.success('上传成功！');
+            for(let key in rd.data){
+              vm.formDialog.imagePath.push(rd.data[key]);
+            }
+          }else{
+            vm.$Message.error(rd.message)
           }
         }).catch(err=>{})
       },

@@ -81,21 +81,19 @@
             <FormItem label="头像" prop="headPortrait">
               <Input v-model="formDialog.headPortrait"></Input>
               <!-- <Row>
-                <Col span="6">
+                <Col span="12">
                   <Upload name="file"
                       :action="url.upload"
-                      multiple
                       :before-upload="myBeforeUpload"
                       :format="['jpg','jpeg','png','gif']"
                       :on-format-error="handleFormatError"
                       :max-size="3000"
-                      :on-exceeded-size="handleMaxSize"
-                      :on-success="myHandleSuccess">
-                    <Button type="ghost" icon="ios-cloud-upload-outline">选择图片</Button>
+                      :on-exceeded-size="handleMaxSize">
+                    <Button type="ghost" icon="ios-cloud-upload-outline">选择头像</Button>
                   </Upload>
-                  <Button type="primary" @click="myUpload" :loading="uploadLoading">上传图片</Button>
+                  <Button type="primary" @click="myUpload" :loading="uploadLoading">上传头像</Button>
                 </Col>
-                <Col span="18">
+                <Col span="12">
                   <Row v-if="fileUrl.length">
                     <Col span="8" v-for="(item, index) in fileUrl" :key="item">
                       <div class="image-box">
@@ -175,13 +173,15 @@
           edit: 'user/update',
           delete: 'user/delete',
           search: 'user/dataSearch',
-          upload: 'api/fwmp/api/file/',
+          upload: 'api/file/',
           sId: 'id/id',
         },
         pager: {
           data: [],
           url: 'user/dataGrid',
         },
+        uploadLoading: false,
+        fileUrl: [],
         derail_address_arr: [],
         derail_address_obj_s: [],
         hometown_address: [], // 家乡
@@ -305,13 +305,41 @@
             "title": "用户头像",
             "key": "headPortrait",
             "width": 240,
-            "sortable": true
+            "sortable": true,
+            render: function (create, params) {
+              return create('img', {
+                attrs: {
+                  src: params.row.headPortrait
+                },
+                style: {
+                  'border': '1px solid transparent',
+                  'border-radius': '4px',
+                  'margin': '10px 0',
+                  'max-width': '100px',
+                  'max-height': '100px'
+                }
+              })
+            }
           },
           {
             "title": "头像背景",
             "key": "bgPortrait",
             "width": 240,
-            "sortable": true
+            "sortable": true,
+            render: function (create, params) {
+              return create('img', {
+                attrs: {
+                  src: params.row.bgPortrait
+                },
+                style: {
+                  'border': '1px solid transparent',
+                  'border-radius': '4px',
+                  'margin': '10px 0',
+                  'max-width': '100px',
+                  'max-height': '100px'
+                }
+              })
+            }
           },
           {
             "title": "省",
@@ -454,6 +482,20 @@
 
         })
       },
+      // 手动上传图片
+      myBeforeUpload(file){
+
+      },
+      handleFormatError(){},
+      handleMaxSize(){},
+      myUpload(){},
+      handleView(index){},
+      handleRemove(index){
+        console.log('删除index: ',index)
+        var vm = this
+        vm.fileUrl.splice(index,1)
+      },
+
       birthChange(date){
         var vm = this
         if(date.length){
