@@ -237,7 +237,6 @@ const page = {
       if (typeof vm.initDialog === 'function') {
         vm.initDialog(_data)
       }
-      console.log('_data: ',_data)
       vm.formDialog = _data
       vm.currDialog = 'edit'
       vm.dialogShow = true

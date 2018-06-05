@@ -169,6 +169,11 @@
             "sortable": true
           },
           {
+            "title": "反馈内容",
+            "key": "text",
+            "width": 500
+          },
+          {
             "title": "上一级",
             "key": "parentId",
             "width": 150,
@@ -211,11 +216,6 @@
             "width": 200,
           },
           {
-            "title": "反馈内容",
-            "key": "text",
-            "width": 500
-          },
-          {
             'title': '操作',
             'key': 'action',
             'width': 140,
@@ -242,24 +242,6 @@
       }
     },
     methods: {
-      delRow (data) {
-        var vm = this
-        vm.$http2({
-          url: vm.url.delete,
-          method: vm.pager.method,
-          data: data
-        }).then(res => {
-          var resData = res.data
-          if(resData.code==1){
-            vm.$Message.success("删除成功！")
-            vm.paging()
-          }else{
-            vm.$Message.error(resData.message)
-          }
-        }).catch(err=>{
-
-        })
-      },
       updateSelect (selection) {
         this.batchOprArr = selection
       },

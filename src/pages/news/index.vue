@@ -5,7 +5,7 @@
       <FormItem label="关键词" prop="keyWord">
         <Input v-model="formSearch.keyWord" placeholder="标题" size="small" style="width: 120px"></Input>
       </FormItem>
-      <FormItem label="新闻ID" prop="id">
+      <!-- <FormItem label="新闻ID" prop="id">
         <Input v-model="formSearch.id" placeholder="新闻ID" size="small" style="width: 120px"></Input>
       </FormItem>
       <FormItem label="来源" prop="newsSrc">
@@ -27,17 +27,17 @@
         <FormItem>至</FormItem>
         <FormItem prop="createdateEnd">
           <DatePicker type="datetime" placeholder="点击选择时间" style="width: 160px;" v-model="formSearch.createdateEnd" size="small" clearable></DatePicker>
-        </FormItem>
+        </FormItem> -->
       </FormItem>
       <Button type="ghost" style="margin:5px 8px 24px 0;" @click="resetSearch('formSearch')" size="small">{{label.clear}}</Button>
       <Button type="primary" style="margin: 5px 8px 24px 0;" @click="submitSearch('formSearch')" size="small">{{label.search}}</Button>
       <Button type="ghost" :disabled="batchOprArr.length==0" style="margin: 5px 8px 24px 0;" @click="batchDelete" size="small">批量删除</Button>
       <Button type="primary" :disabled="batchOprArr.length==0" style="margin: 5px 8px 24px 0;" @click="batchPublish" size="small">批量发布</Button>
+      <Button type="primary" style="margin: 5px 8px 24px 0;" @click="addRow" size="small">{{label.add}}</Button>
     </Form>
-    <!-- <mainTable :columns="columns" :data="pager.data" :height="610"></mainTable> -->
     <mainTable :columns="columns" :data="pager.data" @updateSelect="updateSelect"></mainTable>
     <paging @changePager="changePager" @paging="paging" :total="pager.total" :currPage="pager.currPage"></paging>
-    <Modal v-model="dialogShow" :title="label[currDialog]" :mask-closable="false" width="800" @on-cancel="resetDialogForm('formDialog')">
+    <Modal v-model="dialogShow" :title="label[currDialog]" :mask-closable="false" width="800" @on-cancel="resetDialogForm('formDialog')" :styles="{top:'30px'}">
       <Form :model="formDialog" ref="formDialog" :rules="rules" :label-width="80">
         <Row>
           <Col span="14">
@@ -48,7 +48,7 @@
               <Input v-model="formDialog.newsSrc" placeholder="请输入新闻来源"></Input>
             </FormItem>
             <FormItem label="关联地区">
-              <Input v-model="formDialog.detailAddress" :disabled="true"></Input>
+              <Input v-model="formDialog.detailAddress" disabled></Input>
             </FormItem>
           </Col>
           <Col span="10">
@@ -70,6 +70,38 @@
           </Col>
         </Row>
         <Row>
+          <Col span="12">
+            <FormItem label="来源url" prop="url">
+              <Input v-model="formDialog.url" placeholder="请输入来源url"></Input>
+            </FormItem>
+          </Col>
+          <Col span="12">
+            <FormItem label="新闻状态" prop="newsStatus">
+              <Select v-model="formDialog.newsStatus" placeholder="请选择"  clearable>
+                <Option v-for="item in newsStatus" :value="item.value" :key="item.value">{{ item.label }}</Option>
+              </Select>
+            </FormItem>
+          </Col>
+        </Row>
+
+        <Row>
+          <Col span="12">
+            <FormItem label="发布时间" prop="newsDate">
+              <Input v-model="formDialog.newsDate" placeholder="请输入标题"></Input>
+              <DatePicker type="date" placeholder="点击选择出生日期" @on-change="newsDateChange" v-model="newsDate" :clearable="false"></DatePicker>
+            </FormItem>
+          </Col>
+          <Col span="12">
+            <FormItem label="新闻类型" prop="newsType">
+              <Input v-model="formDialog.newsType" placeholder="请输入来源url"></Input>
+              <!-- <Select v-model="formDialog.newsType" placeholder="请选择"  clearable>
+                <Option v-for="item in newsType" :value="item.value" :key="item.value">{{ item.label }}</Option>
+              </Select> -->
+            </FormItem>
+          </Col>
+        </Row>
+
+        <Row>
           <Col span="24">
             <FormItem label="新闻内容" prop="content">
               <tinymce :id="tinymceId" @updateContent="updateContent" v-model="formDialog.content"></tinymce>
@@ -87,9 +119,10 @@
         <br>
         <p>{{previewData.newsSrc}}&nbsp;&nbsp;&nbsp;{{previewData.date}}</p>
         <br>
-        <div v-html="previewData.content" class="pic" style="overflow-y:auto;max-height:500px"></div>
+        <div class="preview-content">
+          <div v-html="previewData.content"></div>
+        </div>
         <br>
-        <!-- <p><a v-bind:href="newsUrl">原文链接</a></p> -->
         <div slot="footer">
             <Button type="primary" @click="previewModal=false">关闭</Button>
         </div>
@@ -113,69 +146,46 @@
     data: function () {
       return {
         url: {
-          add: 'news/add.do',
-          edit: 'news/edit.do',
-          delete: 'news/delete.do',
-          batchDelete: 'news/batchDelete.do',
-          batchPublish: 'news/batchPublish.do',
-          newsSource: 'communal/news/sources.do'
+          add: 'web/news/add',
+          edit: 'web/news/update',
+          delete: 'web/news/delete',
+          batchDelete: 'web/news/batchDelete',
+          batchPublish: 'web/news/batchPublish',
+          newsSource: 'web/communal/news/sources'
         },
         tinymceId: 'news',
         pager: {
-          data: [
-            {
-              id: '22972',
-              areaId: '659007',
-              url: '',
-              title: '光明新区周家大道（马田段）土地整备攻坚战告捷',
-              newsSrc: '绿色光明网',
-              content: '今鞍山道卡萨丁',
-              date: '',
-              image: 'http://iguangming.sznews.com/images/attachement/png/site640/20171220/IMG889ffafebae246370159022.PNG',
-              commentNum: '789',
-              upvoteNum: '798',
-              shareNum: '897',
-              status: '0',
-              detailAddress: '深圳市光明新区'
-            }, {
-              id: '22970',
-              areaId: '659007',
-              url: '',
-              title: '光明新区首设全待行路口 提升道路通行能力',
-              newsSrc: '绿色光明网',
-              content: '阿斯顿',
-              date: '',
-              image: 'http://iguangming.sznews.com/images/attachement/jpg/site640/20171220/IMGb083feb941e04637355087.jpg',
-              commentNum: '123',
-              upvoteNum: '132',
-              shareNum: '312',
-              status: '1',
-              detailAddress: '深圳市光明新区'
-            }, {
-              id: '22968',
-              areaId: '659005',
-              url: '',
-              title: '观湖街道“上围艺术+”党群驿站揭牌启用',
-              newsSrc: '龙华网',
-              content: '为人头就偶尔提',
-              date: '',
-              image: 'http://ilonghua.sznews.com/images/attachement/jpg/site1011/20171219/IMG74e543574fc54636456847.jpg',
-              commentNum: '456',
-              upvoteNum: '465',
-              shareNum: '654',
-              status: '2',
-              detailAddress: '深圳市龙华新区'
-            }
-          ],
-          url: 'news/dataGrid.do',
-          sort: 'createTime',
-          order: 'desc'
+          data: [],
+          url: 'web/news/dataGrid',
         },
         previewModal: false,
         derail_address_arr: [],
         derail_address_obj_s: [],
         batchOprArr: [],
         newsSource: [], // 新闻来源网站数组 例子： ['南方网', '人民网']
+        newsStatus: [
+          {
+            value: '1',
+            label: '未发布'
+          },
+          {
+            value: '2',
+            label: '已发布'
+          },
+        ],
+        newsDate: '',
+        newsStatusMap: {},
+        newsType: [
+          {
+            value: '',
+            label: ''
+          },
+          {
+            value: '',
+            label: ''
+          },
+        ],
+        newsTypeMap: {},
         previewData: {
           title: '',
           newsSrc: '',
@@ -194,18 +204,19 @@
         },
         formDialog: {
           id: '',
-          areaId: '',
           url: '',
           title: '',
+          newsImage: '',
           newsSrc: '',
           content: '',
-          date: '',
-          image: '',
-          commentNum: '',
-          upvoteNum: '',
-          shareNum: '',
-          status: '',
-          detailAddress: ''
+          newsStatus: '1',
+          newsType: '',
+          newsDate: '',
+          areasCode: '',
+          cityCode: '',
+          provincesCode: '',
+          detailAddress: '',
+          createTime: ''
         },
         columns: [
           {
@@ -222,25 +233,28 @@
           },
           {
             'title': '区域ID',
-            'key': 'areaId',
+            'key': 'areasCode',
             'width': 120,
             'sortable': true
           },
           {
             'title': '新闻图片',
-            'key': 'image',
+            'key': 'newsImage',
             'width': 120,
             'sortable': true,
             render: function (create, params) {
+              // 多张图片的处理
+              var src = params.row.newsImage ? params.row.newsImage.split(',')[0] : '无'
               return create('img', {
                 attrs: {
-                  src: params.row.image,
-                  width: 80,
-                  height: 80
+                  src: src
                 },
                 style: {
                   'border': '1px solid transparent',
-                  'border-radius': '4px'
+                  'margin': '10px',
+                  'border-radius': '4px',
+                  'max-width': '100px',
+                  'max-height': '100px'
                 }
               })
             }
@@ -255,13 +269,24 @@
             'title': '新闻来源',
             'key': 'newsSrc',
             'width': 150,
-            'sortable': true
+          },
+          {
+            'title': '来源url',
+            'key': 'url',
+            'width': 200,
+            render: function (create, params) {
+              return create('a', {
+                attrs: {
+                  'href': params.row.url,
+                  'target': '_blank'
+                },
+              },params.row.url)
+            }
           },
           {
             'title': '关联地区',
             'key': 'detailAddress',
             'width': 160,
-            'sortable': true
           },
           {
             'title': '评论数',
@@ -302,7 +327,7 @@
           {
             title: '操作',
             key: 'action',
-            width: 200,
+            width: 220,
             align: 'center',
             fixed: 'right',
             render: (create, params) => {
@@ -335,11 +360,11 @@
                   },
                   on: {
                     click: () => {
-                      console.log('发布')
+                      vm.$Message.info(vm.label.wait)
                     }
                   }
                 }, '发布'),
-                vm.createDelBtn(create, params.row.id)
+                // vm.createDelBtn(create, params.row.id)
               ])
             }
           }
@@ -347,8 +372,10 @@
         rules: {}
       }
     },
-    computed: {},
     methods: {
+      newsDateChange(date){
+        this.formDialog.newsDate = date
+      },
       updateSelect (selection) {
         this.batchOprArr = selection
       },
@@ -390,8 +417,6 @@
         vm.derail_address_arr = JSON.parse(sessionStorage.chinaData)
       }
     },
-    created () {},
-    mounted () {},
     watch: {
       derail_address_obj_s (val) {
         if (val.length) {
@@ -403,3 +428,15 @@
     }
   }
 </script>
+<style scoped>
+  .preview-content{
+    overflow-y:auto;
+    max-height:500px;
+  }
+  /* 为什么选不中 */
+  .preview-content img{
+    padding: 20px;
+    max-width: 90%!important;
+  }
+</style>
+

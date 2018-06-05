@@ -13,7 +13,7 @@ module.exports = {
     proxyTable: {
         '/api': {
           // target: 'http://localhost:8282/zsx-upms-web-server', //原项目
-          target: 'http://10.0.0.40:8088',  //  李植电脑
+          target: 'http://10.0.0.20:8088',  //  李植电脑
           changeOrigin: true,
           pathRewrite: {
             '^/api': '/'

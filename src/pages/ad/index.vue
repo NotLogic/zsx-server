@@ -1,7 +1,7 @@
 <template>
   <div class="ad">
     <Form :model="formSearch" ref="formSearch" inline :label-width="60">
-      <FormItem label="关键字" prop="title">
+      <FormItem label="标题" prop="title">
         <Input v-model="formSearch.title" placeholder="标题" size="small"></Input>
       </FormItem>
       <!-- <FormItem label="广告位置" prop="postion">
@@ -68,7 +68,7 @@
                         :on-success="myHandleSuccess">
                       <Button type="ghost" icon="ios-cloud-upload-outline">选择图片</Button>
                     </Upload>
-                    <Button type="primary" @click="myUpload">上传图片</Button>
+                    <Button type="primary" @click="myUpload" :loading="uploadLoading">上传图片</Button>
                   </Col>
                   <Col span="18">
                     <Row v-if="fileUrl.length">
@@ -181,6 +181,7 @@
           upload: 'file/440859402723328',
           sId: 'id/id',
         },
+        uploadLoading: false,
         needId: true,
         pager: {
           url: 'advert/dataGrid',
@@ -269,15 +270,15 @@
         areaData: [],
         countryData: [{label: "中国", value: "1", children: []}],
         formSearch: {
-          startTime: '',
-          endTime: '',
+          // startTime: '',
+          // endTime: '',
           // province: 0,
           // city: 0,
-          type: '',
-          ls: '',
+          // type: '',
+          // ls: '',
           title: '',
-          areaType: '4',
-          areaId: ''
+          // areaType: '4',
+          // areaId: ''
         },
         hasExtraImg: false,
         startTime: '',
@@ -341,22 +342,30 @@
             'title': '链接地址',
             'key': 'href',
             'width': 250,
-            'sortable': true
+            'sortable': true,
+            // render: (create, params) => {
+            //   return create('a', {
+            //     attrs: {
+            //       href: params.row.href
+            //     }
+            //   })
+            // }
+          },
+          {
+            'title': '广告位置',
+            'key': 'postion',
+            'width': 150,
+            'sortable': true,
+            render: (create, params) => {
+              var txt = this.postionMap[params.row.postion] + ' （' + params.row.postion + '）'
+              return create('span', txt)
+            }
           },
           {
             'title': '点击次数',
             'key': 'clickNum',
             'width': 120,
             'sortable': true
-          },
-          {
-            'title': '广告位置',
-            'key': 'postion',
-            'width': 120,
-            'sortable': true,
-            render: (create, params) => {
-              return create('span', this.postionMap[params.row.postion])
-            }
           },
           {
             'title': '关联地区',
@@ -586,6 +595,7 @@
               arr.push(rd.data[key]);
             }
             vm.formDialog.imagePath = arr[0] || '';
+            vm.uploadLoading = false
           }else{
             vm.$Message.error(rd.message)
           }
@@ -602,6 +612,7 @@
       handleRemove(index){
         var vm = this
         vm.fileUrl.splice(index,1)
+        vm.uploadImgArr.splice(index,1)
       },
       // 编辑行时回显的额外操作  
       initDialog (data) {
