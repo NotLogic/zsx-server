@@ -82,7 +82,7 @@
           <Col span="12">
             <FormItem label="头像" prop="headPortrait">
               <Input v-model="formDialog.headPortrait"></Input>
-              <Row>
+              <!-- <Row>
                 <Col span="12">
                   <Upload name="file"
                       :action="url.upload"
@@ -111,7 +111,7 @@
                     <img src="static/images/img-upload-default.png" class="ad-img">
                   </div>
                 </Col>
-              </Row>
+              </Row> -->
             </FormItem>
           </Col>
           <Col span="12">
@@ -155,7 +155,7 @@
       </div>
     </Modal>
     <!-- 预览用户数据 -->
-    <Modal v-model="previewShow" title="预览" width="1000">
+    <Modal v-model="previewShow" title="预览" width="800">
       <Row>
         <Col span="4" class="rightt"><strong>账号:</strong></Col>
         <Col span="19"><p>{{previewData.loginUsername}}</p></Col>
@@ -166,7 +166,7 @@
       </Row>
       <Row>
         <Col span="4" class="rightt"><strong>appSoucre:</strong></Col>
-        <Col span="19" ><p>{{previewData.appSoucre}}</p></Col>
+        <Col span="19" ><p>{{appSoucreMap[previewData.appSoucre]}}</p></Col>
       </Row>
       <Row>
         <Col span="4" class="rightt"><strong>出生日期:</strong></Col>
@@ -179,15 +179,23 @@
       </Row>
       <Row>
         <Col span="4" class="rightt"><strong>性别:</strong></Col>
-        <Col span="19" ><p>{{previewData.sex}}</p></Col>
+        <Col span="19" ><p>{{sexMap[previewData.sex]}}</p></Col>
       </Row>
       <Row>
         <Col span="4" class="rightt"><strong>用户头像:</strong></Col>
-        <Col span="19" ><p>{{previewData.headPortrait}}</p></Col>
+        <Col span="19" >
+          <div class="preview-img-box">
+            <img :src="previewData.headPortrait" :alt="previewData.headPortrait">
+          </div>
+        </Col>
       </Row>
       <Row>
         <Col span="4" class="rightt"><strong>头像背景:</strong></Col>
-        <Col span="19" ><p>{{previewData.bgPortrait}}</p></Col>
+        <Col span="19" >
+          <div class="preview-img-box">
+            <img :src="previewData.bgPortrait" :alt="previewData.bgPortrait">
+          </div>
+        </Col>
       </Row>
       <Row>
         <Col span="4" class="rightt"><strong>所在地:</strong></Col>
@@ -199,15 +207,15 @@
       </Row>
       <Row>
         <Col span="4" class="rightt"><strong>是否认证:</strong></Col>
-        <Col span="19" ><p>{{previewData.isAuth}}</p></Col>
+        <Col span="19" ><p>{{isAuthMap[previewData.isAuth]}}</p></Col>
       </Row>
       <Row>
         <Col span="4" class="rightt"><strong>是否完善资料:</strong></Col>
-        <Col span="19" ><p>{{previewData.isConsummate}}</p></Col>
+        <Col span="19" ><p>{{isConsummateMap[previewData.isConsummate]}}</p></Col>
       </Row>
       <Row>
         <Col span="4" class="rightt"><strong>用户状态:</strong></Col>
-        <Col span="19" ><p>{{previewData.userStatus}}</p></Col>
+        <Col span="19" ><p>{{userStatusMap[previewData.userStatus]}}</p></Col>
       </Row>
       <Row>
         <Col span="4" class="rightt"><strong>创建时间:</strong></Col>
@@ -218,7 +226,7 @@
       </div>
     </Modal>
     <!-- 根据userId获取的帖子数据 -->
-    <Modal v-model="postShow" title="预览" width="1000">
+    <Modal v-model="postShow" title="帖子" width="1000">
 
     </Modal>
   </div>
@@ -253,6 +261,7 @@
           url: 'user/dataGrid',
         },
         postShow: false,
+        postData: [], // 帖子数据
         needId: true,
         previewShow: false,
         uploadLoading: false,
@@ -264,6 +273,11 @@
         location_address: [], //  所在地
         roleIds: [],
         chinaJson: {},
+        appSoucreMap: {
+          "1": 'IOS',
+          "2": "Android",
+          "3": "Web"
+        },
         userStatus: [{label:'正常', value:'1'}, {label:"禁用", value:'2'}, {label:"封号", value:'3'}],
         userStatusMap: {
           "1": "正常",
@@ -347,13 +361,9 @@
             "key": "appSoucre",
             "width": 150,
             "sortable": true,
-            render(create,params){
-              var map = {
-                "1": 'IOS',
-                "2": "Android",
-                "3": "Web"
-              }
-              return create('span',map[params.row.appSoucre])
+            render:(create,params)=>{
+              var appSoucre = params.row.appSoucre ? params.row.appSoucre : ''
+              return create('span',this.appSoucreMap[appSoucre])
             }
           },
           {
@@ -374,8 +384,7 @@
             "width": 80,
             "sortable": true,
             render: (create, params) => {
-              var vm = this
-              var txt = vm.sexMap[params.row.sex]
+              var txt = this.sexMap[params.row.sex]
               return create('span',txt)
             }
           },
@@ -540,6 +549,7 @@
       }
     },
     methods: {
+      // 创建预览按钮
       createPreviewBtn(create,rowData){
         var vm = this;
         return create('Button',{
@@ -556,20 +566,21 @@
               for(var key in rowData){
                 previewData[key] = rowData[key]
               }
-              // var provincesCode = rowData.provincesCode,
-              //     cityCode = rowData.cityCode,
-              //     areaCode = rowData.areaCode,
-              //     homeProvincesCode = rowData.homeProvincesCode,
-              //     homeCityCode = rowData.homeCityCode,
-              //     homeAreaCode = rowData.homeAreaCode;
-              // previewData.location = vm.util.getProvinceCityArea([provincesCode,cityCode,areaCode], vm.chinaJson, true)
-              // previewData.home = vm.util.getProvinceCityArea([homeProvincesCode,homeCityCode,homeAreaCode], vm.chinaJson, true)
+              var provincesCode = rowData.provincesCode,
+                  cityCode = rowData.cityCode,
+                  areaCode = rowData.areaCode,
+                  homeProvincesCode = rowData.homeProvincesCode,
+                  homeCityCode = rowData.homeCityCode,
+                  homeAreaCode = rowData.homeAreaCode;
+              previewData.location = vm.util.getProvinceCityArea([provincesCode,cityCode,areaCode], vm.chinaJson, true)
+              previewData.home = vm.util.getProvinceCityArea([homeProvincesCode,homeCityCode,homeAreaCode], vm.chinaJson, true)
               vm.previewData = previewData
               vm.previewShow = true
             }
           }
         },'预览')
       },
+      // 查看用户帖子按钮
       createPostBtn(create, userId){
         var vm = this;
         return create('Button',{
@@ -594,7 +605,7 @@
           vm.$Message.error('用户ID获取失败')
           return
         } 
-        vm.$http.post(vm.url.post + userId).then(res=>{
+        vm.$http2.post(vm.url.post + userId).then(res=>{
           console.log('res: ',res)
         }).catch(err=>{})
       },
@@ -783,5 +794,14 @@
   font-size: 20px;
   cursor: pointer;
   margin: 0 2px;
+}
+.preview-img-box{
+  width: 100px;
+  height: 100px;
+  border: 1px solid gray;
+}
+.preview-img-box img{
+  max-width: 100%;
+  max-height: 100%;
 }
 </style>

@@ -33,25 +33,18 @@
       <Button type="primary" style="margin: 5px 8px 24px 0;" @click="submitSearch('formSearch')" size="small">{{label.search}}</Button>
       <Button type="ghost" :disabled="batchOprArr.length==0" style="margin: 5px 8px 24px 0;" @click="batchDelete" size="small">批量删除</Button>
       <Button type="primary" :disabled="batchOprArr.length==0" style="margin: 5px 8px 24px 0;" @click="batchPublish" size="small">批量发布</Button>
-      <Button type="primary" style="margin: 5px 8px 24px 0;" @click="addRow" size="small">{{label.add}}</Button>
     </Form>
     <mainTable :columns="columns" :data="pager.data" @updateSelect="updateSelect"></mainTable>
     <paging @changePager="changePager" @paging="paging" :total="pager.total" :currPage="pager.currPage"></paging>
     <Modal v-model="dialogShow" :title="label[currDialog]" :mask-closable="false" width="800" @on-cancel="resetDialogForm('formDialog')" :styles="{top:'30px'}">
       <Form :model="formDialog" ref="formDialog" :rules="rules" :label-width="80">
         <Row>
-          <Col span="14">
+          <Col span="24">
             <FormItem label="新闻标题" prop="title">
               <Input v-model="formDialog.title" placeholder="请输入标题"></Input>
             </FormItem>
-            <FormItem label="新闻来源" prop="newsSrc">
-              <Input v-model="formDialog.newsSrc" placeholder="请输入新闻来源"></Input>
-            </FormItem>
-            <FormItem label="关联地区">
-              <Input v-model="formDialog.detailAddress" disabled></Input>
-            </FormItem>
           </Col>
-          <Col span="10">
+          <!-- <Col span="10">
             <FormItem label="新闻主图" prop="image">
               <Row>
                 <Col span="12">
@@ -67,8 +60,20 @@
                 </Col>
               </Row>
             </FormItem>
-          </Col>
+          </Col> -->
         </Row>
+        <Row>
+          <Col span="12">
+            <FormItem label="新闻来源" prop="newsSrc">
+              <Input v-model="formDialog.newsSrc" placeholder="请输入新闻来源"></Input>
+            </FormItem>
+          </Col>
+          <Col span="12">
+            <FormItem label="关联地区">
+              <Input v-model="formDialog.detailAddress" :disabled="currDialog=='edit'"></Input>
+            </FormItem>
+          </Col>
+        </row>
         <Row>
           <Col span="12">
             <FormItem label="来源url" prop="url">
@@ -87,16 +92,15 @@
         <Row>
           <Col span="12">
             <FormItem label="发布时间" prop="newsDate">
-              <Input v-model="formDialog.newsDate" placeholder="请输入标题"></Input>
               <DatePicker type="date" placeholder="点击选择出生日期" @on-change="newsDateChange" v-model="newsDate" :clearable="false"></DatePicker>
             </FormItem>
           </Col>
           <Col span="12">
             <FormItem label="新闻类型" prop="newsType">
-              <Input v-model="formDialog.newsType" placeholder="请输入来源url"></Input>
-              <!-- <Select v-model="formDialog.newsType" placeholder="请选择"  clearable>
+              <!-- <Input v-model="formDialog.newsType" placeholder="请输整数的新闻类型值"></Input> -->
+              <Select v-model="formDialog.newsType" placeholder="请选择"  clearable>
                 <Option v-for="item in newsType" :value="item.value" :key="item.value">{{ item.label }}</Option>
-              </Select> -->
+              </Select>
             </FormItem>
           </Col>
         </Row>
@@ -146,7 +150,7 @@
     data: function () {
       return {
         url: {
-          add: 'web/news/add',
+          // add: 'web/news/add', //接口已删除
           edit: 'web/news/update',
           delete: 'web/news/delete',
           batchDelete: 'web/news/batchDelete',
@@ -162,6 +166,7 @@
         derail_address_arr: [],
         derail_address_obj_s: [],
         batchOprArr: [],
+        batchIdArr: [],
         newsSource: [], // 新闻来源网站数组 例子： ['南方网', '人民网']
         newsStatus: [
           {
@@ -169,23 +174,109 @@
             label: '未发布'
           },
           {
-            value: '2',
+            value: '0',
             label: '已发布'
           },
         ],
         newsDate: '',
-        newsStatusMap: {},
+        newsStatusMap: {
+          "0": "已发布",
+          "1": "未发布"
+        },
         newsType: [
           {
-            value: '',
-            label: ''
+            value: '1',
+            label: '时尚'
           },
           {
-            value: '',
-            label: ''
+            value: '2',
+            label: '旅游'
+          },
+          {
+            value: '3',
+            label: '母婴'
+          },
+          {
+            value: '4',
+            label: '科技'
+          },
+          {
+            value: '5',
+            label: '教育'
+          },
+          {
+            value: '6',
+            label: '健康'
+          },
+          {
+            value: '7',
+            label: '美食'
+          },
+          {
+            value: '8',
+            label: '文化'
+          },
+          {
+            value: '9',
+            label: '历史'
+          },
+          {
+            value: '10',
+            label: '星座'
+          },
+          {
+            value: '11',
+            label: '动漫'
+          },
+          {
+            value: '12',
+            label: '游戏'
+          },
+          {
+            value: '13',
+            label: '娱乐'
+          },
+          {
+            value: '14',
+            label: '军事'
+          },
+          {
+            value: '15',
+            label: '社会'
+          },
+          {
+            value: '16',
+            label: '宏观'
+          },
+          {
+            value: '17',
+            label: '理财'
+          },
+          {
+            value: '18',
+            label: '财经'
           },
         ],
-        newsTypeMap: {},
+        newsTypeMap: {
+          "1": "时尚",
+          "2": "旅游",
+          "3": "母婴",
+          "4": "科技",
+          "5": "教育",
+          "6": "健康",
+          "7": "美食",
+          "8": "文化",
+          "9": "历史",
+          "10": "星座",
+          "11": "动漫",
+          "12": "游戏",
+          "13": "娱乐",
+          "14": "军事",
+          "15": "社会",
+          "16": "宏观",
+          "17": "理财",
+          "18": "财经"
+        },
         previewData: {
           title: '',
           newsSrc: '',
@@ -211,7 +302,7 @@
           content: '',
           newsStatus: '1',
           newsType: '',
-          newsDate: '',
+          newsDate: '', //  发布日期
           areasCode: '',
           cityCode: '',
           provincesCode: '',
@@ -244,19 +335,23 @@
             'sortable': true,
             render: function (create, params) {
               // 多张图片的处理
-              var src = params.row.newsImage ? params.row.newsImage.split(',')[0] : '无'
-              return create('img', {
-                attrs: {
-                  src: src
-                },
-                style: {
-                  'border': '1px solid transparent',
-                  'margin': '10px',
-                  'border-radius': '4px',
-                  'max-width': '100px',
-                  'max-height': '100px'
-                }
-              })
+              var src = params.row.newsImage ? params.row.newsImage.split(',')[0] : ''
+              if(src){
+                return create('img', {
+                  attrs: {
+                    src: src
+                  },
+                  style: {
+                    'border': '1px solid transparent',
+                    'margin': '10px 0',
+                    'border-radius': '4px',
+                    'max-width': '100px',
+                    'max-height': '100px'
+                  }
+                })
+              }else{
+                return create('span', '无')
+              }
             }
           },
           {
@@ -289,24 +384,6 @@
             'width': 160,
           },
           {
-            'title': '评论数',
-            'key': 'commentNum',
-            'width': 100,
-            'sortable': true
-          },
-          {
-            'title': '点赞数',
-            'key': 'upvoteNum',
-            'width': 100,
-            'sortable': true
-          },
-          {
-            'title': '分享数',
-            'key': 'shareNum',
-            'width': 100,
-            'sortable': true
-          },
-          {
             'title': '状态',
             'key': 'status',
             'width': 100,
@@ -322,6 +399,24 @@
             'title': '采集时间',
             'key': 'createTime',
             'width': 160,
+            'sortable': true
+          },
+          {
+            'title': '评论数',
+            'key': 'commentNum',
+            'width': 100,
+            'sortable': true
+          },
+          {
+            'title': '点赞数',
+            'key': 'upvoteNum',
+            'width': 100,
+            'sortable': true
+          },
+          {
+            'title': '分享数',
+            'key': 'shareNum',
+            'width': 100,
             'sortable': true
           },
           {
@@ -364,7 +459,7 @@
                     }
                   }
                 }, '发布'),
-                // vm.createDelBtn(create, params.row.id)
+                vm.createDelBtn(create, params.row.id)
               ])
             }
           }
@@ -373,6 +468,25 @@
       }
     },
     methods: {
+      delRow(data){
+        var vm = this;
+        if(!data.id){
+          vm.$Message.error('id获取失败')
+          return
+        }
+        vm.batchIdArr = [data.id]
+        console.log('vm.batchIdArr: ',vm.batchIdArr)
+        return
+        vm.$http2.post(vm.url.delete).then(res=>{
+          var resData = res.data
+          if(resData.code==1){
+            vm.$Message.success('删除成功');
+            vm.paging()
+          }else{
+            vm.$Message.error(resData.message);
+          }
+        }).catch(err=>{})
+      },
       newsDateChange(date){
         this.formDialog.newsDate = date
       },
@@ -409,8 +523,27 @@
       },
       initDialog (data) {
         let vm = this
-        let _data = vm.util.extend(data)
-        vm.setContent(_data.content)
+        vm.newsDate = data.newsDate
+        if(typeof data.newsType == 'number'){
+          data.newsType = data.newsType.toString()
+        }
+        console.log('data.newsType: ',data.newsType)
+        vm.setContent(data.content)
+      },
+      pagerResult(data){
+        var vm = this
+        var result = vm.util.deepcopy(data)
+        var len = result.length,item;
+        for(var i=0;i<len;i++){
+          item = result[i]
+          if(typeof item.newsDate == 'number'){
+            item.newsDate = vm.util.timestampToTime(item.newsDate);
+          }
+          if(typeof item.newsStatus == 'number'){
+            item.newsStatus = item.newsStatus.toString()
+          }
+        }
+        return result
       },
       initData () {
         let vm = this
@@ -424,6 +557,13 @@
         } else {
           this.formSearch.areaId = ''
         }
+      },
+      batchOprArr (val){
+        var vm = this,batchIdArr = [],len=val.length;
+        for(var i=0;i<len;i++){
+          batchIdArr.push(val[i].id)
+        }
+        vm.batchIdArr = batchIdArr
       }
     }
   }

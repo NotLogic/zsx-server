@@ -630,7 +630,7 @@
           provincesId = data.provincesId
           arr = [provincesId]
         }
-        data.postion.toString()
+        data.postion = data.postion.toString()
         vm.derail_address_obj = arr
         if(data.imageArr){
           vm.fileUrl = data.imageArr

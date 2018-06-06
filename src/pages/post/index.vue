@@ -174,7 +174,7 @@
           // id: '',
           postContent: '',
           userId: '1003922948007866370',
-          postStatus: '',
+          postStatus: '0',
           createTime: '',
           imagePath: [],
           userheadPortrait: '',
