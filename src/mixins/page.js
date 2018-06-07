@@ -133,14 +133,21 @@ const page = {
         vm.changePager(currPage)
         return
       }
+      if(typeof vm.pageLoading != 'undefined'){
+        vm.pageLoading = true
+      }
       vm.$http2({
         url: vm.pager.url,
         method: vm.pager.method,
         data: vm.pagingFiltData(vm.pager)
       }).then(res => {
+        console.log('返回的不太真实的原始数据： ',res) // 为什么是先执行  vm.pagerResult再打印？？
         let resData = res.data
         resData = typeof resData == 'object' ? resData : JSON.parse(resData)
         if (resData.code == 1) {
+          if(typeof vm.pageLoading != 'undefined'){
+            vm.pageLoading = false
+          }
           if (typeof vm.pagerResult == 'function') {
             // 返回数据预处理
             resData.data = vm.pagerResult(resData.data)
@@ -148,7 +155,7 @@ const page = {
           setTimeout(function(){
             vm.pager.data = resData.data
             vm.pager.total = resData.total
-          },20)
+          },50)
         }
       }).catch(err=>{})
     },
@@ -236,7 +243,6 @@ const page = {
       if (typeof vm.initDialog === 'function') {
         vm.initDialog(_data)
       }
-      console.log('编辑行的最终数据： ',_data)
       vm.formDialog = _data
       vm.currDialog = 'edit'
       vm.dialogShow = true
@@ -298,6 +304,13 @@ const page = {
         mixinPager[key] = pager[key]
       }
       vm.pager = mixinPager
+    }
+  },
+  watch: {
+    dialogShow(val){
+      if(!val && typeof this.resetDialogForm == 'function'){
+        this.resetDialogForm()
+      }
     }
   },
   created () {

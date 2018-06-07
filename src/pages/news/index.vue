@@ -2,8 +2,8 @@
   <div class="news">
     <!-- 高级搜索 -->
     <Form :model="formSearch" ref="formSearch" inline :label-width="60">
-      <FormItem label="关键词" prop="keyWord">
-        <Input v-model="formSearch.keyWord" placeholder="标题" size="small" style="width: 120px"></Input>
+      <FormItem label="标题" prop="title">
+        <Input v-model="formSearch.title" placeholder="标题" size="small" style="width: 120px"></Input>
       </FormItem>
       <!-- <FormItem label="新闻ID" prop="id">
         <Input v-model="formSearch.id" placeholder="新闻ID" size="small" style="width: 120px"></Input>
@@ -31,8 +31,8 @@
       </FormItem>
       <Button type="ghost" style="margin:5px 8px 24px 0;" @click="resetSearch('formSearch')" size="small">{{label.clear}}</Button>
       <Button type="primary" style="margin: 5px 8px 24px 0;" @click="submitSearch('formSearch')" size="small">{{label.search}}</Button>
-      <Button type="ghost" :disabled="batchOprArr.length==0" style="margin: 5px 8px 24px 0;" @click="batchDelete" size="small">批量删除</Button>
-      <Button type="primary" :disabled="batchOprArr.length==0" style="margin: 5px 8px 24px 0;" @click="batchPublish" size="small">批量发布</Button>
+      <Button type="error" :disabled="batchOprArr.length==0" style="margin: 5px 8px 24px 0;" @click="batchDelete" size="small">批量删除</Button>
+      <Button type="ghost" :disabled="batchOprArr.length==0" style="margin: 5px 8px 24px 0;" @click="batchPublish" size="small">批量发布</Button>
     </Form>
     <mainTable :columns="columns" :data="pager.data" @updateSelect="updateSelect"></mainTable>
     <paging @changePager="changePager" @paging="paging" :total="pager.total" :currPage="pager.currPage"></paging>
@@ -97,8 +97,7 @@
           </Col>
           <Col span="12">
             <FormItem label="新闻类型" prop="newsType">
-              <!-- <Input v-model="formDialog.newsType" placeholder="请输整数的新闻类型值"></Input> -->
-              <Select v-model="formDialog.newsType" placeholder="请选择"  clearable>
+              <Select v-model="formDialog.newsType" placeholder="请选择" filterable clearable>
                 <Option v-for="item in newsType" :value="item.value" :key="item.value">{{ item.label }}</Option>
               </Select>
             </FormItem>
@@ -150,12 +149,10 @@
     data: function () {
       return {
         url: {
-          // add: 'web/news/add', //接口已删除
           edit: 'web/news/update',
-          delete: 'web/news/delete',
-          batchDelete: 'web/news/batchDelete',
-          batchPublish: 'web/news/batchPublish',
-          newsSource: 'web/communal/news/sources'
+          delete: 'web/news/delete',  //  {ids: [放需要删除的id]}
+          search: 'web/news/dataSearch',
+          batchPublish: 'web/news/release',
         },
         tinymceId: 'news',
         pager: {
@@ -284,14 +281,14 @@
           content: '',
         },
         formSearch: {
-          startTime: '',
-          endTime: '',
-          province: 0,
-          city: 0,
-          type: null,
-          lockStatus: null,
-          title: null,
-          areaType: '0'
+          // startTime: '',
+          // endTime: '',
+          // province: 0,
+          // city: 0,
+          // type: null,
+          // lockStatus: null,
+          title: '',
+          // areaType: '0'
         },
         formDialog: {
           id: '',
@@ -385,14 +382,11 @@
           },
           {
             'title': '状态',
-            'key': 'status',
+            'key': 'newsStatus',
             'width': 100,
             'sortable': true,
-            render: function (create, params) {
-              var map = {
-                0: '未发布', 1: '未发布', 2: '已发布'
-              }
-              return create('span', map[params.row.status])
+            render: (create, params) => {
+              return create('span', this.newsStatusMap[params.row.newsStatus])
             }
           },
           {
@@ -427,6 +421,7 @@
             fixed: 'right',
             render: (create, params) => {
               let vm = this
+              var disabled = params.row.newsStatus == 1 ? false : true
               return create('div', [
                 vm.createEditBtn(create, params.row),
                 create('Button', {
@@ -448,14 +443,21 @@
                 }, '查看'),
                 create('Button', {
                   props: {
-                    size: 'small'
+                    size: 'small',
+                    disabled: disabled
                   },
                   style: {
                     marginRight: '5px'
                   },
                   on: {
                     click: () => {
-                      vm.$Message.info(vm.label.wait)
+                      vm.$Modal.confirm({
+                        title: '确认',
+                        content: '确认发布这条数据吗？',
+                        onOk: function () {
+                          vm.newsPublish(params.row.id)    
+                        }
+                      })
                     }
                   }
                 }, '发布'),
@@ -468,19 +470,49 @@
       }
     },
     methods: {
+      submitSearch (name) {
+        let vm = this
+        // 搜索操作
+        vm.$http({
+          url: vm.url.search,
+          method: vm.pager.method,
+          data: vm.formSearch
+        }).then(res => {
+          var resData = res.data
+          if(resData.code==1){
+            vm.pager.data = resData.data
+          }else{
+            vm.$Message.error('搜索失败: ' + resData.message)
+          }
+        }).catch(err=>{})
+      },
       delRow(data){
         var vm = this;
         if(!data.id){
           vm.$Message.error('id获取失败')
           return
         }
-        vm.batchIdArr = [data.id]
-        console.log('vm.batchIdArr: ',vm.batchIdArr)
-        return
-        vm.$http2.post(vm.url.delete).then(res=>{
+        var parmas = {
+          method: 'post',
+          url: vm.url.delete,
+          data: {
+            ids: [data.id]
+          }
+        }
+        vm.batchoperation(parmas)
+      },
+      // 批量操作
+      batchoperation(parmas){
+        var vm = this
+        if(typeof parmas != 'object'){
+          vm.$Message.error('传参错误')
+          return
+        }
+        parmas.method = parmas.method || 'post'
+        vm.$http2(parmas).then(res=>{
           var resData = res.data
           if(resData.code==1){
-            vm.$Message.success('删除成功');
+            vm.$Message.success('操作成功');
             vm.paging()
           }else{
             vm.$Message.error(resData.message);
@@ -499,14 +531,58 @@
         vm.$refs[name].resetFields()
         vm.submitSearch(name)
       },
+      newsPublish(id){
+        var vm = this;
+        if(!id){
+          vm.$Message.error('id获取失败')
+          return
+        }
+        var parmas = {
+          method: 'post',
+          url: vm.url.batchPublish,
+          data: {
+            ids: [id]
+          }
+        }
+        vm.batchoperation(parmas)
+      },
       batchDelete () {
-        console.log('批量删除数据： ',this.batchOprArr)
+        var vm = this
+        vm.$Modal.confirm({
+          title: '确认',
+          content: '确认删除这些数据吗？',
+          onOk: function () {
+            var parmas = {
+              method: 'post',
+              url: vm.url.delete,
+              data: {
+                ids: vm.batchIdArr
+              }
+            }
+            vm.batchoperation(parmas)
+          }
+        })
       },
       batchPublish () {
-        console.log('批量发布数据： ',this.batchOprArr)
+        var vm = this
+        vm.$Modal.confirm({
+          title: '确认',
+          content: '确认发布这些数据吗？',
+          onOk: function () {
+            var parmas = {
+              method: 'post',
+              url: vm.url.batchPublish,
+              data: {
+                ids: vm.batchIdArr
+              }
+            }
+            vm.batchoperation(parmas)
+          }
+        })
       },
       handleSuccess () {},
       resetDialogForm (name) {
+        name = name || 'formDialog'
         let vm = this
         vm.setContent('')
         vm.$refs[name].resetFields()
@@ -560,8 +636,10 @@
       },
       batchOprArr (val){
         var vm = this,batchIdArr = [],len=val.length;
-        for(var i=0;i<len;i++){
-          batchIdArr.push(val[i].id)
+        if(len){
+          for(var i=0;i<len;i++){
+            batchIdArr.push(val[i].id)
+          }
         }
         vm.batchIdArr = batchIdArr
       }

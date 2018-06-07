@@ -23,32 +23,27 @@
         <Button type="primary" style="margin: 5px 8px 24px 0" @click="submitSearch('formSearch')" size="small">{{label.search}}</Button>
         <Button type="error" style="margin: 5px 8px 24px 0" :disabled="batchOprArr.length==0" @click="batchDel" size="small">批量删除</Button>
         <Button type="primary" style="margin: 5px 8px 24px 0" @click="exportData" size="small">导出</Button>
-        <!-- <Button type="primary" style="margin:5px 8px 24px 0;" @click="addRow" size="small">{{label.add}}</Button> -->
+        <Button type="primary" style="margin:5px 8px 24px 0;" @click="addRow" size="small">{{label.add}}</Button>
     </Form>
     <mainTable :columns="columns" :data="pager.data" @updateSelect="updateSelect"></mainTable>
-    <paging @changePager="changePager" @paging="paging" :total="pager.total" :currPage="pager.currPage"></paging>
+    <paging @changePager="changePager" @paging="paging" :loading="pageLoading" :total="pager.total" :currPage="pager.currPage"></paging>
     <Modal v-model="dialogShow" :title="label[currDialog]" :mask-closable="false" width="750" @on-cancel="resetDialogForm('formDialog')">
       <Form :model="formDialog" ref="formDialog" :rules="rules" :label-width="80">
         <Row>
           <Col span="12">
-            <FormItem label="parentId" prop="parentId">
-              <Input v-model="formDialog.parentId" placeholder="请输入parentId"></Input>
+            <FormItem label="模块名称" prop="text">
+              <Input v-model="formDialog.text" placeholder="请输入模块名称"></Input>
             </FormItem>
           </Col>
           <Col span="12">
-            <FormItem label="跳转URL" prop="skipUrl">
-              <Input v-model="formDialog.skipUrl" placeholder="请输入跳转URL"></Input>
+            <FormItem label="父级" prop="parentId">
+              <Select v-model="formDialog.parentId" placeholder="请选择/输入关键字搜索" filterable clearable>
+                <Option v-for="item in parentId" :value="item.value" :key="item.value">{{ item.label }}</Option>
+              </Select>
             </FormItem>
           </Col>
         </Row>
         <Row>
-          <Col span="12">
-            <FormItem label="状态" prop="status">
-              <Select v-model="formDialog.status" placeholder="请选择" clearable>
-                <Option v-for="item in status" :value="item.value" :key="item.value">{{ item.label }}</Option>
-              </Select>
-            </FormItem>
-          </Col>
           <Col span="12">
             <FormItem label="是否跳转" prop="isSkip">
               <Select v-model="formDialog.isSkip" placeholder="请选择" clearable>
@@ -56,20 +51,25 @@
               </Select>
             </FormItem>
           </Col>
-        </Row>
-        <Row>
           <Col span="12">
             <FormItem label="跳转方式" prop="skipType">
-              <Select v-model="formDialog.skipType" placeholder="请选择" clearable>
+              <Select v-model="formDialog.skipType" placeholder="请选择" clearable :disabled="isSkipDisabled">
                 <Option v-for="item in skipType" :value="item.value" :key="item.value">{{ item.label }}</Option>
               </Select>
             </FormItem>
           </Col>
         </Row>
         <Row>
-          <Col span="24">
-            <FormItem label="反馈内容" prop="text">
-              <Input type="textarea" v-model="formDialog.text" placeholder="请输入反馈内容"></Input>
+          <Col span="12">
+            <FormItem label="跳转URL" prop="skipUrl">
+              <Input v-model="formDialog.skipUrl" placeholder="请输入跳转URL" :disabled="isSkipDisabled"></Input>
+            </FormItem>
+          </Col>
+          <Col span="12">
+            <FormItem label="状态" prop="status">
+              <Select v-model="formDialog.status" placeholder="请选择" clearable>
+                <Option v-for="item in status" :value="item.value" :key="item.value">{{ item.label }}</Option>
+              </Select>
             </FormItem>
           </Col>
         </Row>
@@ -105,6 +105,8 @@
           data: [],
           url: 'feedback/dataGrid',
         },
+        pageLoading: false,
+        parentId: [],
         status: [
           {
             value: "0",
@@ -148,6 +150,7 @@
           "1": '外部'
         },
         batchOprArr: [],
+        batchIdArr: [],
         formSearch: {
           st: '',
           et: '',
@@ -155,6 +158,7 @@
           phone: '',
           userId: ''
         },
+        isSkipDisabled: false,
         columns: [
           {
             'type': 'selection',
@@ -169,12 +173,12 @@
             "sortable": true
           },
           {
-            "title": "反馈内容",
+            "title": "所属模块",
             "key": "text",
-            "width": 500
+            "width": 150
           },
           {
-            "title": "上一级",
+            "title": "父级",
             "key": "parentId",
             "width": 150,
             "sortable": true
@@ -233,12 +237,16 @@
           id: '',
           text: '',
           parentId: '', //  上一级
-          status: '',  // 0 起用  1禁用
+          status: '0',  // 0 起用  1禁用
           isSkip: '',  //是否可以跳转  0 是  1  否
           skipType: '', //  0  内部   1外部
           skipUrl: ''  //  跳转路径
         },
-        rules: {}
+        rules: {
+          text: [
+            { required: true, message: '模块名称不能为空', trigger: 'blur' }
+          ],
+        }
       }
     },
     methods: {
@@ -269,6 +277,19 @@
           }
           _data.push(_item)
         }
+        // 初始化模块选择
+        let item2,parentIdArr = [{
+          value: '0',
+          label: '顶级'
+        }]
+        for(let i=0;i<_data.length;i++){
+          item2 = _data[i]
+          parentIdArr.push({
+            value: item2.id,
+            label: item2.text
+          })
+        }
+        vm.parentId = parentIdArr
         return _data
       },
       resetDialogForm (name) {
@@ -277,9 +298,32 @@
         vm.$refs[name].resetFields()
       },
       batchDel () {
-        console.log('批量删除数据： ',this.batchOprArr)
+        console.log('批量删除数据： ',this.batchIdArr)
+        var vm = this
+        vm.$Message.info(vm.label.wait)
       },
-      exportData () {},
+      exportData () {
+        var vm = this
+        vm.$Message.info(vm.label.wait)
+      },
     },
+    watch: {
+      batchOprArr (val){
+        var vm = this,batchIdArr = [],len=val.length;
+        if(len){
+          for(var i=0;i<len;i++){
+            batchIdArr.push(val[i].id)
+          }
+        }
+        vm.batchIdArr = batchIdArr
+      },
+      ["formDialog.isSkip"](val){
+        if(val==1){
+          this.isSkipDisabled = true 
+        }else{
+          this.isSkipDisabled = false
+        }
+      }
+    }
   }
 </script>

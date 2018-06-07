@@ -233,7 +233,7 @@
             'sortable': true
           },
           {
-            'title': 'userSex',
+            'title': '性别',
             'key': 'userSex',
             'width': 150,
             'sortable': true,
