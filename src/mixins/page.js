@@ -35,7 +35,7 @@ const page = {
         'cancle': '取消',
         'uploadImg': '上传图片',
         'uploadExcel': '导入Excel',
-        'wait': '功能正在研发中，请稍后...'
+        'wait': '功能正在研发中，请稍后,谢谢...'
       },
       mixinPager: {
         'url': '',
@@ -217,7 +217,7 @@ const page = {
       return ajaxData
     },
     // 创建编辑按钮
-    createEditBtn (create, data) {
+    createEditBtn (create, data, callback) {
       let vm = this
       return create('Button', {
         props: {
@@ -229,7 +229,11 @@ const page = {
         },
         on: {
           click: () => {
-            vm.editRow(data)
+            if(typeof callback == 'function'){
+              callback(data)
+            }else{
+              vm.editRow(data)
+            }
           }
         }
       }, '编辑')
@@ -248,7 +252,7 @@ const page = {
       vm.dialogShow = true
     },
     // 创建删除按钮
-    createDelBtn (create, data) {
+    createDelBtn (create, data, callback) {
       let vm = this
       return create('Button', {
         props: {
@@ -270,7 +274,11 @@ const page = {
                   idData = data
                 }
                 idObj[key] = idData
-                vm.delRow(idObj)
+                if(typeof callback == 'function'){
+                  callback(idObj)
+                }else{
+                  vm.delRow(idObj)
+                }
               }
             })
           }
@@ -294,6 +302,28 @@ const page = {
       }).catch(err=>{
 
       })
+    },
+    // 创建预览按钮
+    createPreviewBtn(create, data, callback){
+      let vm = this
+      return create('Button', {
+        props: {
+          type: 'success',
+          size: 'small'
+        },
+        style: {
+          marginRight: '5px'
+        },
+        on: {
+          click: () => {
+            if(typeof callback == 'function'){
+              callback(data)
+            }else{
+              vm.$Message.error('预览请传回调函数')
+            }
+          }
+        }
+      }, '预览')
     },
     // 初始化pager   组件中pager的键覆盖mixinPager的键
     initPager (data) {

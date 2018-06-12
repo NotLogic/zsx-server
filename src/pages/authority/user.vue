@@ -1,5 +1,9 @@
 <template>
   <div class="user">
+    <div>
+      <Button :type="currentSourceWeb ? 'primary' : 'ghost'" style="margin: 5px 8px 24px 0;" @click="pager.source='web';paging();currentSourceWeb=true">web用户</Button>
+      <Button :type="!currentSourceWeb ? 'primary' : 'ghost'" style="margin: 5px 8px 24px 0;" @click="pager.source='app';paging();currentSourceWeb=false">app用户</Button>
+    </div>
     <Form :model="formSearch" ref="formSearch" inline :label-width="60">
         <FormItem label="用户">
             <Input v-model="formSearch.name" placeholder="用户名/账号/手机号" size="small"></Input>
@@ -186,7 +190,7 @@
       </div>
     </Modal>
     <!-- 预览用户数据 -->
-    <Modal v-model="previewShow" title="预览" width="800">
+    <Modal v-model="previewShow" title="用户预览" width="800">
       <Row>
         <Col span="4" class="rightt"><strong>账号:</strong></Col>
         <Col span="19"><p>{{previewData.loginUsername}}</p></Col>
@@ -258,7 +262,15 @@
     </Modal>
     <!-- 根据userId获取的帖子数据 -->
     <Modal v-model="postShow" title="帖子" width="1000">
-      <mainTable :columns="postColumns" :data="postPager.data"></mainTable>
+      <Form :model="postFormSearch" ref="postFormSearch" inline :label-width="60">
+        <FormItem label="帖子内容" prop="key">
+          <Input v-model="postFormSearch.key" placeholder="请输入要搜索的帖子内容" size="small"></Input>
+        </FormItem>
+        <Button type="ghost" style="margin:5px 8px 24px 0;" @click="postResetSearch('postFormSearch')" size="small">{{label.clear}}</Button>
+        <Button type="primary" style="margin: 5px 8px 24px 0;" @click="postSubmitSearch('postFormSearch')" size="small">{{label.search}}</Button>
+        <Button type="error" style="margin: 5px 8px 24px 0" :disabled="batchOprArr.length==0" @click="batchDel" size="small">批量删除</Button> 
+      </Form>
+      <mainTable :columns="postColumns" :data="postPager.data" @updateSelect="updateSelect"></mainTable>
       <paging @changePager="postChangePager" @paging="postPaging" :total="postPager.total" :currPage="postPager.currPage"></paging>
       <div slot="footer">
         <Button type="primary" size="large"  @click="postShow = false">关闭</Button>
@@ -336,6 +348,16 @@
           <Button type="primary" @click="postSubmitDialogForm('postFormDialog')" :loading="postDialogSubmitLoading">{{label.submit}}</Button>
         </div>
     </Modal>
+    <!-- 预览帖子内容 表现形式同APP -->
+    <Modal v-model="postPreviewShow" title="帖子预览" width="800">
+      <div class="post-content">
+        帖子数据--展现形式同APP
+        <div v-for="item in postPreviewData">{{item}}</div>
+      </div>
+      <div slot="footer">
+        <Button type="primary" size="large"  @click="postPreviewShow = false">关闭</Button>
+      </div>
+    </Modal>
   </div>
 </template>
 
@@ -360,13 +382,17 @@
           upload: 'file/',
           sId: 'id/id',
           post: 'post/search/userId/',
-          postAdd: 'post/add'
+          postAdd: 'post/add',
+          postDelete: 'post/delete',
+          postSearch: 'post/dataSearch'
         },
         userId: [],
         pager: {
           data: [],
           url: 'user/dataGrid',
+          source: 'web', //  web  显示web用户    app  显示ios和安卓用户   ios  显示ios   android  显示安卓用户
         },
+        currentSourceWeb: true,
         postCurrDialog: 'add',
         postShow: false,
         postPager: {
@@ -393,66 +419,11 @@
         },
         postColumns: [
           {
-            "title": "ID",
-            "key": "id",
-            "width": 180,
-            "sortable": true,
-            "fixed": "left"
+            'type': 'selection',
+            'width': 80,
+            'fixed': 'left',
+            'align': 'center'
           },
-          {
-            "title": "用户ID",
-            "key": "userId",
-            "width": 180,
-            "sortable": true,
-          },
-          // {
-          //   'title': '收藏数量',
-          //   'key': 'postCollectionCount',
-          //   'width': 120,
-          //   'sortable': true
-          // },
-          // {
-          //   'title': '评论数量',
-          //   'key': 'postCommentsCount',
-          //   'width': 120,
-          //   'sortable': true
-          // },
-          // {
-          //   'title': '点赞数量',
-          //   'key': 'postThumbCount',
-          //   'width': 120,
-          //   'sortable': true
-          // },
-          // {
-          //   'title': '转发数量',
-          //   'key': 'postTransmitCount',
-          //   'width': 120,
-          //   'sortable': true
-          // },
-          // {
-          //   'title': '是否认证',
-          //   'key': 'userIsAuth',
-          //   'width': 150,
-          //   'sortable': true,
-          //   render: (create, params) => {
-          //     return create('span', this.isAuthMap[params.row.userIsAuth.toString()]);
-          //   }
-          // },
-          // {
-          //   'title': '昵称',
-          //   'key': 'userNickName',
-          //   'width': 150,
-          //   'sortable': true
-          // },
-          // {
-          //   'title': '性别',
-          //   'key': 'userSex',
-          //   'width': 150,
-          //   'sortable': true,
-          //   render: (create, params) => {
-          //     return create('span',this.sexMap[params.row.userSex])
-          //   }
-          // },
           {
             'title': '帖子状态',
             'key': 'postStatus',
@@ -465,7 +436,7 @@
           {
             'title': '创建时间',
             'key': 'createTime',
-            // 'width': 150,
+            'width': 150,
             'sortable': true
           },
           {
@@ -475,39 +446,35 @@
             'ellipsis': true,
             'sortable': true
           },
-          // {
-          //   'title': '用户头像',
-          //   'key': 'userheadPortrait',
-          //   'width': 250,
-          //   'sortable': true,
-          //   render: function (create, params) {
-          //     return create('img', {
-          //       attrs: {
-          //         src: params.row.userheadPortrait
-          //       },
-          //       style: {
-          //         'border': '1px solid transparent',
-          //         'border-radius': '4px',
-          //         'margin': '10px 0',
-          //         'max-width': '100px',
-          //         'max-height': '100px'
-          //       }
-          //     })
-          //   }
-          // },
-          // {
-          //   'title': '帖子图片',
-          //   'key': 'fileManageList',
-          //   'width': 250,
-          //   'sortable': true,
-          //   render(create,params){
-          //     return create('span','图片数据')
-          //   }
-          // },
+          {
+            'title': '帖子图片',
+            'key': 'fileManageList',
+            'width': 250,
+            'sortable': true,
+            render(create,params){
+              return create('span','图片数据')
+            }
+          },
+          {
+            'title': '操作',
+            'key': 'action',
+            'width': 200,
+            'align': 'center',
+            'fixed': 'right',
+            render: (create, params) => {
+              var vm = this
+              return create('div',[
+                vm.createPreviewBtn(create, params.row, vm.postPreview),
+                vm.createEditBtn(create, params.row, vm.postEditRow),
+                vm.createDelBtn(create, params.row.id, vm.postDelRow)
+              ])
+            }
+          }
         ],
         needId: true,
         postDialogShow: false,
         previewShow: false,
+        postPreviewShow: false,
         uploadLoading: false,
         uploadLoading2: false,
         uploadLoading3: false,
@@ -563,6 +530,7 @@
         birthday: '',
         loginPassword: '',
         previewData: {},
+        postPreviewData: {},
         formDialog: {
           id: '',
           loginUsername: '',
@@ -585,12 +553,20 @@
           userStatus: '1',
           createTime: '',
         },
+        // 帖子批量操作
+        batchOprArr: [],
+        batchIdArr: [], // id数组
         postFormDialog: {
           id: '',
           userId: '',
           postStatus: '0',
           postContent: '',
           imagePath: [],
+        },
+        postFormSearch: {
+          id: '',
+          userId: '',
+          key: '',
         },
         columns: [
           {
@@ -696,41 +672,73 @@
             }
           },
           {
-            "title": "省",
-            "key": "provincesCode",
-            "width": 100,
-            "sortable": true
+            "title": "家乡",
+            "key": "hometown_address",
+            "width": 150,
+            render: (create, params) => {
+              var txt = '',vm=this;
+              var chinaJson = JSON.parse(sessionStorage.chinaJson)
+              var homeProvincesCode = params.row.homeProvincesCode,
+                homeCityCode = params.row.homeCityCode,
+                homeAreaCode = params.row.homeAreaCode;
+              if(homeProvincesCode && homeCityCode && homeAreaCode){
+                txt = vm.util.getProvinceCityArea([homeProvincesCode, homeCityCode, homeAreaCode], chinaJson, true)
+              }
+              return create('span',txt)
+            }
           },
           {
-            "title": "市",
-            "key": "cityCode",
-            "width": 100,
-            "sortable": true
+            "title": "属地",
+            "key": "location_address",
+            "width": 150,
+            render: (create, params) => {
+              var txt = '',vm=this;
+              var chinaJson = JSON.parse(sessionStorage.chinaJson)
+              var provincesCode = params.row.provincesCode,
+                cityCode = params.row.cityCode,
+                areaCode = params.row.areaCode;
+              if(provincesCode && cityCode && areaCode){
+                txt = vm.util.getProvinceCityArea([provincesCode, cityCode, areaCode], chinaJson, true)  
+              }
+              return create('span',txt)
+            }
           },
-          {
-            "title": "区",
-            "key": "areaCode",
-            "width": 100,
-            "sortable": true
-          },
-          {
-            "title": "家乡省",
-            "key": "homeProvincesCode",
-            "width": 100,
-            "sortable": true
-          },
-          {
-            "title": "家乡市",
-            "key": "homeCityCode",
-            "width": 100,
-            "sortable": true
-          },
-          {
-            "title": "家乡区",
-            "key": "homeAreaCode",
-            "width": 100,
-            "sortable": true
-          },
+          // {
+          //   "title": "省",
+          //   "key": "provincesCode",
+          //   "width": 100,
+          //   "sortable": true
+          // },
+          // {
+          //   "title": "市",
+          //   "key": "cityCode",
+          //   "width": 100,
+          //   "sortable": true
+          // },
+          // {
+          //   "title": "区",
+          //   "key": "areaCode",
+          //   "width": 100,
+          //   "sortable": true
+          // },
+          // {
+          //   "title": "家乡省",
+          //   "key": "homeProvincesCode",
+          //   "width": 100,
+          //   "sortable": true
+          // },
+          // {
+          //   "title": "家乡市",
+          //   "key": "homeCityCode",
+          //   "width": 100,
+          //   "sortable": true
+          // },
+          // {
+          //   "title": "家乡区",
+          //   "key": "homeAreaCode",
+          //   "width": 100,
+          //   "sortable": true
+          // },
           {
             "title": "是否认证",
             "key": "isAuth",
@@ -770,12 +778,17 @@
           {
             title: '操作',
             key: 'action',
-            width: 250,
+            width: 300,
             align: 'center',
             fixed: 'right',
             render: (create, params) => {
               let vm = this
-              var arr = [vm.createPreviewBtn(create, params.row), vm.createPostBtn(create,params.row.id), vm.createEditBtn(create, params.row)]
+              var arr = [
+                vm.createPreviewBtn(create, params.row,vm.preview),
+                vm.createPreviewPostBtn(create,params.row.id),
+                vm.createEditBtn(create, params.row),
+                vm.createPostBtn(create, params.row.id),
+              ]
               if(params.row.appSoucre=='3'){
                 arr.push(vm.createDelBtn(create, params.row.id))
               }
@@ -813,45 +826,153 @@
       }
     },
     methods: {
+      // 帖子批量操作
+      updateSelect (selection) {
+        this.batchOprArr = selection
+      },
+      postEditRow(data){
+        console.log('编辑行数据： ',data)
+        var vm = this
+        let _data = {}
+        for (let key in vm.postFormDialog) {
+          _data[key] = data[key]
+        }
+        if(typeof _data.postStatus == 'number'){
+          _data.postStatus = _data.postStatus.toString()
+        }
+        // 图片回显
+        // vm.uploadImgArr3 = 
+        vm.postFormDialog = _data
+        vm.postCurrDialog = 'edit'
+        vm.postDialogShow = true
+      },
+      postDelRow(data){
+        var vm = this;
+        if(!data.id){
+          vm.$Message.error('id获取失败')
+          return
+        }
+        var parmas = {
+          method: vm.postPager.method,
+          url: vm.url.postDelete,
+          data: {
+            ids: [data.id]
+          }
+        }
+        vm.batchoperation(parmas)
+      },
+      postPreview(data){
+        var vm = this
+        console.log('帖子预览数据： ',data)
+        vm.$Message.info(vm.label.wait)
+        return
+        vm.postPreviewData = data
+        vm.postPreviewShow = true
+      },
       // 发帖按钮
       postAddRow(){
         var vm = this
         vm.postCurrDialog = 'add'
         vm.postDialogShow = true
       },
+      postResetSearch(name){
+        var vm =this
+        vm.$refs[name].resetFields()
+        vm.postSubmitSearch(name)
+      },
+      postSubmitSearch(name){
+        let vm = this
+        // 搜索操作
+        vm.$http2({
+          url: vm.url.postSearch,
+          method: vm.postPager.method,
+          data: vm.postFormSearch
+        }).then(res => {
+          var resData = res.data
+          if(resData.code==1){
+            vm.postPager.data = resData.data.records
+          }else{
+            vm.$Message.error('搜索失败: ' + resData.message)
+          }
+        }).catch(err=>{})
+      },
+      batchDel(){
+        var vm = this
+        vm.$Modal.confirm({
+          title: '确认',
+          content: '确认删除这些数据吗？',
+          onOk: function () {
+            var parmas = {
+              method: vm.postPager.method,
+              url: vm.url.postDelete,
+              data: {
+                ids: vm.batchIdArr
+              }
+            }
+            vm.batchoperation(parmas)
+          }
+        })
+      },
+      // 批量操作
+      batchoperation(parmas){
+        var vm = this
+        if(typeof parmas != 'object'){
+          vm.$Message.error('传参错误')
+          return
+        }
+        parmas.method = parmas.method || 'post'
+        vm.$http2(parmas).then(res=>{
+          var resData = res.data
+          if(resData.code==1){
+            vm.$Message.success('操作成功');
+            vm.batchOprArr = []
+            vm.postPaging()
+          }else{
+            vm.$Message.error(resData.message);
+          }
+        }).catch(err=>{})
+      },
 
-      // 创建预览按钮
-      createPreviewBtn(create,rowData){
+      // 用户预览
+      preview(rowData){
+        var vm = this;
+        var previewData = {};
+        for(var key in rowData){
+          previewData[key] = rowData[key]
+        }
+        var provincesCode = rowData.provincesCode,
+            cityCode = rowData.cityCode,
+            areaCode = rowData.areaCode,
+            homeProvincesCode = rowData.homeProvincesCode,
+            homeCityCode = rowData.homeCityCode,
+            homeAreaCode = rowData.homeAreaCode;
+        previewData.location = vm.util.getProvinceCityArea([provincesCode,cityCode,areaCode], vm.chinaJson, true)
+        previewData.home = vm.util.getProvinceCityArea([homeProvincesCode,homeCityCode,homeAreaCode], vm.chinaJson, true)
+        vm.previewData = previewData
+        vm.previewShow = true
+      },
+      // 查看用户帖子按钮
+      createPreviewPostBtn(create, userId){
         var vm = this;
         return create('Button',{
           props: {
             type: 'primary',
-            size: 'small'
+            size: 'small',
+            // loading: false // 绑定上传loading效果
           },
           style: {
             'margin-right': '5px'
           },
           on: {
             click(){
-              var previewData = {};
-              for(var key in rowData){
-                previewData[key] = rowData[key]
-              }
-              var provincesCode = rowData.provincesCode,
-                  cityCode = rowData.cityCode,
-                  areaCode = rowData.areaCode,
-                  homeProvincesCode = rowData.homeProvincesCode,
-                  homeCityCode = rowData.homeCityCode,
-                  homeAreaCode = rowData.homeAreaCode;
-              previewData.location = vm.util.getProvinceCityArea([provincesCode,cityCode,areaCode], vm.chinaJson, true)
-              previewData.home = vm.util.getProvinceCityArea([homeProvincesCode,homeCityCode,homeAreaCode], vm.chinaJson, true)
-              vm.previewData = previewData
-              vm.previewShow = true
+              // 查看用户帖子时，对搜索的userId进行初始化
+              vm.postFormSearch.userId = userId
+              vm.initPostData(userId)
             }
           }
-        },'预览')
+        },'查看帖子')
       },
-      // 查看用户帖子按钮
+      // 创建发帖按钮
       createPostBtn(create, userId){
         var vm = this;
         return create('Button',{
@@ -865,10 +986,11 @@
           },
           on: {
             click(){
-              vm.initPostData(userId)
+              vm.postFormDialog.userId = userId
+              vm.postAddRow(userId)
             }
           }
-        },'查看帖子')
+        },'发帖')
       },
       initPostData(userId){
         var vm = this;
@@ -1098,21 +1220,22 @@
           return
         }
         vm.uploadLoading3 = true
+        var userId = vm.postFormDialog.userId
         if(vm.postCurrDialog=='add'){
           vm.$http.post(vm.url.sId).then(res=>{
             var resData = res.data
             if(resData.code==1){
               var sId = resData.data;
               vm.postFormDialog.id = sId;
-              vm.uploadFile3(sId)
+              vm.uploadFile3(sId, userId)
             }
           }).catch(err=>{})
         }else{
           var sId = vm.postFormDialog.id
-          vm.uploadFile(sId)
+          vm.uploadFile(sId, userId)
         }
       },
-      uploadFile3(sId){
+      uploadFile3(sId, userId){
         var vm = this;
         let params = new FormData();
         vm.uploadImgArr3.forEach(file =>{
@@ -1128,11 +1251,12 @@
               'Content-Type': 'multipart/form-data'
             }
         };
-        vm.$http.post(vm.url.upload + sId, params, config).then(res=>{
+        vm.$http.post(vm.url.upload + userId, params, config).then(res=>{
           let rd = res.data;
           if(rd.code==1){
-            // 清空已上传数组
+            // 清空用于展示和保存文件数据的数组
             vm.uploadImgArr3 = [];
+            vm.fileUrl3 = [] // 之前没清空这个数组是想让用户看到上传的是哪几张图片，误导了用户
             vm.$Message.success('上传成功！');
             var arr = []
             for(var key in rd.data){
@@ -1204,36 +1328,34 @@
         vm.fileUrl3 = []
         vm.uploadImgArr3 = []
         vm.postFormDialog.imagePath = []
+        vm.postDialogSubmitLoading = false
+        vm.$refs[name].resetFields()
       },
       postSubmitDialogForm(name){
         var vm = this
         vm.$refs[name].validate(function (valid) {
-        if (valid) {
-          let ajaxData = vm.postFormDialog
-          let ajaxUrl = vm.url.postAdd
-          vm.postDialogSubmitLoading = true
-          vm.$http({
-            url: ajaxUrl,
-            method: vm.pager.method,
-            data: ajaxData
-          }).then(res => {
-            vm.postDialogSubmitLoading = false
-            var resData = res.data
-            if(resData.code==1){
-              vm.$Message.success('发帖成功!')
-              vm.paging();
-              vm.postDialogShow = false
-              if(typeof vm.resetDialogForm == 'function'){
-                vm.postResetDialogForm()
+          if (valid) {
+            let ajaxData = vm.postFormDialog
+            let ajaxUrl = vm.url.postAdd
+            vm.postDialogSubmitLoading = true
+            vm.$http({
+              url: ajaxUrl,
+              method: vm.pager.method,
+              data: ajaxData
+            }).then(res => {
+              vm.postDialogSubmitLoading = false
+              var resData = res.data
+              if(resData.code==1){
+                vm.$Message.success('发帖成功!')
+                vm.postDialogShow = false
+              }else{
+                vm.$Message.error('发帖失败: ' + resData.message)
               }
-            }else{
-              vm.$Message.error('发帖失败: ' + resData.message)
-            }
-          }).catch(err=>{
-    
-          })
-        }
-      })
+            }).catch(err=>{
+      
+            })
+          }
+        })
       },
 
       resetDialogForm (name) {
@@ -1284,10 +1406,11 @@
         vm.birthday = data.birthday
       },
       pagerResult(data){
-        var userId = [];
-        var item;
-        for(let i=0;i<data.length;i++){
-          item = data[i]
+        var vm = this;
+        var userId = [],_data = vm.util.deepcopy(data);
+        var item,hometown_address,location_address;
+        for(let i=0;i<_data.length;i++){
+          item = _data[i]
           userId.push({
             value: item.id,
             label: item.nickName
@@ -1295,7 +1418,7 @@
         }
         console.log('userId: ',userId)
         // vm.userId = userId
-        return data
+        return _data
       },
       initData () {
         var vm = this
@@ -1345,7 +1468,28 @@
           vm.formDialog.homeCityCode = ''
           vm.formDialog.homeAreaCode = ''
         }
-      }
+      },
+      postDialogShow(val){
+        if(!val){
+          this.postResetDialogForm()
+        }
+      },
+      postShow(val){
+        if(!val){
+          this.postPager.data = []
+          // 关闭时清空查询的userId
+          this.postFormSearch.userId = ''
+        }
+      },
+      batchOprArr (val){
+        var vm = this,batchIdArr = [],len=val.length;
+        if(len){
+          for(var i=0;i<len;i++){
+            batchIdArr.push(val[i].id)
+          }
+        }
+        vm.batchIdArr = batchIdArr
+      },
     },
   }
 </script>

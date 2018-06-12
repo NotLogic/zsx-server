@@ -341,6 +341,7 @@
           var resData = res.data
           if(resData.code==1){
             vm.$Message.success('操作成功');
+            vm.batchOprArr = []
             vm.paging()
           }else{
             vm.$Message.error(resData.message);
@@ -364,7 +365,6 @@
       },
       batchDel () {
         console.log('批量删除数据： ',this.batchIdArr)
-        var vm = this
         var vm = this
         vm.$Modal.confirm({
           title: '确认',
