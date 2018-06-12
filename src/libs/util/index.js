@@ -373,6 +373,60 @@ export function timestampToTime(timestamp) {
   var s = (date.getSeconds()<10 ? '0'+date.getSeconds() : date.getSeconds());
   return Y+M+D+h+m+s;
 }
+export function isIOS9 () {
+  //获取固件版本
+  var getOsv = function () {
+    var reg = /OS ((\d+_?){2,3})\s/;
+    if (navigator.userAgent.match(/iPad/i) || navigator.platform.match(/iPad/i) || navigator.userAgent.match(/iP(hone|od)/i) || navigator.platform.match(/iP(hone|od)/i)) {
+        var osv = reg.exec(navigator.userAgent);
+        if (osv.length > 0) {
+            return osv[0].replace('OS', '').replace('os', '').replace(/\s+/g, '').replace(/_/g, '.');
+        }
+    }
+    return '';
+  };
+  var osv = getOsv();
+  var osvArr = osv.split('.');
+  //初始化显示ios9引导
+  if (osvArr && osvArr.length > 0) {
+      if (parseInt(osvArr[0]) >= 9) {
+          return true
+      }
+  }
+  return false
+}
+export function isWeiXin (){
+  var ua = window.navigator.userAgent.toLowerCase();
+  return ua.indexOf('micromessenger') != -1 ? true : false
+}
+export function isIos(){
+  var ua = window.navigator.userAgent.toLowerCase();
+  return ua.match(/(iPhone|iPod|iPad);?/i) ? true : false
+}
+export function isAndroid(){
+  var ua = window.navigator.userAgent.toLowerCase();
+  return ua.match(/android/i) ? true : false
+}
+export function isQQ(){
+  var ua = window.navigator.userAgent.toLowerCase();
+  if(ua.indexOf('qq') > -1){
+    if(/nettype/i.test(ua)){
+      if(/micromessenger/i.test(ua)){
+        return true;
+      }else{
+        return true;
+      }
+    }else{
+      return false;
+    }
+  }
+  return false;
+}
+// export function 
+// export function 
+// export function 
+// export function 
+// export function 
 // export function 
 // export function 
 // export function 

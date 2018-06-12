@@ -35,7 +35,7 @@ const page = {
         'cancle': '取消',
         'uploadImg': '上传图片',
         'uploadExcel': '导入Excel',
-        'wait': '还没做好请稍等'
+        'wait': '功能正在研发中，请稍后...'
       },
       mixinPager: {
         'url': '',
@@ -179,16 +179,16 @@ const page = {
           delete obj[key]
         }
       }
-      if (obj.data) {
+      if (typeof obj.data != 'undefined') {
         delete obj.data
       }
-      if (obj.url || obj.url === '') {
+      if (typeof obj.url != 'undefined') {
         delete obj.url
       }
-      if (obj.method) {
+      if (typeof obj.method != 'undefined') {
         delete obj.method
       }
-      if (obj.total) {
+      if (typeof obj.total != 'undefined') {
         delete obj.total
       }
       return obj

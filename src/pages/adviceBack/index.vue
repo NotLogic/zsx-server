@@ -124,16 +124,16 @@
         isSkip: [
           {
             value: "0",
-            label: '是'
+            label: '否'
           },
           {
             value: "1",
-            label: '否'
+            label: '是'
           }
         ],
         isSkipMap: {
-          "0": '是',
-          "1": '否'
+          "1": '是',
+          "0": '否'
         },
         skipType: [
           {
@@ -170,24 +170,34 @@
             "title": "ID",
             "key": "id",
             "width": 150,
-            "sortable": true
           },
           {
             "title": "所属模块",
             "key": "text",
-            "width": 150
+            "width": 200,
+            render: (create, params)=>{
+              var vm = this
+              return create('Button',{
+                props: {
+                  type: 'text'
+                },
+                on: {
+                  click: function () {
+                      vm.editRow(params.row)
+                  }
+                }
+              },params.row.text)
+            }
           },
           {
             "title": "父级",
             "key": "parentId",
             "width": 150,
-            "sortable": true
           },
           {
             "title": "状态",
             "key": "status",
             "sortable": true,
-            "width": 150,
             render: (create, params) => {
               var vm = this;
               return create('span', vm.statusMap[params.row.status])
@@ -197,7 +207,6 @@
             "title": "是否跳转",
             "key": "isSkip",
             "width": 150,
-            "sortable": true,
             render: (create, params) => {
               var vm = this;
               return create('span', vm.isSkipMap[params.row.isSkip])
@@ -207,7 +216,6 @@
             "title": "跳转方式",
             "key": "skipType",
             "width": 150,
-            "sortable": true,
             render: (create, params) => {
               var vm = this;
               return create('span', vm.skipTypeMap[params.row.skipType])
@@ -216,8 +224,7 @@
           {
             "title": "跳转URL",
             "key": "skipUrl",
-            "sortable": true,
-            "width": 200,
+            // "width": 200,
           },
           {
             'title': '操作',
@@ -238,7 +245,7 @@
           text: '',
           parentId: '', //  上一级
           status: '0',  // 0 起用  1禁用
-          isSkip: '',  //是否可以跳转  0 是  1  否
+          isSkip: '1',  //是否可以跳转  0否   1 是 
           skipType: '', //  0  内部   1外部
           skipUrl: ''  //  跳转路径
         },
@@ -257,50 +264,122 @@
         this.$refs[name].resetFields()
         this.submitSearch(name)
       },
-      // 返回数据预处理
-      pagerResult(data){
-        var vm = this,key,_key,_data=[],item,_item
-        var result = vm.util.deepcopy(data)
-        var len = result.length
-        if(!len)return []
-        for(let i=0;i<len;i++){
-          item = result[i]
-          _item = {}
-          for(key in item){
-            if(typeof item[key]=='object'){
-              for(_key in item[key]){
-                _item[_key] = item[key][_key]
-              }
-            }else{
-              _item[key] = item[key]
-            }
-          }
-          _data.push(_item)
+      initDialog(data){
+        var vm = this
+        if(typeof data.status=='number'){
+          data.status = data.status.toString()
         }
-        // 初始化模块选择
-        let item2,parentIdArr = [{
+        if(typeof data.isSkip=='number'){
+          data.isSkip = data.isSkip.toString()
+        }
+        if(typeof data.skipType=='number'){
+          data.skipType = data.skipType.toString()
+        }
+        if(typeof data.parentId=='number'){
+          data.parentId = data.parentId.toString()
+        }
+      },
+      initParentId(data){
+        var vm = this,item,parentIdArr=[{
           value: '0',
           label: '顶级'
         }]
-        for(let i=0;i<_data.length;i++){
-          item2 = _data[i]
+        for(let i=0;i<data.length;i++){
+          item = data[i]
           parentIdArr.push({
-            value: item2.id,
-            label: item2.text
+            value: item.id,
+            label: item.text
           })
         }
         vm.parentId = parentIdArr
-        return _data
+      },
+      pagerDataSort(data){
+        
+      },
+      // 返回数据预处理
+      pagerResult(data){
+        var vm = this,result=[],item
+        // 初始化父级选择数据
+        vm.initParentId(data)        
+        var _data = vm.util.deepcopy(data)
+        for(let i=0;i<data.length;i++){
+          item = data[i]
+          item.level = 1
+          if(item.parentId==0){
+            result.push(item)
+          }
+          _data.splice(i,1)
+        }
+        // var child,item2
+        // for(let i=0;i<result.length;i++){
+        //   child = result[i]
+        //   for(let j=0;j<_data.length;j++){
+        //     item2 = _data[j]
+
+
+        //   }
+        // }
+        
+        console.log('_data: ',_data)
+
+        return data
       },
       resetDialogForm (name) {
         name = name || 'formDialog'
         let vm = this
         vm.$refs[name].resetFields()
       },
+      // 批量操作
+      batchoperation(parmas){
+        var vm = this
+        if(typeof parmas != 'object'){
+          vm.$Message.error('传参错误')
+          return
+        }
+        parmas.method = parmas.method || 'post'
+        vm.$http2(parmas).then(res=>{
+          var resData = res.data
+          if(resData.code==1){
+            vm.$Message.success('操作成功');
+            vm.paging()
+          }else{
+            vm.$Message.error(resData.message);
+          }
+        }).catch(err=>{})
+      },
+      delRow(data){
+        var vm = this;
+        if(!data.id){
+          vm.$Message.error('id获取失败')
+          return
+        }
+        var parmas = {
+          method: 'post',
+          url: vm.url.delete,
+          data: {
+            ids: [data.id]
+          }
+        }
+        vm.batchoperation(parmas)
+      },
       batchDel () {
         console.log('批量删除数据： ',this.batchIdArr)
         var vm = this
-        vm.$Message.info(vm.label.wait)
+        var vm = this
+        vm.$Modal.confirm({
+          title: '确认',
+          content: '确认删除这些数据吗？',
+          onOk: function () {
+            var parmas = {
+              method: 'post',
+              url: vm.url.delete,
+              data: {
+                ids: vm.batchIdArr
+              }
+            }
+            vm.batchoperation(parmas)
+          }
+        })
       },
       exportData () {
         var vm = this
@@ -319,9 +398,9 @@
       },
       ["formDialog.isSkip"](val){
         if(val==1){
-          this.isSkipDisabled = true 
-        }else{
           this.isSkipDisabled = false
+        }else{
+          this.isSkipDisabled = true
         }
       }
     }

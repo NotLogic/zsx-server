@@ -30,12 +30,12 @@
         <Row v-if="currDialog=='add'">
           <Col span="12">
             <FormItem label="账号" prop="loginUsername">
-                <Input v-model="formDialog.loginUsername" placeholder="请输入账号"></Input>
+              <Input v-model="formDialog.loginUsername" placeholder="请输入账号"></Input>
             </FormItem>
           </Col>
           <Col span="12" >
             <FormItem label="密码" prop="loginPassword">
-                <Input v-model="loginPassword" placeholder="请输入密码" type="password"></Input>
+              <Input v-model="loginPassword" placeholder="请输入密码" type="password"></Input>
             </FormItem>
           </Col>
         </Row>
@@ -270,8 +270,10 @@
           <Row>
             <Col span="12">
               <FormItem label="用户ID" prop="userId">
-                <Input type="text" v-model="postFormDialog.userId" placeholder="请输入用户ID">
-                </Input>
+                <Input v-model="postFormDialog.userId" placeholder="请输入用户ID"></Input>
+                <!-- <Select v-model="postFormDialog.userId" placeholder="请选择" clearable>
+                  <Option v-for="item in userId" :value="item.value" :key="item.value">{{ item.label }}</Option>
+                </Select> -->
               </FormItem>
             </Col>
             <Col span="12">
@@ -285,8 +287,7 @@
           <Row>
             <Col span="24">
               <FormItem label="帖子内容" prop="postContent">
-                <Input type="textarea" :rows="4" v-model="postFormDialog.postContent" placeholder="请输入帖子内容">
-                </Input>
+                <Input type="textarea" :rows="4" v-model="postFormDialog.postContent" placeholder="请输入帖子内容"></Input>
               </FormItem>
             </Col>
           </Row>
@@ -361,6 +362,7 @@
           post: 'post/search/userId/',
           postAdd: 'post/add'
         },
+        userId: [],
         pager: {
           data: [],
           url: 'user/dataGrid',
@@ -523,7 +525,6 @@
         derail_address_obj_s: [],
         hometown_address: [], // 家乡
         location_address: [], //  所在地
-        roleIds: [],
         chinaJson: {},
         appSoucreMap: {
           "1": 'IOS',
@@ -1282,6 +1283,20 @@
         vm.fileUrl2 = [data.bgPortrait]
         vm.birthday = data.birthday
       },
+      pagerResult(data){
+        var userId = [];
+        var item;
+        for(let i=0;i<data.length;i++){
+          item = data[i]
+          userId.push({
+            value: item.id,
+            label: item.nickName
+          })
+        }
+        console.log('userId: ',userId)
+        // vm.userId = userId
+        return data
+      },
       initData () {
         var vm = this
         if(sessionStorage.chinaData){
@@ -1292,7 +1307,13 @@
     },
     watch: {
       loginPassword(val){
-        this.formDialog.loginPassword = hex_md5(val)
+        var vm = this
+        if(vm.currDialog == 'add'){
+          // 添加用户是进行md5加密，编辑时不用
+          vm.formDialog.loginPassword = hex_md5(val)
+        }else{
+          vm.formDialog.loginPassword = val
+        }
       },
       derail_address_obj_s (val) {
         if (val.length) {
