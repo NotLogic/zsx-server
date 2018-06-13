@@ -106,7 +106,7 @@
                       <div class="image-box">
                         <img :src="item" class="ad-img">
                         <div class="demo-upload-list-cover">
-                          <Icon type="ios-eye-outline" @click.native="handleView(index)"></Icon>
+                          <!-- <Icon type="ios-eye-outline" @click.native="handleView(index)"></Icon> -->
                           <Icon type="ios-trash-outline" @click.native="handleRemove(index)"></Icon>
                         </div>
                       </div>
@@ -141,7 +141,7 @@
                       <div class="image-box">
                         <img :src="item" class="ad-img">
                         <div class="demo-upload-list-cover">
-                          <Icon type="ios-eye-outline" @click.native="handleView2(index)"></Icon>
+                          <!-- <Icon type="ios-eye-outline" @click.native="handleView2(index)"></Icon> -->
                           <Icon type="ios-trash-outline" @click.native="handleRemove2(index)"></Icon>
                         </div>
                       </div>
@@ -282,10 +282,14 @@
           <Row>
             <Col span="12">
               <FormItem label="用户ID" prop="userId">
-                <Input v-model="postFormDialog.userId" placeholder="请输入用户ID"></Input>
-                <!-- <Select v-model="postFormDialog.userId" placeholder="请选择" clearable>
-                  <Option v-for="item in userId" :value="item.value" :key="item.value">{{ item.label }}</Option>
-                </Select> -->
+                <Select v-model="postFormDialog.userId" placeholder="请选择/输入关键字筛选用户" clearable filterable>
+                  <template v-if="currentSourceWeb">
+                    <Option v-for="item in webUserId" :value="item.value" :key="item.value">{{ item.label }}</Option>
+                  </template>
+                  <template v-if="!currentSourceWeb">
+                    <Option v-for="item in appUserId" :value="item.value" :key="item.value">{{ item.label }}</Option>
+                  </template>
+                </Select>
               </FormItem>
             </Col>
             <Col span="12">
@@ -328,7 +332,7 @@
                           <video :src="item" v-if="isVideo(item)" controls="controls" @click="toggle(index)"></video>
                           <img :src="item" v-else class="ad-img">
                           <div class="demo-upload-list-cover">
-                            <Icon type="ios-eye-outline" @click.native="handleView3(index)"></Icon>
+                            <!-- <Icon type="ios-eye-outline" @click.native="handleView3(index)"></Icon> -->
                             <Icon type="ios-trash-outline" @click.native="handleRemove3(index)"></Icon>
                           </div>
                         </div>
@@ -351,8 +355,54 @@
     <!-- 预览帖子内容 表现形式同APP -->
     <Modal v-model="postPreviewShow" title="帖子预览" width="800">
       <div class="post-content">
-        帖子数据--展现形式同APP
-        <div v-for="item in postPreviewData">{{item}}</div>
+        <div class="post-preview-header clearfix">
+          <div class="head-portrait">
+            <img :src="userData.headPortrait" alt="">
+          </div>
+          <div class="post-user-info">
+            <div class="info-header">
+              <span class="user-name">{{userData.nickName}}</span>
+              <img class="user-sex" :src="sexImgSrcMap[userData.sex]" alt="">
+            </div>
+            <div class="info-footer">
+              <span>{{postPreviewData.createTime}}</span>
+              <!-- <span>5分钟前</span> -->
+            </div>
+          </div>
+        </div>
+        <div class="post-preview-conntent">{{postPreviewData.postContent}}</div>
+        <div class="post-preview-media clearfix" v-if="postPreviewData.postImagesSrc && postPreviewData.postImagesSrc.length">
+          <template v-if="postPreviewData.postImagesSrc.length==1">
+            <template v-for="item in postPreviewData.postImagesSrc">
+              <template v-if="typeof item == 'object'">
+                <video id="myvideo" class="video-js vjs-default-skin vjs-big-play-centered" controls preload="auto" 
+                style="max-width: 100%;max-height: 10rem;" :poster="item.poster">
+                  <source :src="item.src" type='video/mp4'>
+                </video>
+              </template>
+              <template v-else>
+                <img style="max-width: 100%;max-height: 225px;" :src="item" :alt="item">
+              </template>
+            </template>
+          </template>
+          <template v-else-if="postPreviewData.postImagesSrc.length==4">
+            <template v-for="item in postPreviewData.postImagesSrc">
+              <div class="post-img-item">
+                <img :src="item" :alt="item">
+              </div>
+            </template>
+          </template>
+          <template v-else>
+            <template v-for="(item,index) in postPreviewData.postImagesSrc">
+              <div v-if="(index+1)%3==0" style="margin-right: 0;" class="post-img-item">
+                <img :src="item" alt="">
+              </div>
+              <div v-else class="post-img-item">
+                <img :src="item" alt="">
+              </div>
+            </template>
+          </template>
+        </div>
       </div>
       <div slot="footer">
         <Button type="primary" size="large"  @click="postPreviewShow = false">关闭</Button>
@@ -379,14 +429,18 @@
           edit: 'user/update',
           delete: 'user/delete',
           search: 'user/dataSearch',
+          allUser: 'user/all/user',
           upload: 'file/',
           sId: 'id/id',
           post: 'post/search/userId/',
           postAdd: 'post/add',
           postDelete: 'post/delete',
-          postSearch: 'post/dataSearch'
+          postSearch: 'post/dataSearch',
         },
+        // 选择发帖用户
         userId: [],
+        webUserId: [],
+        appUserId: [],
         pager: {
           data: [],
           url: 'user/dataGrid',
@@ -437,7 +491,15 @@
             'title': '创建时间',
             'key': 'createTime',
             'width': 150,
-            'sortable': true
+            'sortable': true,
+            render: (create, params)=>{
+              var vm = this
+              var txt = '',stamp = params.row.createTime
+              if(typeof stamp == 'number'){
+                txt = vm.util.timestampToTime(stamp)
+              }
+              return create('span',txt)
+            }
           },
           {
             'title': '帖子内容',
@@ -520,6 +582,10 @@
           '1': '男',
           '': '保密'
         },
+        sexImgSrcMap: {
+          '0': 'static/images/girl.png',
+          '1': 'static/images/boy.png',
+        },
         imageHost: sessionStorage.imageHost || '',
         formSearch: {
           name: '',
@@ -530,7 +596,12 @@
         birthday: '',
         loginPassword: '',
         previewData: {},
-        postPreviewData: {},
+        postPreviewData: {
+          // postImagesSrc: ['http://10.0.0.21:800/zsx/2018/6/06/443377501892608/user/icon/443377501892608/443377503354880_yt.jpg'],
+          postImagesSrc: []
+        },
+        // 根据用户查帖子时进行初始化，帖子窗口关闭时清空
+        userData: {},
         formDialog: {
           id: '',
           loginUsername: '',
@@ -609,12 +680,6 @@
             "width": 240,
             "sortable": true
           },
-          // {
-          //   "title": "电话",
-          //   "key": "phone",
-          //   "width": 240,
-          //   "sortable": true
-          // },
           {
             "title": "年龄",
             "key": "age",
@@ -703,42 +768,6 @@
               return create('span',txt)
             }
           },
-          // {
-          //   "title": "省",
-          //   "key": "provincesCode",
-          //   "width": 100,
-          //   "sortable": true
-          // },
-          // {
-          //   "title": "市",
-          //   "key": "cityCode",
-          //   "width": 100,
-          //   "sortable": true
-          // },
-          // {
-          //   "title": "区",
-          //   "key": "areaCode",
-          //   "width": 100,
-          //   "sortable": true
-          // },
-          // {
-          //   "title": "家乡省",
-          //   "key": "homeProvincesCode",
-          //   "width": 100,
-          //   "sortable": true
-          // },
-          // {
-          //   "title": "家乡市",
-          //   "key": "homeCityCode",
-          //   "width": 100,
-          //   "sortable": true
-          // },
-          // {
-          //   "title": "家乡区",
-          //   "key": "homeAreaCode",
-          //   "width": 100,
-          //   "sortable": true
-          // },
           {
             "title": "是否认证",
             "key": "isAuth",
@@ -785,7 +814,7 @@
               let vm = this
               var arr = [
                 vm.createPreviewBtn(create, params.row,vm.preview),
-                vm.createPreviewPostBtn(create,params.row.id),
+                vm.createPreviewPostBtn(create,params.row),
                 vm.createEditBtn(create, params.row),
                 vm.createPostBtn(create, params.row.id),
               ]
@@ -861,13 +890,30 @@
         }
         vm.batchoperation(parmas)
       },
+      // 预览帖子
       postPreview(data){
         var vm = this
         console.log('帖子预览数据： ',data)
-        vm.$Message.info(vm.label.wait)
-        return
-        vm.postPreviewData = data
+        var postPreviewData = {}
+        postPreviewData.postContent = data.postContent
+        postPreviewData.createTime = vm.util.timestampToTime(data.createTime)
+        postPreviewData.postImagesSrc = vm.getPostImagesSrc(data.fileManageList)
+        vm.postPreviewData = postPreviewData
         vm.postPreviewShow = true
+      },
+      getPostImagesSrc(data){
+        var arr = [];
+        if(!data)return arr
+        var len = data.length,i;
+        console.log('图片/视频数组: ',data)
+        if(len){
+          if(data[0].fileType==2){
+
+          }else if (data[0].fileType==1){
+
+          }
+        }
+        return arr
       },
       // 发帖按钮
       postAddRow(){
@@ -933,7 +979,7 @@
         }).catch(err=>{})
       },
 
-      // 用户预览
+      // 预览用户
       preview(rowData){
         var vm = this;
         var previewData = {};
@@ -946,13 +992,21 @@
             homeProvincesCode = rowData.homeProvincesCode,
             homeCityCode = rowData.homeCityCode,
             homeAreaCode = rowData.homeAreaCode;
-        previewData.location = vm.util.getProvinceCityArea([provincesCode,cityCode,areaCode], vm.chinaJson, true)
-        previewData.home = vm.util.getProvinceCityArea([homeProvincesCode,homeCityCode,homeAreaCode], vm.chinaJson, true)
+        if(provincesCode && cityCode && areaCode){
+          previewData.location = vm.util.getProvinceCityArea([provincesCode,cityCode,areaCode], vm.chinaJson, true)
+        }else{
+          previewData.location = '无'
+        }
+        if(homeProvincesCode && homeCityCode && homeAreaCode){
+          previewData.home = vm.util.getProvinceCityArea([homeProvincesCode,homeCityCode,homeAreaCode], vm.chinaJson, true)
+        }else{
+          previewData.home = '无'
+        }
         vm.previewData = previewData
         vm.previewShow = true
       },
       // 查看用户帖子按钮
-      createPreviewPostBtn(create, userId){
+      createPreviewPostBtn(create, rowData){
         var vm = this;
         return create('Button',{
           props: {
@@ -965,8 +1019,16 @@
           },
           on: {
             click(){
+              console.log('rowData: ',rowData)
+              var userId = rowData.id
               // 查看用户帖子时，对搜索的userId进行初始化
               vm.postFormSearch.userId = userId
+              // 对 userData 初始化
+              var userData = {}
+              userData.sex = rowData.sex
+              userData.nickName = rowData.nickName
+              userData.headPortrait = rowData.headPortrait
+              vm.userData = userData
               vm.initPostData(userId)
             }
           }
@@ -998,9 +1060,9 @@
           vm.$Message.error('用户ID获取失败')
           return
         }
-        vm.postShow = true
         vm.postPager.url = vm.url.post + userId
         vm.postPaging()
+        vm.postShow = true
       },
       postChangePager(data){
         let vm = this
@@ -1286,17 +1348,6 @@
         return isVideo
       },
 
-
-      // getNoHostUrl(url,host){
-      //   host = host || 'http://10.0.0.21:800/'
-      //   var result = '' + url
-      //   if(!result) return result
-      //   var ind = url.indexOf(host)
-      //   if(ind>-1){
-      //     result = url.split(host)[1]
-      //   }
-      //   return result
-      // },
       birthChange(date){
         var vm = this
         if(date.length){
@@ -1399,26 +1450,19 @@
             homeProvincesCode = data.homeProvincesCode,
             homeCityCode = data.homeCityCode,
             homeAreaCode = data.homeAreaCode;
-        vm.hometown_address = [homeProvincesCode, homeCityCode, homeAreaCode]
-        vm.location_address = [provincesCode, cityCode, areaCode]
+        if(homeProvincesCode&&homeCityCode&&homeAreaCode){
+          vm.hometown_address = [homeProvincesCode, homeCityCode, homeAreaCode]
+        }else{
+          vm.hometown_address = []
+        }
+        if(provincesCode&&cityCode&&areaCode){
+          vm.location_address = [provincesCode, cityCode, areaCode]
+        }else{
+          vm.location_address = []
+        }
         vm.fileUrl = [data.headPortrait]
         vm.fileUrl2 = [data.bgPortrait]
         vm.birthday = data.birthday
-      },
-      pagerResult(data){
-        var vm = this;
-        var userId = [],_data = vm.util.deepcopy(data);
-        var item,hometown_address,location_address;
-        for(let i=0;i<_data.length;i++){
-          item = _data[i]
-          userId.push({
-            value: item.id,
-            label: item.nickName
-          })
-        }
-        console.log('userId: ',userId)
-        // vm.userId = userId
-        return _data
       },
       initData () {
         var vm = this
@@ -1426,6 +1470,35 @@
           vm.derail_address_arr = JSON.parse(sessionStorage.chinaData)
           vm.chinaJson = JSON.parse(sessionStorage.chinaJson)
         }
+        vm.$http({
+          method: 'get',
+          url: vm.url.allUser,
+        }).then(res=>{
+          var resData = res.data
+          if(resData.code==1){
+            var userId = resData.data
+            var len = userId.length,i,item,webUserId=[],appUserId=[];
+            for(i=0;i<len;i++){
+              item = userId[i]
+              if(item.appSoucre==3){
+                webUserId.push({
+                  value: item.id,
+                  label: item.nickName || item.id
+                })
+              }else{
+                appUserId.push({
+                  value: item.id,
+                  label: item.nickName || item.id
+                })
+              }
+            }
+            // vm.userId = userId;
+            vm.webUserId = webUserId;
+            vm.appUserId = appUserId;
+          }else{
+            vm.$Message.error(resData.message)
+          }
+        }).catch(err=>{})
       }
     },
     watch: {
@@ -1479,6 +1552,7 @@
           this.postPager.data = []
           // 关闭时清空查询的userId
           this.postFormSearch.userId = ''
+          this.userData = {}
         }
       },
       batchOprArr (val){
@@ -1494,6 +1568,14 @@
   }
 </script>
 <style scoped>
+.clearfix:after {
+    content: ".";
+    display: block;
+    height: 0;
+    clear: both;
+    visibility: hidden;
+}
+/* .clearfix {display: inline-block;} *//* for IE/Mac */
 .image-box{
   position: relative;
   width:102px;
@@ -1532,5 +1614,64 @@
 .preview-img-box img{
   max-width: 100%;
   max-height: 100%;
+}
+/* 帖子预览*/
+.post-content{
+  /* width: 750px; */
+  box-sizing: border-box;
+  padding: 15px;
+  width: 375px;
+  margin: 0 auto;
+  border: 2px dotted aqua;
+
+}
+.post-preview-header{
+  height: 42px;
+  margin-bottom: 15px;
+}
+.head-portrait{
+  float: left;
+  margin-right: 10px;
+  width: 40px;
+  height: 40px;
+}
+.head-portrait img{
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+}
+.post-user-info{
+  float: left;
+}
+.post-user-info .user-name{
+  color: #3679DF;
+  font-size: 16px;
+}
+.post-user-info .user-sex{
+  height: 12px;
+}
+.post-user-info .info-footer{
+  font-size: 12px;
+  color: #999;
+}
+.post-preview-conntent{
+  font-size: 17px;
+  line-height: 26px;
+  color: #333;
+}
+.post-preview-media{
+
+}
+.post-img-item{
+	float: left;
+	text-align: center;
+	margin-right: 10px;
+	margin-top: 10px;
+  width: 105px;
+  height: 105px;
+}
+.post-img-item img{
+  max-width: 100%;
+	max-height: 100%;
 }
 </style>

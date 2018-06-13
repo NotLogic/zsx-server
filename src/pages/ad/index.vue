@@ -76,7 +76,7 @@
                         <div class="image-box">
                           <img :src="item" class="ad-img">
                           <div class="demo-upload-list-cover">
-                            <Icon type="ios-eye-outline" @click.native="handleView(index)"></Icon>
+                            <!-- <Icon type="ios-eye-outline" @click.native="handleView(index)"></Icon> -->
                             <Icon type="ios-trash-outline" @click.native="handleRemove(index)"></Icon>
                           </div>
                         </div>
@@ -315,7 +315,7 @@
           {
             'title': '标题',
             'key': 'title',
-            'width': 150,
+            'width': 250,
             'sortable': true
           },
           {
@@ -343,13 +343,14 @@
             'key': 'href',
             'width': 250,
             'sortable': true,
-            // render: (create, params) => {
-            //   return create('a', {
-            //     attrs: {
-            //       href: params.row.href
-            //     }
-            //   })
-            // }
+            render: function (create, params) {
+              return create('a', {
+                attrs: {
+                  'href': params.row.href,
+                  'target': '_blank'
+                },
+              },params.row.href)
+            }
           },
           {
             'title': '广告位置',

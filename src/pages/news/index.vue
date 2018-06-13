@@ -363,6 +363,19 @@
             'width': 150,
           },
           {
+            'title': '新闻类型',
+            'key': 'newsType',
+            'width': 150,
+            render: (create, params)=>{
+              var vm = this
+              var txt = '',newsType = params.row.newsType
+              if(typeof newsType != 'undefined'){
+                txt = vm.newsTypeMap[newsType.toString()]
+              }
+              return create('span',txt)
+            }
+          },
+          {
             'title': '来源url',
             'key': 'url',
             'width': 200,
@@ -386,14 +399,29 @@
             'width': 100,
             'sortable': true,
             render: (create, params) => {
-              return create('span', this.newsStatusMap[params.row.newsStatus])
+              var vm = this
+              var status = params.row.newsStatus
+              if(typeof status == 'number'){
+                status = status.toString()
+              }
+              return create('span', vm.newsStatusMap[status])
             }
           },
           {
             'title': '采集时间',
             'key': 'createTime',
             'width': 160,
-            'sortable': true
+            'sortable': true,
+            render: (create, params)=>{
+              var vm = this
+              var txt = '',stamp = params.row.createTime
+              if(typeof stamp == 'number'){
+                txt = vm.util.timestampToTime(stamp)
+              }else{
+                txt = stamp
+              }
+              return create('span',txt)
+            }
           },
           {
             'title': '评论数',
@@ -603,23 +631,7 @@
         if(typeof data.newsType == 'number'){
           data.newsType = data.newsType.toString()
         }
-        console.log('data.newsType: ',data.newsType)
         vm.setContent(data.content)
-      },
-      pagerResult(data){
-        var vm = this
-        var result = vm.util.deepcopy(data)
-        var len = result.length,item;
-        for(var i=0;i<len;i++){
-          item = result[i]
-          if(typeof item.newsDate == 'number'){
-            item.newsDate = vm.util.timestampToTime(item.newsDate);
-          }
-          if(typeof item.newsStatus == 'number'){
-            item.newsStatus = item.newsStatus.toString()
-          }
-        }
-        return result
       },
       initData () {
         let vm = this

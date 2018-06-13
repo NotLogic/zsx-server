@@ -61,7 +61,7 @@
                           <video :src="item" v-if="isVideo(item)" controls="controls" @click="toggle(index)"></video>
                           <img :src="item" v-else class="ad-img">
                           <div class="demo-upload-list-cover">
-                            <Icon type="ios-eye-outline" @click.native="handleView(index)"></Icon>
+                            <!-- <Icon type="ios-eye-outline" @click.native="handleView(index)"></Icon> -->
                             <Icon type="ios-trash-outline" @click.native="handleRemove(index)"></Icon>
                           </div>
                         </div>

@@ -362,6 +362,9 @@ export function str_repeat (str, num) {
 }
 // 时间戳转时间
 export function timestampToTime(timestamp) {
+  if(typeof timestamp == 'string'){
+    return timestamp
+  }
   var timeStr = '' + timestamp;
   var myTimestamp = timeStr.length == 10 ? timestamp*1000 : timestamp;
   var date = new Date(myTimestamp);//时间戳为10位需*1000，时间戳为13位的话不需乘1000
