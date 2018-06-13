@@ -287,7 +287,7 @@
         for(let i=0;i<data.length;i++){
           item = data[i]
           parentIdArr.push({
-            value: item.id,
+            value: item.id.toString(),
             label: item.text
           })
         }
@@ -301,27 +301,15 @@
         var vm = this,result=[],item
         // 初始化父级选择数据
         vm.initParentId(data)        
-        var _data = vm.util.deepcopy(data)
-        for(let i=0;i<data.length;i++){
-          item = data[i]
-          item.level = 1
-          if(item.parentId==0){
-            result.push(item)
-          }
-          _data.splice(i,1)
-        }
-        // var child,item2
-        // for(let i=0;i<result.length;i++){
-        //   child = result[i]
-        //   for(let j=0;j<_data.length;j++){
-        //     item2 = _data[j]
-
-
+        // var _data = vm.util.deepcopy(data)
+        // for(let i=0;i<data.length;i++){
+        //   item = data[i]
+        //   item.level = 1
+        //   if(item.parentId==0){
+        //     result.push(item)
         //   }
+        //   _data.splice(i,1)
         // }
-        
-        console.log('_data: ',_data)
-
         return data
       },
       resetDialogForm (name) {

@@ -457,14 +457,16 @@
                     },
                     on: {
                       click: () => {
+                        // 禁用后台报错
                         vm.$Message.info(vm.label.wait)
-                        // vm.$Modal.confirm({
-                        //   title: '确认',
-                        //   content: "确认" + txt2 +"这条数据吗？",
-                        //   onOk: function () {
-                        //     vm.disableRow({id: params.row.id})
-                        //   }
-                        // })
+                        return
+                        vm.$Modal.confirm({
+                          title: '确认',
+                          content: "确认" + txt2 +"这条数据吗？",
+                          onOk: function () {
+                            vm.disableRow({id: params.row.id})
+                          }
+                        })
                       }
                     }
                   }, txt),

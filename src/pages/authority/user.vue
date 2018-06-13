@@ -504,18 +504,9 @@
           {
             'title': '帖子内容',
             'key': 'postContent',
-            'width': 250,
+            'width': 400,
             'ellipsis': true,
             'sortable': true
-          },
-          {
-            'title': '帖子图片',
-            'key': 'fileManageList',
-            'width': 250,
-            'sortable': true,
-            render(create,params){
-              return create('span','图片数据')
-            }
           },
           {
             'title': '操作',
@@ -904,13 +895,20 @@
       getPostImagesSrc(data){
         var arr = [];
         if(!data)return arr
-        var len = data.length,i;
+        var len = data.length,i,j,imageItem,videoItem;
         console.log('图片/视频数组: ',data)
         if(len){
+          var fileList = data[0].fileList
           if(data[0].fileType==2){
-
+            // for(j=0;j<fileList.length;j++){
+            //   imageItem = fileList[j]
+            //   arr.push(imageItem.fileName)
+            // }
           }else if (data[0].fileType==1){
-
+            for(j=0;j<fileList.length;j++){
+              imageItem = fileList[j]
+              arr.push(imageItem.fileName)
+            }
           }
         }
         return arr
@@ -1093,7 +1091,7 @@
               // resData.data = vm.postPagerResult(resData.data)
             }
             setTimeout(function(){
-              vm.postPager.data = resData.data
+              vm.postPager.data = resData.data.records
               vm.postPager.total = resData.total
             },50)
           } else{

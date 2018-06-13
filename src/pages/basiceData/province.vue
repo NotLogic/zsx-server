@@ -4,7 +4,6 @@
       <Button type="primary" size="small" style="margin-right: 10px;" @click="addRoww('province')">{{label.add}}</Button>
       <Button type="primary" size="small" @click="checkData">校验所有数据</Button>
     </div>
-    <!-- <main-table :columns="provinceColumns" :data="provinceData" :height="685"></main-table> -->
     <main-table :columns="provinceColumns" :data="provinceData"></main-table>
 
     <!-- 市弹窗 -->
@@ -12,7 +11,6 @@
       <div style="margin-bottom: 10px;">
         <Button type="primary" @click="addRoww('city')" size="small">{{label.add}}</Button>
       </div>
-      <!-- <main-table :columns="cityColumns" :data="cityData" :height="500" :size="'small'"></main-table> -->
       <main-table :columns="cityColumns" :data="cityData" :size="'small'"></main-table>
       <div slot="footer">
         <Button type="primary" @click="closeModal('cityDialogShow')">{{label.sure}}</Button>
@@ -24,7 +22,6 @@
       <div style="margin-bottom: 10px;">
         <Button type="primary" @click="addRoww('area')" :size="'small'">{{label.add}}</Button>
       </div>
-      <!-- <main-table :columns="areaColumns" :data="areaData" size="small" :height="500"></main-table> -->
       <main-table :columns="areaColumns" :data="areaData" size="small"></main-table>
       <div slot="footer">
         <Button type="primary" @click="closeModal('areaDialogShow')">{{label.sure}}</Button>
@@ -69,6 +66,7 @@
     data () {
       return {
         url: {
+          init: 'area/areas',
           add: 'province/add.do',
           edit: 'province/edit.do',
           delete: 'province/delete.do',
@@ -186,8 +184,7 @@
             render: (create, params) => {
               let vm = this
               return create('div', [
-                (function (vm, create, params) {
-                  return create('Button', {
+                  create('Button', {
                     props: { type: 'primary', size: 'small' },
                     style: { marginRight: '5px' },
                     on: {
@@ -195,10 +192,8 @@
                         // vm.checkCity(params)
                       }
                     }
-                  }, '校验')
-                })(vm, create, params),
-                (function (vm, create, params) {
-                  return create('Button', {
+                  }, '校验'),
+                  create('Button', {
                     props: { type: 'primary', size: 'small' },
                     style: { marginRight: '5px' },
                     on: {
@@ -206,10 +201,8 @@
                         vm.editRow(params.row, 'city')
                       }
                     }
-                  }, vm.label.edit)
-                })(vm, create, params),
-                (function (vm, create, params) {
-                  return create('Button', {
+                  }, vm.label.edit),
+                  create('Button', {
                     props: { type: 'error', size: 'small' },
                     on: {
                       click: function () {
@@ -217,7 +210,6 @@
                       }
                     }
                   }, vm.label.delete)
-                })(vm, create, params)
               ])
             }
           }
@@ -277,7 +269,6 @@
         }
       }
     },
-    computed: {},
     methods: {
       closeModal (name) {
         this[name] = false
@@ -308,7 +299,7 @@
       },
       getCityData (provinceId) {
         var vm = this
-        var data = vm.util.extend(vm.chinaJson[provinceId])
+        var data = vm.chinaJson[provinceId]
         var dataArr = []
         for (let key in data) {
           dataArr.push({
@@ -320,7 +311,7 @@
       },
       getAreaData (cityId) {
         var vm = this
-        var data = vm.util.extend(vm.chinaJson[cityId])
+        var data = vm.chinaJson[cityId]
         var dataArr = []
         for (let key in data) {
           dataArr.push({
@@ -348,22 +339,32 @@
             delete data[key]
           }
         }
+      },
+      initData(){
+        var vm = this
+        vm.$http.post(vm.url.init).then(res => {
+          var resData = res.data
+          if(resData.code==1){
+            var chinaData = resData.data 
+            vm.chinaData = chinaData
+            vm.chinaJson = vm.util.getChinaJsonByData(chinaData)
+            let provinceData = []
+            chinaData.forEach(item => {
+              provinceData.push({
+                'id': item.value,
+                'provinceName': item.label
+              })
+            })
+            vm.provinceData = provinceData
+          }else{
+            vm.$message.error(resData.message)
+          }
+        })
       }
     },
     mounted () {
       let vm = this
-      vm.$http.get('/static/data/address.json').then(res => {
-        vm.chinaJson = vm.util.extend(res.data)
-        vm.chinaData = vm.util.getChinaDataByJson(res.data)
-        let provinceData = []
-        vm.chinaData.forEach(item => {
-          provinceData.push({
-            'id': item.value,
-            'provinceName': item.label
-          })
-        })
-        vm.provinceData = provinceData
-      })
+      vm.initData()
       // 为什么全局的axios不行， vm.$http.all   not a function
       // vm.$http.all([vm.$http.get('/static/data/address.json'), vm.$http.get('/static/data/accessData.json')]).then(vm.$http.spread(function(acct, perms){
       // axios.all([vm.$http.get('/static/data/address.json'), vm.$http.get('/static/data/accessData.json')]).then(axios.spread(function(res1, res2){
@@ -373,10 +374,14 @@
     },
     watch: {
       'dialogShow': function(val){
-            if(!val){
-              this.editInd = 0
-            }
+        var vm = this
+        if(!val){
+          vm.editInd = 0
+          if(typeof vm.resetDialogForm == 'function'){
+            vm.resetDialogForm()
+          }
         }
+      }
     }
   }
 </script>
