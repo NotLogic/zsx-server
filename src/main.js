@@ -3,7 +3,6 @@ import App from './App'
 import router from './router'
 import {Message} from 'iview'
 import iView from 'iview'
-import tinymce from 'tinymce'
 // 引入'babel-polyfill' 兼容ie 9-11 ie不支持Promise方法
 import 'babel-polyfill'
 import store from './vuex'

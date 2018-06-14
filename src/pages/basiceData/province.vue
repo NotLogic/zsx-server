@@ -134,13 +134,11 @@
                     style: { marginRight: '5px' },
                     on: {
                       click: function () {
-                        vm.editRow(params.row, 'province')
+                        // vm.editRow(params.row, 'province')
                       }
                     }
                   }, vm.label.edit)
-                })(vm, create, params),
-                (function (vm, create, params) {
-                  return create('Button', {
+                })(vm, create, params),create('Button', {
                     props: { type: 'error', size: 'small' },
                     on: {
                       click: function () {
@@ -148,7 +146,6 @@
                       }
                     }
                   }, vm.label.delete)
-                })(vm, create, params)
               ])
             }
           }
@@ -198,7 +195,7 @@
                     style: { marginRight: '5px' },
                     on: {
                       click: function () {
-                        vm.editRow(params.row, 'city')
+                        // vm.editRow(params.row, 'city')
                       }
                     }
                   }, vm.label.edit),
@@ -246,7 +243,7 @@
                   style: { marginRight: '5px' },
                   on: {
                     click: function () {
-                      vm.editRow(params.row, 'area')
+                      // vm.editRow(params.row, 'area')
                     }
                   }
                 }, vm.label.edit),

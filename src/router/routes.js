@@ -35,6 +35,29 @@ export const mainRoutes = {
   ]
 }
 export const appRoutes = [
+  // 模板
+  // {
+  //   path: '/template',
+  //   name: 'template',
+  //   meta: {
+  //     title: '模板',
+  //     access: 1,
+  //     icon: ''
+  //   },
+  //   component: main,
+  //   children: [
+  //     {
+  //       path: 'template_index',
+  //       name: 'template_index',
+  //       meta: {
+  //         title: '模板',
+  //         access: 1,
+  //         icon: ''
+  //       },
+  //       component: resolve => { require(['@/pages/pageTemplate'], resolve) }
+  //     }
+  //   ]
+  // },
   // 用户
   {
     path: '/user',
@@ -55,17 +78,7 @@ export const appRoutes = [
           icon: ''
         },
         component: resolve => { require(['@/pages/authority/user'], resolve) }
-      },
-      // {
-      //   path: 'post',
-      //   name: 'post',
-      //   meta: {
-      //     title: 'APP帖子',
-      //     access: 1,
-      //     icon: ''
-      //   },
-      //   component: resolve => { require(['@/pages/post'], resolve) }
-      // }
+      }
     ]
   },
   // 广告管理
@@ -132,7 +145,7 @@ export const appRoutes = [
           access: 1,
           icon: ''
         },
-        component: resolve => { require(['@/pages/news'], resolve) }
+        component: resolve => { require(['@/pages/content/news'], resolve) }
       },
       {
         path: 'gover',
@@ -142,7 +155,7 @@ export const appRoutes = [
           access: 1,
           icon: ''
         },
-        component: resolve => { require(['@/pages/gover'], resolve) }
+        component: resolve => { require(['@/pages/content/gover'], resolve) }
       },
       {
         path: 'policy',
@@ -152,7 +165,7 @@ export const appRoutes = [
           access: 1,
           icon: ''
         },
-        component: resolve => { require(['@/pages/policy'], resolve) }
+        component: resolve => { require(['@/pages/content/policy'], resolve) }
       },
       {
         path: 'workClass',
@@ -162,7 +175,7 @@ export const appRoutes = [
           access: 1,
           icon: ''
         },
-        component: resolve => { require(['@/pages/guide/workClass'], resolve) }
+        component: resolve => { require(['@/pages/content/workClass'], resolve) }
       },
       {
         path: 'workMatter',
@@ -172,7 +185,16 @@ export const appRoutes = [
           access: 1,
           icon: ''
         },
-        component: resolve => { require(['@/pages/guide/workMatter'], resolve) }
+        component: resolve => { require(['@/pages/content/workMatter'], resolve) }
+      },{
+        path: 'article',
+        name: 'article',
+        meta: {
+          title: '推文管理',
+          access: 1,
+          icon: ''
+        },
+        component: resolve => { require(['@/pages/content/article'], resolve) }
       }
     ]
   },
@@ -188,131 +210,6 @@ export const appRoutes = [
     component: main,
     children: []
   },
-  // 权限管理
-  // {
-  //   path: '/authority',
-  //   name: 'authority',
-  //   meta: {
-  //     title: '权限管理',
-  //     access: 1,
-  //     icon: 'key'
-  //   },
-  //   component: main,
-  //   children: [
-  //     {
-  //       path: 'resource',
-  //       name: 'resource',
-  //       meta: {
-  //         title: '资源管理',
-  //         access: 1,
-  //         icon: ''
-  //       },
-  //       component: resolve => { require(['@/pages/authority/resource'], resolve) }
-  //     },
-  //     {
-  //       path: 'role',
-  //       name: 'role',
-  //       meta: {
-  //         title: '角色管理',
-  //         access: 1,
-  //         icon: ''
-  //       },
-  //       component: resolve => { require(['@/pages/authority/role'], resolve) }
-  //     }
-  //   ]
-  // },
-  // 会员管理
-  // {
-  //   path: '/member',
-  //   name: 'member',
-  //   meta: {
-  //     title: '会员管理',
-  //     access: 1,
-  //     icon: ''
-  //   },
-  //   component: main,
-  //   children: [
-  //     {
-  //       path: 'index',
-  //       name: 'member_index',
-  //       meta: {
-  //         title: '会员管理',
-  //         access: 1,
-  //         icon: ''
-  //       },
-  //       component: resolve => { require(['@/pages/member'], resolve) }
-  //     }
-  //   ]
-  // },
-  // 评论管理
-  // {
-  //   path: '/comment',
-  //   name: 'comment',
-  //   meta: {
-  //     title: '评论管理',
-  //     access: 1,
-  //     icon: ''
-  //   },
-  //   component: main,
-  //   children: [
-  //     {
-  //       path: 'index',
-  //       name: 'comment_index',
-  //       meta: {
-  //         title: '评论管理',
-  //         access: 1,
-  //         icon: ''
-  //       },
-  //       component: resolve => { require(['@/pages/comment'], resolve) }
-  //     }
-  //   ]
-  // },
-  // 群组管理
-  // {
-  //   path: '/appGroup',
-  //   name: 'appGroup',
-  //   meta: {
-  //     title: '群组管理',
-  //     access: 1,
-  //     icon: ''
-  //   },
-  //   component: main,
-  //   children: [
-  //     {
-  //       path: 'index',
-  //       name: 'appGroup_index',
-  //       meta: {
-  //         title: '群组管理',
-  //         access: 1,
-  //         icon: ''
-  //       },
-  //       component: resolve => { require(['@/pages/appGroup'], resolve) }
-  //     }
-  //   ]
-  // },
-  // 举报管理
-  // {
-  //   path: '/complaint',
-  //   name: 'complaint',
-  //   meta: {
-  //     title: '举报管理',
-  //     access: 1,
-  //     icon: ''
-  //   },
-  //   component: main,
-  //   children: [
-  //     {
-  //       path: 'index',
-  //       name: 'complaint_index',
-  //       meta: {
-  //         title: '举报管理',
-  //         access: 1,
-  //         icon: ''
-  //       },
-  //       component: resolve => { require(['@/pages/complaint'], resolve) }
-  //     }
-  //   ]
-  // },
   // 系统配置
   {
     path: '/systemSetting',
@@ -345,39 +242,6 @@ export const appRoutes = [
       }
     ]
   },
-  // API管理
-  // {
-  //   path: '/thirdparty',
-  //   name: 'thirdparty',
-  //   meta: {
-  //     title: 'API管理',
-  //     access: 1,
-  //     icon: ''
-  //   },
-  //   component: main,
-  //   children: [
-  //     {
-  //       path: 'thirdpartyClass',
-  //       name: 'thirdpartyClass',
-  //       meta: {
-  //         title: 'API分类',
-  //         access: 1,
-  //         icon: ''
-  //       },
-  //       component: resolve => { require(['@/pages/thirdparty/thirdpartyClass'], resolve) }
-  //     },
-  //     {
-  //       path: 'thirdpartySetting',
-  //       name: 'thirdpartySetting',
-  //       meta: {
-  //         title: 'API配置',
-  //         access: 1,
-  //         icon: ''
-  //       },
-  //       component: resolve => { require(['@/pages/thirdparty/thirdpartySetting'], resolve) }
-  //     }
-  //   ]
-  // },
   // 基础数据
   {
     path: '/basiceData',

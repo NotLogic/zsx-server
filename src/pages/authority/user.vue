@@ -1,8 +1,8 @@
 <template>
   <div class="user">
     <div>
-      <Button :type="currentSourceWeb ? 'primary' : 'ghost'" style="margin: 5px 8px 24px 0;" @click="pager.source='web';paging();currentSourceWeb=true">web用户</Button>
-      <Button :type="!currentSourceWeb ? 'primary' : 'ghost'" style="margin: 5px 8px 24px 0;" @click="pager.source='app';paging();currentSourceWeb=false">app用户</Button>
+      <Button :type="currentSourceWeb ? 'primary' : 'ghost'" style="margin: 5px 8px 24px 0;" @click="switchSource('web')">web用户</Button>
+      <Button :type="!currentSourceWeb ? 'primary' : 'ghost'" style="margin: 5px 8px 24px 0;" @click="switchSource('app')">app用户</Button>
     </div>
     <Form :model="formSearch" ref="formSearch" inline :label-width="60">
         <FormItem label="用户">
@@ -23,10 +23,11 @@
         <Button type="ghost" style="margin:5px 8px 24px 0;" @click="resetSearch('formSearch')" size="small">{{label.clear}}</Button>
         <Button type="primary" style="margin: 5px 8px 24px 0;" @click="submitSearch('formSearch')" size="small">{{label.search}}</Button>
         <Button type="primary" style="margin: 5px 8px 24px 0;" @click="addRow" size="small">{{label.add}}</Button>
-        <Button type="primary" style="margin: 5px 8px 24px 0;" @click="postAddRow" size="small">发帖</Button>
+        <Button type="primary" style="margin: 5px 8px 24px 0;" @click="postAddRow(false)" size="small">发帖</Button>
+        <Button type="error" style="margin: 5px 8px 24px 0;" :disabled="batchUserArr.length==0 || !currentSourceWeb" @click="batchDelWebUser" size="small">批量删除web用户</Button>
     </Form>
     <!-- 用户数据展示表格 -->
-    <mainTable :columns="columns" :data="pager.data"></mainTable>
+    <mainTable :columns="columns" :data="pager.data" @updateSelect="updateSelectUser"></mainTable>
     <paging @changePager="changePager" @paging="paging" :total="pager.total" :currPage="pager.currPage"></paging>
     <!-- 添加/编辑用户弹窗 -->
     <Modal v-model="dialogShow" :title="label[currDialog]" :mask-closable="false" width="750" @on-cancel="resetDialogForm('formDialog')">
@@ -34,7 +35,7 @@
         <Row v-if="currDialog=='add'">
           <Col span="12">
             <FormItem label="账号" prop="loginUsername">
-              <Input v-model="formDialog.loginUsername" placeholder="请输入账号"></Input>
+              <Input v-model="formDialog.loginUsername" placeholder="请输入11位数字账号"></Input>
             </FormItem>
           </Col>
           <Col span="12" >
@@ -49,37 +50,25 @@
                 <Input v-model="formDialog.nickName" placeholder="请输入昵称"></Input>
             </FormItem>
           </Col>
-          <Col span="12">
-            <FormItem label="用户状态" prop="userStatus">
-                <Select v-model="formDialog.userStatus">
-                  <Option v-for="item in userStatus" :value="item.value" :key="item.value">{{ item.label }}</Option>
-                </Select>
-            </FormItem>
-          </Col>
-        </Row>
-        <Row>
-          <Col span="12">
+           <Col span="12">
             <FormItem label="性别" prop="sex">
                 <Select v-model="formDialog.sex">
                     <Option v-for="item in sex" :value="item.value" :key="item.value">{{ item.label }}</Option>
                 </Select>
             </FormItem>
           </Col>
-          <!-- <Col span="12">
-              <FormItem label="电话" prop="phone">
-                <Input v-model="formDialog.phone"></Input>
-              </FormItem>
-          </Col> -->
         </Row>
         <Row>
+         <!-- <Col span="12" v-show="currDialog=='edit'">
+            <FormItem label="用户状态" prop="userStatus">
+                <Select v-model="formDialog.userStatus">
+                  <Option v-for="item in userStatus" :value="item.value" :key="item.value">{{ item.label }}</Option>
+                </Select>
+            </FormItem>
+          </Col> -->
           <Col span="12">
             <FormItem label="出生日期" prop="birthday">
               <DatePicker type="date" placeholder="点击选择出生日期" @on-change="birthChange" v-model="birthday" :clearable="false"></DatePicker>
-            </FormItem>
-          </Col>
-           <Col span="12">
-            <FormItem label="年龄" prop="age">
-              <Input v-model="formDialog.age"></Input>
             </FormItem>
           </Col>
         </Row>
@@ -119,9 +108,8 @@
               </Row>
             </FormItem>
           </Col>
-          <Col span="12">
+          <Col span="12" v-show="currDialog=='edit'">
             <FormItem label="头像背景" prop="bgPortrait">
-              <!-- <Input v-model="formDialog.bgPortrait"></Input> -->
               <Row>
                 <Col span="12">
                   <Upload name="file"
@@ -155,7 +143,7 @@
             </FormItem>
           </Col>
         </Row>
-        <Row>
+        <Row v-show="currDialog=='edit'">
           <Col span="12">
             <FormItem label="所在地">
               <Cascader :data="derail_address_arr" v-model="location_address" filterable></Cascader>
@@ -164,22 +152,6 @@
           <Col span="12">
             <FormItem label="家乡">
               <Cascader :data="derail_address_arr" v-model="hometown_address" filterable></Cascader>
-            </FormItem>
-          </Col>
-        </Row>
-        <Row>
-          <Col span="12">
-            <FormItem label="是否完善资料" prop="isConsummate">
-              <Select v-model="formDialog.isConsummate">
-                  <Option v-for="item in isConsummate" :value="item.value" :key="item.value">{{ item.label }}</Option>
-                </Select>
-            </FormItem>
-          </Col>
-          <Col span="12">
-            <FormItem label="是否认证" prop="isAuth">
-              <Select v-model="formDialog.isAuth">
-                  <Option v-for="item in isAuth" :value="item.value" :key="item.value">{{ item.label }}</Option>
-                </Select>
             </FormItem>
           </Col>
         </Row>
@@ -268,7 +240,7 @@
         </FormItem>
         <Button type="ghost" style="margin:5px 8px 24px 0;" @click="postResetSearch('postFormSearch')" size="small">{{label.clear}}</Button>
         <Button type="primary" style="margin: 5px 8px 24px 0;" @click="postSubmitSearch('postFormSearch')" size="small">{{label.search}}</Button>
-        <Button type="error" style="margin: 5px 8px 24px 0" :disabled="batchOprArr.length==0" @click="batchDel" size="small">批量删除</Button> 
+        <Button type="error" style="margin: 5px 8px 24px 0" :disabled="batchIdArr.length==0" @click="batchDel" size="small">批量删除</Button> 
       </Form>
       <mainTable :columns="postColumns" :data="postPager.data" @updateSelect="updateSelect"></mainTable>
       <paging @changePager="postChangePager" @paging="postPaging" :total="postPager.total" :currPage="postPager.currPage"></paging>
@@ -282,7 +254,7 @@
           <Row>
             <Col span="12">
               <FormItem label="用户ID" prop="userId">
-                <Select v-model="postFormDialog.userId" placeholder="请选择/输入关键字筛选用户" clearable filterable>
+                <Select v-model="postFormDialog.userId" placeholder="请选择/输入关键字筛选用户" :disabled="userSelectDisabled" filterable>
                   <template v-if="currentSourceWeb">
                     <Option v-for="item in webUserId" :value="item.value" :key="item.value">{{ item.label }}</Option>
                   </template>
@@ -357,7 +329,7 @@
       <div class="post-content">
         <div class="post-preview-header clearfix">
           <div class="head-portrait">
-            <img :src="userData.headPortrait" alt="">
+            <img :src="userData.headPortrait" alt="头像">
           </div>
           <div class="post-user-info">
             <div class="info-header">
@@ -441,6 +413,8 @@
         userId: [],
         webUserId: [],
         appUserId: [],
+        // 点击的发帖按钮是在上边
+        userSelectDisabled: false,
         pager: {
           data: [],
           url: 'user/dataGrid',
@@ -519,7 +493,7 @@
               return create('div',[
                 vm.createPreviewBtn(create, params.row, vm.postPreview),
                 vm.createEditBtn(create, params.row, vm.postEditRow),
-                vm.createDelBtn(create, params.row.id, vm.postDelRow)
+                vm.createDelBtn(create, params.row.postId, vm.postDelRow)
               ])
             }
           }
@@ -580,6 +554,7 @@
         imageHost: sessionStorage.imageHost || '',
         formSearch: {
           name: '',
+          source: 'web',
           // createdateStart: '',
           // createdateEnd: '',
           // areaCode: ''
@@ -588,7 +563,6 @@
         loginPassword: '',
         previewData: {},
         postPreviewData: {
-          // postImagesSrc: ['http://10.0.0.21:800/zsx/2018/6/06/443377501892608/user/icon/443377501892608/443377503354880_yt.jpg'],
           postImagesSrc: []
         },
         // 根据用户查帖子时进行初始化，帖子窗口关闭时清空
@@ -604,20 +578,19 @@
           appSoucre: '3', // 后台管理系统添加的用户appSource永远为3，为了和ios和安卓用户区分
           bgPortrait: '',
           headPortrait: '',
-          provincesCode: '',
-          cityCode: '',
-          areaCode: '',
-          homeProvincesCode: '',
-          homeCityCode: '',
-          homeAreaCode: '',
-          isAuth: '',
-          isConsummate: '',
+          provincesCode: '0',
+          cityCode: '0',
+          areaCode: '0',
+          homeProvincesCode: '0',
+          homeCityCode: '0',
+          homeAreaCode: '0',
+          isAuth: '1',
+          isConsummate: '1',
           userStatus: '1',
-          createTime: '',
+          // createTime: '',
         },
-        // 帖子批量操作
-        batchOprArr: [],
-        batchIdArr: [], // id数组
+        batchIdArr: [], // 批量帖子id数组
+        batchUserArr: [], // 批量用户id数组
         postFormDialog: {
           id: '',
           userId: '',
@@ -818,8 +791,16 @@
         ],
         rules: {
           loginUsername: [
-            { required: true, message: '登录名称不能为空', trigger: 'blur' },
-            { type: 'string', min: 4, max: 64, message: '登录名须在4-64个字符之间', trigger: 'blur' }
+            { required: true, message: '账户不能为空', trigger: 'blur' },
+            {
+              validator(rule, value, callback, source, options) {
+                var errors = [];
+                if(typeof Number(value) != 'number' || typeof Number(value) == 'number' && Number(value).toString().length != 11){
+                  callback('账户必须为11位数字');
+                }
+                callback(errors);
+              }
+            }
           ],
           nickName: [
             { required: true, message: '姓名不能为空', trigger: 'blur' }
@@ -846,9 +827,36 @@
       }
     },
     methods: {
+      // 切换用户
+      switchSource(source){
+        var vm = this
+        if(source=='web'){
+          vm.currentSourceWeb=true
+        }else if(source=='app'){
+          vm.currentSourceWeb=false
+        }
+        vm.pager.source=source;
+        vm.batchUserArr = []
+        vm.paging();
+      },
       // 帖子批量操作
       updateSelect (selection) {
-        this.batchOprArr = selection
+        var vm = this,batchIdArr = [],len=selection.length;
+        if(len){
+          for(var i=0;i<len;i++){
+            batchIdArr.push(selection[i].postId)
+          }
+        }
+        vm.batchIdArr = batchIdArr
+      },
+      updateSelectUser(selection){
+        var vm = this,batchIdArr = [],len=selection.length;
+        if(len){
+          for(var i=0;i<len;i++){
+            batchIdArr.push(selection[i].id)
+          }
+        }
+        vm.batchUserArr = batchIdArr
       },
       postEditRow(data){
         console.log('编辑行数据： ',data)
@@ -868,6 +876,7 @@
       },
       postDelRow(data){
         var vm = this;
+        debugger
         if(!data.id){
           vm.$Message.error('id获取失败')
           return
@@ -895,28 +904,32 @@
       getPostImagesSrc(data){
         var arr = [];
         if(!data)return arr
-        var len = data.length,i,j,imageItem,videoItem;
+        var len = data.length,i,j,item;
         console.log('图片/视频数组: ',data)
         if(len){
           var fileList = data[0].fileList
           if(data[0].fileType==2){
-            // for(j=0;j<fileList.length;j++){
-            //   imageItem = fileList[j]
-            //   arr.push(imageItem.fileName)
-            // }
+            for(j=0;j<fileList.length;j++){
+              item = fileList[j]
+              arr.push({
+                src: item.fileName,
+                poster: item.fileVideoImage
+              })
+            }
           }else if (data[0].fileType==1){
             for(j=0;j<fileList.length;j++){
-              imageItem = fileList[j]
-              arr.push(imageItem.fileName)
+              item = fileList[j]
+              arr.push(item.fileName)
             }
           }
         }
         return arr
       },
       // 发帖按钮
-      postAddRow(){
+      postAddRow(disabled){
         var vm = this
         vm.postCurrDialog = 'add'
+        vm.userSelectDisabled = disabled
         vm.postDialogShow = true
       },
       postResetSearch(name){
@@ -940,6 +953,21 @@
           }
         }).catch(err=>{})
       },
+      delRow (data) {
+        var vm = this;
+        if(!data.id){
+          vm.$Message.error('id获取失败')
+          return
+        }
+        var parmas = {
+          method: 'post',
+          url: vm.url.delete,
+          data: {
+            ids: [data.id]
+          }
+        }
+        vm.batchoperation(parmas,vm.paging)
+      },
       batchDel(){
         var vm = this
         vm.$Modal.confirm({
@@ -958,7 +986,7 @@
         })
       },
       // 批量操作
-      batchoperation(parmas){
+      batchoperation(parmas,refresh){
         var vm = this
         if(typeof parmas != 'object'){
           vm.$Message.error('传参错误')
@@ -969,12 +997,34 @@
           var resData = res.data
           if(resData.code==1){
             vm.$Message.success('操作成功');
-            vm.batchOprArr = []
-            vm.postPaging()
+            vm.batchIdArr = []
+            if(typeof refresh == 'function'){
+              refresh()
+            }else{
+              vm.postPaging()
+            }
           }else{
             vm.$Message.error(resData.message);
           }
         }).catch(err=>{})
+      },
+      // 批量删除web用户
+      batchDelWebUser(){
+        var vm = this
+        vm.$Modal.confirm({
+          title: '确认',
+          content: '确认删除这些web用户吗？请考虑清楚，谨慎操作',
+          onOk: function () {
+            var parmas = {
+              method: 'post',
+              url: vm.url.delete,
+              data: {
+                ids: vm.batchUserArr
+              }
+            }
+            vm.batchoperation(parmas, vm.paging)
+          }
+        })
       },
 
       // 预览用户
@@ -1047,7 +1097,8 @@
           on: {
             click(){
               vm.postFormDialog.userId = userId
-              vm.postAddRow(userId)
+              // 点击的不是顶部发帖
+              vm.postAddRow(true)
             }
           }
         },'发帖')
@@ -1279,9 +1330,10 @@
           vm.$Message.error('请先选择发帖用户')
           return
         }
-        vm.uploadLoading3 = true
+        // vm.uploadLoading3 = true
         var userId = vm.postFormDialog.userId
-        if(vm.postCurrDialog=='add'){
+        // 帖子上传图片添加帖子，并且未请求过id时才获取sourceId
+        if(vm.postCurrDialog=='add'&&!vm.postFormDialog.id){
           vm.$http.post(vm.url.sId).then(res=>{
             var resData = res.data
             if(resData.code==1){
@@ -1292,10 +1344,18 @@
           }).catch(err=>{})
         }else{
           var sId = vm.postFormDialog.id
-          vm.uploadFile(sId, userId)
+          vm.uploadFile3(sId, userId)
         }
       },
       uploadFile3(sId, userId){
+        if(!sId){
+          vm.$Message.error('请传sId')
+          return
+        }
+        if(!userId){
+          vm.$Message.error('请传userId')
+          return
+        }
         var vm = this;
         let params = new FormData();
         vm.uploadImgArr3.forEach(file =>{
@@ -1349,7 +1409,7 @@
       birthChange(date){
         var vm = this
         if(date.length){
-          vm.formDialog.birthday = date + ' 00:00:00'
+          vm.formDialog.birthday = date
           var now = new Date();
           var arr = date.split('-');
           var year = now.getFullYear(),
@@ -1370,6 +1430,22 @@
         vm.formSearch.name = ''
         vm.$refs[name].resetFields()
         vm.submitSearch(name)
+      },
+      submitSearch (name) {
+        let vm = this
+        // 搜索操作
+        vm.$http2({
+          url: vm.url.search,
+          method: vm.pager.method,
+          data: vm.formSearch
+        }).then(res => {
+          var resData = res.data
+          if(resData.code==1){
+            vm.pager.data = resData.data.records
+          }else{
+            vm.$Message.error('搜索失败: ' + resData.message)
+          }
+        }).catch(err=>{})
       },
       postResetDialogForm(name){
         name = name || 'postFormDialog'
@@ -1553,15 +1629,9 @@
           this.userData = {}
         }
       },
-      batchOprArr (val){
-        var vm = this,batchIdArr = [],len=val.length;
-        if(len){
-          for(var i=0;i<len;i++){
-            batchIdArr.push(val[i].id)
-          }
-        }
-        vm.batchIdArr = batchIdArr
-      },
+      currentSourceWeb(val){
+        this.formSearch.source = val ? 'web' : 'app'
+      }
     },
   }
 </script>
