@@ -611,12 +611,6 @@
             "align": 'center'
           },
           {
-            "title": "ID",
-            "key": "id",
-            "width": 200,
-            "sortable": true
-          },
-          {
             "title": "账号",
             "key": "loginUsername",
             "width": 150,
@@ -803,26 +797,11 @@
             }
           ],
           nickName: [
-            { required: true, message: '姓名不能为空', trigger: 'blur' }
+            { required: true, message: '昵称不能为空', trigger: 'blur' }
           ],
           loginPassword: [
             { required: true, message: '密码不能为空', trigger: 'blur' }
           ],
-          // userStatus: [
-          //   { required: true, message: '用户状态不能为空', trigger: 'change' }
-          // ],
-          // userType: [
-          //   { required: true, message: '用户类型不能为空', trigger: 'change' }
-          // ],
-          // sex: [
-          //   { required: true, message: '用户性别不能为空', trigger: 'change' }
-          // ],
-          // detailAddress: [
-          //   { required: true, message: '请选择关联地区', trigger: 'change' }
-          // ],
-          // phone : [
-          //   { required: true, message: '联系方式不能为空', trigger: 'change' },
-          // ]
         }
       }
     },
