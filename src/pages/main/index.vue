@@ -45,7 +45,7 @@
   import tagsPageOpened from '@/components/tagsPageOpened'
   import breadcrumbNav from '@/components/breadcrumbNav'
   export default {
-    name: 'main',
+    name: 'zsx_main',
     components: {
       sidebar,
       tagsPageOpened,
@@ -53,7 +53,8 @@
     },
     data () {
       return {
-        hideMenuText: false
+        hideMenuText: false,
+        exitUrl: 'web/sys/user/quit/'
       }
     },
     // 计算属性 引入vuex进行状态管理，从store实例中读取状态最简单的方法就是在计算属性中返回某个状态
@@ -80,24 +81,41 @@
           title: '确认退出',
           content: '点击“取消”将留在当前页，点击“确定”将转向登录页。',
           onOk: function () {
-            vm.$router.push({name: 'login'})
-            // 清空用户数据
-            if (sessionStorage.user) {sessionStorage.removeItem('user')}
-            // 清空左侧展开菜单数据
-            if (sessionStorage.currentPageName) {sessionStorage.removeItem('currentPageName')}
-            if (sessionStorage.currentPath) {sessionStorage.removeItem('currentPath')}
-            if (sessionStorage.pageOpenedList) {sessionStorage.removeItem('pageOpenedList')}
-            // 清空左侧菜单
-            vm.$store.commit('clearOpenedSubmenu')
-            // 清空快捷导航菜单数组
-            vm.$store.commit('clearPageOpenedList')
-            // 清空面包屑
-            vm.$store.commit('clearCurrentPath')
+            var user = JSON.parse(sessionStorage.user);
+            var userId = '';
+            if(typeof(user) == 'object'){
+              userId = user.userId
+            }
+            vm.$http.post(vm.exitUrl + userId).then(res=>{
+              var resData = res.data
+              if(resData.code ==1){
+                vm.exitLogin()
+              }else{
+                vm.$Message.error(resData.message)
+              }
+            }).catch(err=>{})
           }
         })
       },
-      toggleClick () {
+      exitLogin(){
+        var vm = this
+        // 清空用户数据
+        if (sessionStorage.user) {sessionStorage.removeItem('user')}
+        // 清空左侧展开菜单数据
+        if (sessionStorage.currentPageName) {sessionStorage.removeItem('currentPageName')}
+        if (sessionStorage.currentPath) {sessionStorage.removeItem('currentPath')}
+        if (sessionStorage.pageOpenedList) {sessionStorage.removeItem('pageOpenedList')}
+        // 清空左侧菜单
+        vm.$store.commit('clearOpenedSubmenu')
+        // 清空快捷导航菜单数组
+        vm.$store.commit('clearPageOpenedList')
+        // 清空面包屑
+        vm.$store.commit('clearCurrentPath')
+        vm.$router.push({name: 'login'})
+      },
+      toggleClick (e) {
         this.hideMenuText = !this.hideMenuText
+        e && e.preventDefault();
       },
       init () {}
     },

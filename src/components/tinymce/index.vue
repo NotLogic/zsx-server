@@ -48,7 +48,6 @@ export default {
             'emoticons paste textcolor colorpicker textpattern imagetools codesample'
           ],
           toolbar1: ' newnote print preview | undo redo | insert | styleselect | forecolor backcolor bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image emoticons media codesample',
-          menubar: this.menubar,
           autosave_interval: '20s',
           image_advtab: true,
           table_default_styles: {

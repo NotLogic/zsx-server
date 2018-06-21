@@ -15,10 +15,12 @@ const page = {
       currDialog: 'add',
       // 主弹出框的显示隐藏
       dialogShow: false,
-      // 主弹出框正在提交数据
+      // 主弹出框是否正在提交数据
       dialogSubmitLoading: false,
       // 删除行的key
       delRowKey: 'id',
+      // 需不需要传id
+      needId: false,
       // 按钮文字map
       label: {
         'edit': '编辑',
@@ -32,17 +34,18 @@ const page = {
         'close': '关闭',
         'cancle': '取消',
         'uploadImg': '上传图片',
-        'uploadExcel': '导入Excel'
+        'uploadExcel': '导入Excel',
+        'wait': '功能正在研发中，请稍后,谢谢...'
       },
       mixinPager: {
         'url': '',
-        'currPage': 1,
+        'current': 1,
         'method': 'post',
-        'order': '',
-        'pagesize': 10,
-        'sort': '',
-        'total': 0,
-        'data': []
+        // 'order': '',
+        'size': 10,
+        // 'sort': '',
+        // 'total': 0,
+        'data': [],
       },
       map: {
         'sex': {
@@ -72,10 +75,22 @@ const page = {
       this.dialogShow = true
     },
     // 搜索提交
-    submitSearch (name) {
+    submitSearch () {
       let vm = this
-      console.log('搜索提交数据', vm.formSearch)
+      var method = typeof vm.pager.searchMethod == 'undefined' ? vm.pager.method : vm.pager.searchMethod
       // 搜索操作
+      vm.$http2({
+        url: vm.url.search,
+        method: method,
+        data: vm.formSearch
+      }).then(res => {
+        var resData = res.data
+        if(resData.code==1){
+          vm.pager.data = resData.data
+        }else{
+          vm.$Message.error('搜索失败: ' + resData.message)
+        }
+      }).catch(err=>{})
     },
     // 新增/编辑主弹出框的提交
     submitDialogForm (name) {
@@ -87,11 +102,33 @@ const page = {
           }
           let ajaxData = vm.editAddAjaxData(vm.currDialog)
           let ajaxUrl = vm.url[vm.currDialog]
-          console.log("ajaxData: ",ajaxData)
-          console.log("ajaxUrl: ",ajaxUrl)
-          // 成功之后
-          vm.dialogShow = false
-          vm.resetDialogForm(name)
+          var method = typeof vm.pager.addMethod != 'undefined' ? vm.pager.addMethod : vm.pager.method
+          vm.dialogSubmitLoading = true
+          var params = {
+            url: ajaxUrl,
+            method: method,
+          }
+          if(method=='post'){
+            params.data = ajaxData
+          }else if(method=='get'){
+            params.params = ajaxData
+          }
+          vm.$http(params).then(res => {
+            vm.dialogSubmitLoading = false
+            var resData = res.data
+            if(resData.code==1){
+              vm.$Message.success(vm.label[vm.currDialog]+'成功!')
+              vm.paging();
+              vm.dialogShow = false
+              if(typeof vm.resetDialogForm == 'function'){
+                vm.resetDialogForm()
+              }
+            }else{
+              vm.$Message.error(vm.label[vm.currDialog]+'失败: ' + resData.message)
+            }
+          }).catch(err=>{
+    
+          })
         }
       })
     },
@@ -102,20 +139,36 @@ const page = {
         vm.changePager(currPage)
         return
       }
-      // vm.$http({
-      //   url: vm.pager.url,
-      //   method: vm.pager.method,
-      //   data: vm.pagingFiltData(vm.pager)
-      // }).then(res => {
-      //   if (res.data.data.code == 1) {
-      //     let _data = res.data.data
-      //     if (typeof vm.pagerResult === 'function') {
-      //       _data = vm.pagerResult(_data)
-      //     }
-      //     vm.pager.data = _data.data
-      //     vm.pager.total = _data.total
-      //   }
-      // })
+      if(typeof vm.pageLoading != 'undefined'){
+        vm.pageLoading = true
+      }
+      var params = {
+        url: vm.pager.url,
+        method: vm.pager.method,
+      }
+      var method = vm.pager.method
+      if(method=='post'){
+        params.data = vm.pagingFiltData(vm.pager)
+      }else if(method=='get'){
+        params.params = vm.pagingFiltData(vm.pager)
+      }
+      vm.$http2(params).then(res => {
+        let resData = res.data
+        resData = typeof resData == 'object' ? resData : JSON.parse(resData)
+        if (resData.code == 1) {
+          if(typeof vm.pageLoading != 'undefined'){
+            vm.pageLoading = false
+          }
+          if (typeof vm.pagerResult == 'function') {
+            // 返回数据预处理
+            resData.data = vm.pagerResult(resData.data)
+          }
+          setTimeout(function(){
+            vm.pager.data = resData.data
+            vm.pager.total = resData.total
+          },50)
+        }
+      }).catch(err=>{})
     },
     // 分页改变
     changePager (data) {
@@ -137,17 +190,20 @@ const page = {
           delete obj[key]
         }
       }
-      if (obj.data) {
+      if (typeof obj.data != 'undefined') {
         delete obj.data
       }
-      if (obj.url || obj.url === '') {
+      if (typeof obj.url != 'undefined') {
         delete obj.url
       }
-      if (obj.method) {
+      if (typeof obj.method != 'undefined') {
         delete obj.method
       }
-      if (obj.total) {
+      if (typeof obj.total != 'undefined') {
         delete obj.total
+      }
+      if (typeof obj.addMethod != 'undefined') {
+        delete obj.addMethod
       }
       return obj
     },
@@ -155,21 +211,27 @@ const page = {
     editAddAjaxData (currDialog) {
       let vm = this
       let ajaxData = {}
-      if (currDialog === 'add') {
-        for (let key in vm.formDialog) {
-          if (key != 'id') {
-            ajaxData[key] = vm.formDialog[key]
-          }
-        }
-      } else if (currDialog === 'edit') {
+      if(vm.needId){
         for (let key in vm.formDialog) {
           ajaxData[key] = vm.formDialog[key]
+        }
+      }else{
+        if (currDialog === 'add') {
+          for (let key in vm.formDialog) {
+            if (key != 'id') {
+              ajaxData[key] = vm.formDialog[key]
+            }
+          }
+        } else if (currDialog === 'edit') {
+          for (let key in vm.formDialog) {
+            ajaxData[key] = vm.formDialog[key]
+          }
         }
       }
       return ajaxData
     },
     // 创建编辑按钮
-    createEditBtn (create, data) {
+    createEditBtn (create, data, callback) {
       let vm = this
       return create('Button', {
         props: {
@@ -181,7 +243,11 @@ const page = {
         },
         on: {
           click: () => {
-            vm.editRow(data)
+            if(typeof callback == 'function'){
+              callback(data)
+            }else{
+              vm.editRow(data)
+            }
           }
         }
       }, '编辑')
@@ -196,17 +262,11 @@ const page = {
         vm.initDialog(_data)
       }
       vm.formDialog = _data
-      // for (let key in vm.formDialog) {
-      //   vm.formDialog[key] = data[key]
-      // }
-      // if (typeof vm.initDialog === 'function') {
-      //   vm.initDialog(data)
-      // }
       vm.currDialog = 'edit'
       vm.dialogShow = true
     },
     // 创建删除按钮
-    createDelBtn (create, data) {
+    createDelBtn (create, data, callback) {
       let vm = this
       return create('Button', {
         props: {
@@ -228,7 +288,11 @@ const page = {
                   idData = data
                 }
                 idObj[key] = idData
-                vm.delRow(idObj)
+                if(typeof callback == 'function'){
+                  callback(idObj)
+                }else{
+                  vm.delRow(idObj)
+                }
               }
             })
           }
@@ -236,7 +300,44 @@ const page = {
       }, '删除')
     },
     delRow (data) {
-      console.log('删除行提交： ',data)
+      var vm = this
+      vm.$http2({
+        url: vm.url.delete,
+        method: vm.pager.method,
+        data: data
+      }).then(res => {
+        var resData = res.data
+        if(resData.code==1){
+          vm.$Message.success("删除成功！")
+          vm.paging()
+        }else{
+          vm.$Message.error(resData.message)
+        }
+      }).catch(err=>{
+
+      })
+    },
+    // 创建预览按钮
+    createPreviewBtn(create, data, callback){
+      let vm = this
+      return create('Button', {
+        props: {
+          type: 'success',
+          size: 'small'
+        },
+        style: {
+          marginRight: '5px'
+        },
+        on: {
+          click: () => {
+            if(typeof callback == 'function'){
+              callback(data)
+            }else{
+              vm.$Message.error('预览请传回调函数')
+            }
+          }
+        }
+      }, '预览')
     },
     // 初始化pager   组件中pager的键覆盖mixinPager的键
     initPager (data) {
@@ -249,15 +350,22 @@ const page = {
       vm.pager = mixinPager
     }
   },
-  computed: {},
+  watch: {
+    dialogShow(val){
+      if(!val && typeof this.resetDialogForm == 'function'){
+        this.resetDialogForm()
+      }
+    }
+  },
   created () {
     let vm = this
     if (typeof vm.initData === 'function') {
       vm.initData()
     }
+    // 在这里修改pager会触发一次页面加载函数，所以不需要在下边再请求一次
+    // 为什么dev的时候有时候会不进行数据初始化
     vm.initPager()
     vm.paging()
-  },
-  mounted () {}
+  }
 }
 export default page

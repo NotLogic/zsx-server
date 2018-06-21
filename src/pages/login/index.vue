@@ -1,5 +1,5 @@
 <template>
-  <div class="zsx-login" @keydown.enter="handleSubmit">
+  <div class="zsx-login" @keydown.enter="handleSubmit" style="background: url('static/images/login-bg.jpg') no-repeat center">
     <div class="login-con">
       <Card :bordered="false">
         <p slot="title">
@@ -8,15 +8,15 @@
         </p>
         <div class="login-form">
           <Form ref="loginForm" :model="loginForm" :rules="rules">
-            <FormItem prop="username">
-              <Input v-model="loginForm.username" type="text" placeholder="请输入用户名">
+            <FormItem prop="loginName">
+              <Input v-model="loginForm.loginName" type="text" placeholder="请输入账号">
                 <span slot="prepend">
                   <Icon :size="16" type="person"></Icon>
                 </span>
               </Input>
             </FormItem>
-            <FormItem prop="password">
-              <Input v-model="loginForm.password" type="password" placeholder="请输入密码">
+            <FormItem prop="loginPass">
+              <Input v-model="loginPass" type="password" placeholder="请输入密码">
                 <span slot="prepend">
                   <Icon :size="16" type="locked"></Icon>
                 </span>
@@ -40,18 +40,18 @@
     name: 'login',
     data () {
       return {
-        loginUrl: 'login2Index.do',
+        loginUrl: 'web/sys/user/login',
         rememberMe: true,
+        loginPass: '',
         loginForm: {
-          "username": "",
-          "password": "",
-          "rememberMe": 1
+          "loginName": "",
+          "loginPass": "",
         },
         rules: {
-          username: [
+          loginName: [
             { required: true, message: '账号不能为空', trigger: 'blur' }
           ],
-          password: [
+          loginPass: [
             { required: true, message: '密码不能为空', trigger: 'blur' }
           ]
         }
@@ -64,48 +64,53 @@
         vm.$refs.loginForm.validate((valid) => {
           if (valid) {
             vm.$http.post(vm.loginUrl, vm.loginForm).then(function (res) {
+              var resData = res.data
               if (res.data.code == 1) {
-                vm.fn()
+                vm.loginFun(resData)
               } else {
-                vm.$Message.error(res.data.message)
-                vm.loginForm.username = ''
-                vm.loginForm.password = ''
+                vm.$Message.error(resData.message)
+                vm.loginForm.loginName = ''
+                vm.loginForm.loginPass = ''
               }
             })
           }
         })
       },
-      fn () {
-        let vm = this
+      loginFun (resData) {
+        let vm = this,sysUser = resData.sysUser && resData.sysUser.length ? resData.sysUser[0] : {}
+        // 登录成功存储的数据
+        var user = {
+          loginName: vm.loginForm.loginName,
+          loginPass: vm.loginForm.loginPass,
+          nickName: sysUser.nickName,
+          userId: sysUser.id,
+          token: resData.token
+        }
+        var userString = JSON.stringify(user)
         if (vm.rememberMe) {
-          // 或者存后台返回的用户信息
-          localStorage.user = JSON.stringify(vm.loginForm)
+          localStorage.user = userString
         } else {
           if (localStorage.user) {
             localStorage.removeItem('user')
           }
         }
-        // 登陆之后保存用户信息到sessionStorage
-        sessionStorage.user = JSON.stringify(vm.loginForm)
+        sessionStorage.user = userString
         vm.$Message.success('登陆成功')
         vm.$router.push({name: 'home'})
-      }
+      },
     },
     watch: {
-      rememberMe (val) {
-        if (val) {
-          this.loginForm.rememberMe = 1
-        } else {
-          this.loginForm.rememberMe = 0
-        }
-      }
+      loginPass(val){
+        this.loginForm.loginPass = hex_md5(val)
+      },
     },
     mounted () {
       if (localStorage.user) {
+        var vm = this
         let obj = JSON.parse(localStorage.user)
-        for (let key in this.loginForm) {
-          this.loginForm[key] = obj[key]
-        }
+        vm.loginForm.loginName = obj.loginForm
+        vm.loginForm.loginPass = obj.loginPass
+        vm.rememberMe = obj.rememberMe
       }
     }
   }
@@ -115,7 +120,6 @@
   .zsx-login{
     width: 100%;
     height: 100%;
-    background: url("../../assets/images/login-bg.jpg");
     background-size: cover;
   }
   .login-con{

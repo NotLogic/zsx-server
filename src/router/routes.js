@@ -35,162 +35,60 @@ export const mainRoutes = {
   ]
 }
 export const appRoutes = [
-  // 富文本
+  // 模板
   // {
-  //   path: '/ueditor',
-  //   name: 'ueditor',
+  //   path: '/template',
+  //   name: 'template',
   //   meta: {
-  //     title: '富文本',
+  //     title: '模板',
   //     access: 1,
   //     icon: ''
   //   },
   //   component: main,
   //   children: [
   //     {
-  //       path: 'index',
-  //       name: 'ueditor_index',
+  //       path: 'template_index',
+  //       name: 'template_index',
   //       meta: {
-  //         title: '富文本',
+  //         title: '模板',
   //         access: 1,
   //         icon: ''
   //       },
-  //       component: resolve => { require(['@/pages/ueditor'], resolve) }
+  //       component: resolve => { require(['@/pages/pageTemplate'], resolve) }
   //     }
   //   ]
   // },
-  // 权限管理
+  // 用户
   {
-    path: '/authority',
-    name: 'authority',
+    path: '/user',
+    name: 'user',
     meta: {
-      title: '权限管理',
+      title: '用户管理',
       access: 1,
-      icon: 'key'
+      icon: ''
     },
     component: main,
     children: [
       {
-        path: 'resource',
-        name: 'resource',
+        path: 'app',
+        name: 'app',
         meta: {
-          title: '资源管理',
-          access: 1,
-          icon: ''
-        },
-        component: resolve => { require(['@/pages/authority/resource'], resolve) }
-      },
-      {
-        path: 'role',
-        name: 'role',
-        meta: {
-          title: '角色管理',
-          access: 1,
-          icon: ''
-        },
-        component: resolve => { require(['@/pages/authority/role'], resolve) }
-      },
-      {
-        path: 'user',
-        name: 'user',
-        meta: {
-          title: '用户管理',
+          title: 'APP用户',
           access: 1,
           icon: ''
         },
         component: resolve => { require(['@/pages/authority/user'], resolve) }
-      }
-    ]
-  },
-  // 会员管理
-  {
-    path: '/member',
-    name: 'member',
-    meta: {
-      title: '会员管理',
-      access: 1,
-      icon: ''
-    },
-    component: main,
-    children: [
+      },
       {
-        path: 'index',
-        name: 'member_index',
+        path: 'systemUser',
+        name: 'systemUser',
         meta: {
-          title: '会员管理',
+          title: '系统用户',
           access: 1,
           icon: ''
         },
-        component: resolve => { require(['@/pages/member'], resolve) }
-      }
-    ]
-  },
-  // 新闻管理
-  {
-    path: '/news',
-    name: 'news',
-    component: main,
-    meta: {
-      title: '新闻管理',
-      access: 1,
-      icon: ''
-    },
-    children: [
-      {
-        path: 'index',
-        name: 'news_index',
-        meta: {
-          title: '新闻管理',
-          access: 1,
-          icon: ''
-        },
-        component: resolve => { require(['@/pages/news'], resolve) }
-      }
-    ]
-  },
-  // 帖子管理
-  {
-    path: '/notes',
-    name: 'notes',
-    meta: {
-      title: '帖子管理',
-      access: 1,
-      icon: ''
-    },
-    component: main,
-    children: [
-      {
-        path: 'index',
-        name: 'notes_index',
-        meta: {
-          title: '帖子管理',
-          access: 1,
-          icon: ''
-        },
-        component: resolve => { require(['@/pages/notes'], resolve) }
-      }
-    ]
-  },
-  // 评论管理
-  {
-    path: '/comment',
-    name: 'comment',
-    meta: {
-      title: '评论管理',
-      access: 1,
-      icon: ''
-    },
-    component: main,
-    children: [
-      {
-        path: 'index',
-        name: 'comment_index',
-        meta: {
-          title: '评论管理',
-          access: 1,
-          icon: ''
-        },
-        component: resolve => { require(['@/pages/comment'], resolve) }
-      }
+        component: resolve => { require(['@/pages/authority/systemUser'], resolve) }
+      },
     ]
   },
   // 广告管理
@@ -213,29 +111,6 @@ export const appRoutes = [
           icon: ''
         },
         component: resolve => { require(['@/pages/ad'], resolve) }
-      }
-    ]
-  },
-  // 群组管理
-  {
-    path: '/appGroup',
-    name: 'appGroup',
-    meta: {
-      title: '群组管理',
-      access: 1,
-      icon: ''
-    },
-    component: main,
-    children: [
-      {
-        path: 'index',
-        name: 'appGroup_index',
-        meta: {
-          title: '群组管理',
-          access: 1,
-          icon: ''
-        },
-        component: resolve => { require(['@/pages/appGroup'], resolve) }
       }
     ]
   },
@@ -262,40 +137,46 @@ export const appRoutes = [
       }
     ]
   },
-  // 举报管理
   {
-    path: '/complaint',
-    name: 'complaint',
+    path: '/content',
+    name: 'content',
+    component: main,
     meta: {
-      title: '举报管理',
+      title: '资讯管理',
       access: 1,
       icon: ''
     },
-    component: main,
     children: [
       {
-        path: 'index',
-        name: 'complaint_index',
+        path: 'news',
+        name: 'news',
         meta: {
-          title: '举报管理',
+          title: '新闻管理',
           access: 1,
           icon: ''
         },
-        component: resolve => { require(['@/pages/complaint'], resolve) }
-      }
-    ]
-  },
-  // 办事指南
-  {
-    path: '/guide',
-    name: 'guide',
-    meta: {
-      title: '办事指南',
-      access: 1,
-      icon: ''
-    },
-    component: main,
-    children: [
+        component: resolve => { require(['@/pages/content/news'], resolve) }
+      },
+      {
+        path: 'gover',
+        name: 'gover',
+        meta: {
+          title: '政务信息',
+          access: 1,
+          icon: ''
+        },
+        component: resolve => { require(['@/pages/content/gover'], resolve) }
+      },
+      {
+        path: 'policy',
+        name: 'policy',
+        meta: {
+          title: '招商引资',
+          access: 1,
+          icon: ''
+        },
+        component: resolve => { require(['@/pages/content/policy'], resolve) }
+      },
       {
         path: 'workClass',
         name: 'workClass',
@@ -304,7 +185,7 @@ export const appRoutes = [
           access: 1,
           icon: ''
         },
-        component: resolve => { require(['@/pages/guide/workClass'], resolve) }
+        component: resolve => { require(['@/pages/content/workClass'], resolve) }
       },
       {
         path: 'workMatter',
@@ -314,67 +195,53 @@ export const appRoutes = [
           access: 1,
           icon: ''
         },
-        component: resolve => { require(['@/pages/guide/workMatter'], resolve) }
+        component: resolve => { require(['@/pages/content/workMatter'], resolve) }
       }
     ]
   },
-  // 招商引资
+  // 权限
   {
-    path: '/policy',
-    name: 'policy',
+    path: '/authority',
+    name: 'authority',
     meta: {
-      title: '招商引资',
+      title: '权限管理',
+      access: 1,
+      icon: 'key'
+    },
+    component: main,
+    children: []
+  },
+  // 系统配置
+  {
+    path: '/systemSetting',
+    name: 'systemSetting',
+    component: main,
+    meta: {
+      title: '系统配置',
       access: 1,
       icon: ''
     },
-    component: main,
     children: [
       {
-        path: 'index',
-        name: 'policy_index',
+        path: 'article',
+        name: 'article',
         meta: {
-          title: '招商引资',
+          title: '推送',
           access: 1,
           icon: ''
         },
-        component: resolve => { require(['@/pages/policy'], resolve) }
-      }
-    ]
-  },
-  // 政务信息
-  {
-    path: '/gover',
-    name: 'gover',
-    meta: {
-      title: '政务信息',
-      access: 1,
-      icon: ''
-    },
-    component: main,
-    children: [
+        component: resolve => { require(['@/pages/content/article'], resolve) }
+      },
       {
-        path: 'index',
-        name: 'gover_index',
+        path: 'message',
+        name: 'message',
         meta: {
-          title: '政务信息',
+          title: '系统消息',
           access: 1,
           icon: ''
         },
-        component: resolve => { require(['@/pages/gover'], resolve) }
-      }
-    ]
-  },
-  // 敏感词库
-  {
-    path: '/sensitiveWord',
-    name: 'sensitiveWord',
-    component: main,
-    meta: {
-      title: '敏感词',
-      access: 1,
-      icon: ''
-    },
-    children: [
+        component: resolve => { require(['@/pages/content/message'], resolve) }
+      },
       {
         path: 'sensitiveWords',
         name: 'sensitiveWords',
@@ -393,39 +260,6 @@ export const appRoutes = [
           icon: ''
         },
         component: resolve => { require(['@/pages/sensitiveWord/sensitiveWordSettting.vue'], resolve) }
-      }
-    ]
-  },
-  // API管理
-  {
-    path: '/thirdparty',
-    name: 'thirdparty',
-    meta: {
-      title: 'API管理',
-      access: 1,
-      icon: ''
-    },
-    component: main,
-    children: [
-      {
-        path: 'thirdpartyClass',
-        name: 'thirdpartyClass',
-        meta: {
-          title: 'API分类',
-          access: 1,
-          icon: ''
-        },
-        component: resolve => { require(['@/pages/thirdparty/thirdpartyClass'], resolve) }
-      },
-      {
-        path: 'thirdpartySetting',
-        name: 'thirdpartySetting',
-        meta: {
-          title: 'API配置',
-          access: 1,
-          icon: ''
-        },
-        component: resolve => { require(['@/pages/thirdparty/thirdpartySetting'], resolve) }
       }
     ]
   },
@@ -453,17 +287,23 @@ export const appRoutes = [
     ]
   }
 ]
-const errorRoutes = {
-  path: '*',
-  name: 'error_404',
-  component: require('@/pages/error/404.vue')
-}
+const errorRoutes = [
+  {
+    path: '404',
+    name: 'error_404',
+    component: require('@/pages/error/404.vue')
+  },
+  // {
+  //   path: '*',
+  //   redirect: {name: 'error_404'}
+  // }
+]
 
 const routes = [
   loginRoute,
   mainRoutes,
   ...appRoutes,
-  errorRoutes
+  ...errorRoutes
 ]
 export const commonRoutes = [loginRoute, mainRoutes, errorRoutes]
 export default routes

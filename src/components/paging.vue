@@ -2,7 +2,7 @@
   <div class="wrapper-pagination">
     <Button shape="circle" icon="ios-refresh-empty" style="margin-right: 10px;" @click="paging"></Button>
     <div class="pager-wrapper">
-      <Page :total="total" show-sizer show-elevator show-total :current="currPage" :page-size="pagesize" :placement="placement" :page-size-opts="pageSizeOpts" @on-change="pagingNumChange" @on-page-size-change="pagingSizeChange"></Page>
+      <Page :total="total" show-sizer show-elevator show-total :current="current" :page-size="size" :placement="placement" :page-size-opts="pageSizeOpts" @on-change="pagingNumChange" @on-page-size-change="pagingSizeChange"></Page>
     </div>
   </div>
 </template>
@@ -13,14 +13,15 @@
     name: 'paging',
     props: {
       total: [Number, String],
-      currPage: [Number, String],
+      current: {
+        type: [Number, String]
+      },
       placement: {
         type: String,
         default: 'top'
       },
-      pagesize: {
-        type: Number,
-        default: 10
+      size: {
+        type: [Number, String]
       },
       pageSizeOpts: {
         type: Array,
@@ -31,11 +32,11 @@
     },
     methods: {
       pagingNumChange (currPage) {
-        this.paging('currPage', currPage)
+        this.paging('current', currPage)
       },
       pagingSizeChange (pageSize) {
         // 更改每页显示数量时会发两次请求：因为 pageSize吧变化的同时 currPage 变为1
-        this.paging('pageSize', pageSize)
+        this.paging('size', pageSize)
       },
       paging (key, value) {
         let vm = this

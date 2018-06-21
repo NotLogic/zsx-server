@@ -25,7 +25,6 @@ const router = new Router({
   routes: routes
 })
 router.beforeEach((to, from, next) => {
-  window.document.title = map[to.name] + ' - 众善行后台管理系统'
   iView.LoadingBar.start()
   // 如果没有登录，且前往的不是登录页
   if (!sessionStorage.user && to.name !== 'login') {
@@ -33,6 +32,8 @@ router.beforeEach((to, from, next) => {
   } else {
     next()
   }
+  var title = map[to.name] ? map[to.name] + ' - 众善行后台管理系统' : '众善行后台管理系统'
+  window.document.title = title
   iView.LoadingBar.finish()
 })
 router.afterEach((to, from) => {

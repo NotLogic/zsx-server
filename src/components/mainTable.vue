@@ -1,6 +1,6 @@
 <template>
   <!-- <div class="wrapper-pagination"> -->
-    <Table :columns='columns' :data='data' :height='height' :size='size' @on-selection-change="onSelectionChange"></Table>
+    <Table :loading="loading" :columns='columns' :data='data' :height='height' :size='size' @on-selection-change="onSelectionChange"></Table>
   <!-- </div>   -->
 </template>
 
@@ -11,7 +11,11 @@ export default {
     columns: Array,
     data: Array,
     height: [Number, String],
-    size: String
+    size: String,
+    loading: {
+      type: Boolean,
+      default: false
+    }
   },
   data () {
     return {}
