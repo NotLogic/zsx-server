@@ -1,231 +1,274 @@
 <template>
   <div class="work-matter">
     <!-- 高级搜索 -->
-    <Form :model="formSearch" ref="formSearch" inline :label-width="60">
-      <FormItem label="事项名称" prop="matterName">
-          <Input v-model="formSearch.matterName" placeholder="事项名称" size="small" style="width: 120px"></Input>
-      </FormItem>
-      <FormItem label="关联地区">
-          <Cascader :data="derail_address_arr_ss" v-model="derail_address_obj_s" @on-change="searchAddrChange" filterable size="small" style="margin-top: 5px;"></Cascader>
-      </FormItem>
-      <FormItem label="所属分类" prop="workClassId">
-        <Select v-model="formSearch.workClassId" size="small" style="width: 150px;">
-          <Option v-for="item in workClassId" :value="item.value" :key="item.value">{{ item.label }}</Option>
-        </Select>
-      </FormItem>
-      <FormItem label="状态" prop="matterStatus">
-          <Select v-model="formSearch.matterStatus" placeholder="请选择" style="width: 80px;" size="small" clearable>
-            <Option v-for="item in matterStatus" :value="item.value" :key="item.value">{{ item.label }}</Option>
-          </Select>
-      </FormItem>
-      <Button type="ghost" style="margin-right: 8px;margin-top: 5px;" @click="resetSearch('formSearch')" size="small">{{label.clear}}</Button>
-      <Button type="primary" style="margin-right: 8px;margin-top: 5px;" @click="submitSearch('formSearch')" size="small">{{label.search}}</Button>
-      <Button type="primary" style="margin-right: 8px;margin-top: 5px;" @click="addRow" size="small">{{label.add}}</Button>
-      <Upload name="execlFile"
-                action="workMatter/execl.do"
-                :on-success="upExeclSuccess"
-                :format="['xlsx']"
-                :on-format-error="handleFormatError"
-                :show-upload-list="false"
-                style="display:inline-block;">
-          <Button type="primary" size="small" style="margin-top:5px;">{{label.uploadExcel}}</Button>
-        </Upload>
-    </Form>
-    <!-- <mainTable :columns="columns" :data="pager.data" :height="610"></mainTable> -->
-    <mainTable :columns="columns" :data="pager.data"></mainTable>
-    <paging @changePager="changePager" @paging="paging" :total="pager.total" :currPage="pager.currPage"></paging>
+    <div id="search-wrapper">
+      <Form :model="formSearch" ref="formSearch" inline :label-width="70">
+        <template v-if="hasPerm('workMatter:search')">
+          <FormItem label="事项名称" prop="matterName">
+              <Input v-model="formSearch.matterName" placeholder="事项名称" size="small" style="width: 120px" @keydown.native.enter.prevent="submitSearch('formSearch')"></Input>
+          </FormItem>
+          <FormItem label="关联地区">
+              <Cascader :data="derail_address_arr_ss" v-model="derail_address_obj_s" @on-change="searchAddrChange" placeholder="请选择" filterable size="small" style="margin-top: 5px;"></Cascader>
+          </FormItem>
+          <FormItem label="所属分类" prop="workClassId">
+            <Select v-model="formSearch.workClassId" size="small" style="width: 200px;" clearable filterable>
+              <Option v-for="item in searchWorkClassId" :value="item.value" :key="item.value">{{ item.label }}</Option>
+            </Select>
+          </FormItem>
+          <FormItem label="状态" prop="matterStatus">
+            <Select v-model="formSearch.matterStatus" placeholder="请选择" style="width: 80px;" size="small" clearable>
+              <Option v-for="item in matterStatus" :value="item.value" :key="item.value">{{ item.label }}</Option>
+            </Select>
+          </FormItem>
+          <Button type="default" style="margin:5px 8px 24px 0;" @click="resetSearch('formSearch')" :disabled="pageLoading" size="small">{{label.clear}}</Button>
+          <Button type="primary" style="margin:5px 8px 24px 0;" @click="submitSearch('formSearch')" :disabled="pageLoading" size="small">{{label.search}}</Button>
+        </template>
+        <Button v-if="hasPerm('workMatter:add')" type="primary" style="margin:5px 8px 24px 0;" @click="addRow" size="small">{{label.add}}</Button>
+        <Button v-if="hasPerm('workMatter:clearCache')" type="warning" style="margin:5px 8px 24px 0;" @click="clearCache('办事事项')" size="small">{{label.clearCache}}</Button>
+      </Form>
+    </div>
+    <mainTable :columns="columns" :data="pager.data" :height="tableHeight" :loading="pageLoading"></mainTable>
+    <paging @changePager="changePager" @paging="paging" :total="pager.total" :current="pager.nowpage" :currPageKey="'nowpage'" :pageSizeKey="'pagesize'" :loading="pageLoading"></paging>
     <!-- 弹出框 -->
     <Modal v-model="dialogShow" :title="label[currDialog]" :mask-closable="false" width="750" @on-cancel="resetDialogForm('formDialog')" :styles="{top:'30px'}">
-      <Form :model="formDialog" ref="formDialog" :rules="rules" :label-width="80">
-        <Row>
-          <Col span="12">
-            <FormItem label="事项名称" prop="matterName">
-              <Input v-model="formDialog.matterName" placeholder="请输入事项名称"></Input>
-            </FormItem>
-          </Col>
-          <Col span="12">
-            <FormItem label="服务对象" prop="serviceObject">
-              <Input v-model="formDialog.serviceObject" placeholder="请输入服务对象"></Input>
-            </FormItem>
-          </Col>
-        </Row>
-        <Row>
-          <Col span="12">
-            <FormItem label="事项来源" prop="matterSoucreName">
-              <Input v-model="formDialog.matterSoucreName" placeholder="请输入事项来源"></Input>
-            </FormItem>
-          </Col>
-          <Col span="12">
-            <FormItem label="发布时间" prop="matterCreateTime">
-              <DatePicker type="date" v-model="formDialog.matterCreateTime" :editable="false" placeholder="请选择日期"></DatePicker>
-            </FormItem>
-          </Col>
-        </Row>
-        <Row>
-          <Col span="12">
-            <FormItem label="所属分类" prop="workClassId">
-              <Select v-model="formDialog.workClassId" placeholder="请选择所属分类" style="width: 150px;">
-                <Option v-for="item in workClassId" :value="item.value" :key="item.value">{{ item.label }}</Option>
-              </Select>
-            </FormItem>
-          </Col>
-        </Row>
-        <Row>
-          <Col span="12">
-            <FormItem label="办理条件" prop="requiredConditions">
-              <Row>
-                <Col span="18">
-                  <Input v-model="formDialog.requiredConditions" disabled placeholder="请添加办理条件"></Input>
-                </Col>
-                <Col span="6" style="text-align: right;">
-                  <Button size="small" type="primary" @click="showHandleDialog('handleModal','requiredConditions')">{{label[currDialog]}}</Button>
-                </Col>
-              </Row>
-            </FormItem>
-          </Col>
-          <Col span="12">
-            <FormItem label="所需材料" prop="materialRequested">
-              <Row>
-                <Col span="18">
-                  <Input v-model="formDialog.materialRequested" disabled placeholder="请添加所需材料"></Input>
-                </Col>
-                <Col span="6" style="text-align: right;">
-                  <Button size="small" type="primary" @click="showHandleDialog('handleModal','materialRequested')">{{label[currDialog]}}</Button>
-                </Col>
-              </Row>
-            </FormItem>
-          </Col>
-        </Row>
-        <Row>
-          <Col span="12">
-            <FormItem label="网上流程" prop="onlineManagement">
-              <Row>
-                <Col span="18">
-                  <Input v-model="formDialog.onlineManagement" disabled placeholder="请添加网上流程"></Input>
-                </Col>
-                <Col span="6" style="text-align: right;">
-                  <Button size="small" type="primary" @click="showHandleDialog('handleModal','onlineManagement')">{{label[currDialog]}}</Button>
-                </Col>
-              </Row>
-            </FormItem>
-          </Col>
-          <Col span="12">
-            <FormItem label="窗口流程" prop="windowManagement">
-              <Row>
-                <Col span="18">
-                  <Input v-model="formDialog.windowManagement" disabled placeholder="请添加网上流程"></Input>
-                </Col>
-                <Col span="6" style="text-align: right;">
-                  <Button size="small" type="primary" @click="showHandleDialog('handleModal','windowManagement')">{{label[currDialog]}}</Button>
-                </Col>
-              </Row>
-            </FormItem>
-          </Col>
-        </Row>
-        <Row>
-          <Col span="12">
-            <FormItem label="限时说明" prop="timeLimitExplanation">
-              <Input v-model="formDialog.timeLimitExplanation" placeholder="请输入限时说明"></Input>
-            </FormItem>
-          </Col>
-          <Col span="12">
-            <FormItem label="收费标准" prop="chargingStandard">
-              <Input v-model="formDialog.chargingStandard" placeholder="请输入收费标准"></Input>
-            </FormItem>
-          </Col>
-        </Row>
-        <Row>
-          <Col span="24">
-            <FormItem label="办理依据" prop="managementBasis">
-              <Input v-model="formDialog.managementBasis" placeholder="请输入办理依据"></Input>
-            </FormItem>
-          </Col>
-        </Row>
-        <Row>
-          <Col span="12">
-            <FormItem label="工作电话" prop="workPhone">
-              <Input v-model="formDialog.workPhone" placeholder='请填工作电话'></Input>
-            </FormItem>
-          </Col>
-          <Col span="12">
-            <FormItem label="监督电话" prop="complaintPhone">
-              <Input v-model="formDialog.complaintPhone" placeholder='请填写监督电话'></Input>
-            </FormItem>
-          </Col>
-        </Row>
-        <Row>
-          <Col span="12">
-            <FormItem label="事项图标">
-              <Row>
-                <Col span="12">
-                  <div style="width:130px;height:130px;border:1px solid #eee;">
-                    <img v-if="formDialog.matterIcon" style="max-width:100%;" :src="formDialog.matterIcon" />
-                    <img v-else style="max-width:100%;" src="static/images/img-upload-default.png"/>
-                  </div>
-                </Col>
-                <Col span="12" style="text-align:right;">
-                  <Upload name="upfile"
-                          action="ueditor/upload.do"
-                          :on-success="handleSuccess"
-                          :show-upload-list="false"
-                          :format="['jpg','jpeg','png']"
-                          :on-format-error="handleFormatError">
-                    <Button type="ghost" icon="ios-cloud-upload-outline">{{label.uploadImg}}</Button>
-                  </Upload>
-                </Col>
-              </Row>
-            </FormItem>
-          </Col>
-          <Col span="12">
-            <FormItem label="事件状态">
-              <Select v-model="formDialog.matterStatus" placeholder="请选择事件状态" style="width:150px;">
-                <Option v-for="item in matterStatus" :value="item.value" :key="item.value">{{ item.label }}</Option>
-              </Select>
-            </FormItem>
-          </Col>
-        </Row>
-        <Row>
-          <Col span="12">
-            <FormItem label="省市">
-              <Cascader :data="derail_address_arr" @on-change="addrChange" v-model="addrDialog.derail_address_obj" placeholder="请选择地址" clearabled="false" style="width: 150px;"></Cascader>
-            </FormItem>
-          </Col>
-          <Col span="12">
-            <FormItem label="办事地址">
-              <Button @click="addAddrBtn">添加地址</Button>
-            </FormItem>
-          </Col>
-        </Row>
-        <Row v-for="(item,index) in addrDialog.addressArr.slice(0,2)" :key="index" style="margin-bottom: 8px;">
-          <Col span="18">
-            办事地址{{index+1}}:  {{item}}
-          </Col>   
-          <Col span="6">
-            <Button size="small" type="primary" @click="editAddrBtn(index)">编辑</Button>
-            <Button size="small" type="error" @click="delAddr(index)" style="margin-left:8px;">删除</Button>
-          </Col>
-        </Row>
-        <Button v-if="addrDialog.addressArr.length>2" size="small" type="primary" @click="seeAddress">查看更多</Button>
-      </Form>
+      <div style="max-height: 700px;overflow-y: auto;">
+        <Form :model="formDialog" ref="formDialog" :rules="rules" :label-width="80">
+          <Row>
+            <Col span="12">
+              <FormItem label="事项名称" prop="matterName">
+                <Input v-model="formDialog.matterName" placeholder="请输入事项名称" @on-blur="onBlur"></Input>
+              </FormItem>
+            </Col>
+            <Col span="12">
+              <FormItem label="服务对象" prop="serviceObject">
+                <Input v-model="formDialog.serviceObject" placeholder="请输入服务对象"></Input>
+              </FormItem>
+            </Col>
+          </Row>
+          <Row>
+            <Col span="12">
+              <FormItem label="事项来源" prop="matterSoucreName">
+                <Input v-model="formDialog.matterSoucreName" placeholder="请输入事项来源"></Input>
+              </FormItem>
+            </Col>
+            <!-- <Col span="12">
+              <FormItem label="发布时间" prop="matterCreateTime">
+                <DatePicker type="date" v-model="matterCreateTime" @on-change="createTimeChange" :editable="false" placeholder="请选择日期"></DatePicker>
+              </FormItem>
+            </Col> -->
+          </Row>
+          <Row>
+            <Col span="12">
+              <FormItem label="关联省市">
+                <Cascader :data="derail_address_arr" @on-change="addrChange" v-model="addrDialog.derail_address_obj" filterable placeholder="请选择地址" clearabled></Cascader>
+              </FormItem>
+            </Col>
+            <Col span="12">
+              <FormItem label="所属分类" prop="workClassId">
+                <Select v-model="formDialog.workClassId" placeholder="请选择所属分类" clearable>
+                  <Option v-for="item in workClassId" :value="item.value" :key="item.value">{{ item.label }}</Option>
+                </Select>
+              </FormItem>
+            </Col>
+          </Row>
+          <Row>
+            <Col span="12">
+              <FormItem label="办理条件" prop="requiredConditions">
+                <Input v-model="formDialog.requiredConditions" :rows="4" type="textarea" placeholder="请添加办理条件"></Input>
+                <!-- <Row>
+                  <Col span="18">
+                    <Input v-model="formDialog.requiredConditions" disabled placeholder="请添加办理条件"></Input>
+                  </Col>
+                  <Col span="6" style="text-align: right;">
+                    <Button size="small" type="primary" @click="showHandleDialog('handleModal','requiredConditions')">{{label[currDialog]}}</Button>
+                  </Col>
+                </Row> -->
+              </FormItem>
+            </Col>
+            <Col span="12">
+              <FormItem label="所需材料" prop="materialRequested">
+                <Input v-model="formDialog.materialRequested" :rows="4" type="textarea" placeholder="请添加所需材料"></Input>
+                <!-- <Row>
+                  <Col span="18">
+                    <Input v-model="formDialog.materialRequested" disabled placeholder="请添加所需材料"></Input>
+                  </Col>
+                  <Col span="6" style="text-align: right;">
+                    <Button size="small" type="primary" @click="showHandleDialog('handleModal','materialRequested')">{{label[currDialog]}}</Button>
+                  </Col>
+                </Row> -->
+              </FormItem>
+            </Col>
+          </Row>
+          <Row>
+            <Col span="12">
+              <FormItem label="网上流程" prop="onlineManagement">
+                <Input v-model="formDialog.onlineManagement" :rows="4" type="textarea" placeholder="请添加网上流程"></Input>
+                <!-- <Row>
+                  <Col span="18">
+                    <Input v-model="formDialog.onlineManagement" disabled placeholder="请添加网上流程"></Input>
+                  </Col>
+                  <Col span="6" style="text-align: right;">
+                    <Button size="small" type="primary" @click="showHandleDialog('handleModal','onlineManagement')">{{label[currDialog]}}</Button>
+                  </Col>
+                </Row> -->
+              </FormItem>
+            </Col>
+            <Col span="12">
+              <FormItem label="窗口流程" prop="windowManagement">
+                <Input v-model="formDialog.windowManagement" :rows="4" type="textarea" placeholder="请添加网上流程"></Input>
+                <!-- <Row>
+                  <Col span="18">
+                    <Input v-model="formDialog.windowManagement" disabled placeholder="请添加网上流程"></Input>
+                  </Col>
+                  <Col span="6" style="text-align: right;">
+                    <Button size="small" type="primary" @click="showHandleDialog('handleModal','windowManagement')">{{label[currDialog]}}</Button>
+                  </Col>
+                </Row> -->
+              </FormItem>
+            </Col>
+          </Row>
+          <Row>
+            <Col span="12">
+              <FormItem label="限时说明" prop="timeLimitExplanation">
+                <Input v-model="formDialog.timeLimitExplanation" placeholder="请输入限时说明"></Input>
+              </FormItem>
+            </Col>
+            <Col span="12">
+              <FormItem label="收费标准" prop="chargingStandard">
+                <Input v-model="formDialog.chargingStandard" placeholder="请输入收费标准"></Input>
+              </FormItem>
+            </Col>
+          </Row>
+          <Row>
+            <Col span="24">
+              <FormItem label="办理依据" prop="managementBasis">
+                <Input v-model="formDialog.managementBasis" placeholder="请输入办理依据"></Input>
+              </FormItem>
+            </Col>
+          </Row>
+          <Row>
+            <Col span="12">
+              <FormItem label="工作电话" prop="workPhone">
+                <Input v-model="formDialog.workPhone" placeholder='请填工作电话'></Input>
+              </FormItem>
+            </Col>
+            <Col span="12">
+              <FormItem label="监督电话" prop="complaintPhone">
+                <Input v-model="formDialog.complaintPhone" placeholder='请填写监督电话'></Input>
+              </FormItem>
+            </Col>
+          </Row>
+          <Row>
+            <Col span="12">
+              <FormItem label="事项图标">
+                <!-- <Row>
+                  <Col span="12">
+                    <div style="width:130px;height:130px;border:1px solid #eee;">
+                      <img v-if="formDialog.matterIcon" style="max-width:100%;" :src="formDialog.matterIcon" />
+                      <img v-else style="max-width:100%;" src="static/images/img-upload-default.png"/>
+                    </div>
+                  </Col>
+                  <Col span="12" style="text-align:right;">
+                    <Upload name="upfile"
+                            action="ueditor/upload.do"
+                            :on-success="handleSuccess"
+                            :show-upload-list="false"
+                            :format="['jpg','jpeg','png']"
+                            :on-format-error="handleFormatError">
+                      <Button type="default" icon="ios-cloud-upload-outline">{{label.uploadImg}}</Button>
+                    </Upload>
+                  </Col>
+                </Row> -->
+                <Row>
+                  <Col span="12">
+                    <Upload name="file"
+                        :action="url.upload"
+                        :before-upload="myBeforeUpload"
+                        :format="['jpg','jpeg','png','gif']"
+                        :on-format-error="handleFormatError"
+                        :max-size="3000"
+                        :on-exceeded-size="handleMaxSize">
+                      <Button type="default" icon="ios-cloud-upload-outline">选择图片</Button>
+                    </Upload>
+                    <Button type="primary" @click="myUpload" :loading="uploadLoading">确定上传</Button>
+                  </Col>
+                  <Col span="12">
+                    <Row v-if="fileUrl.length">
+                      <Col span="8" v-for="(item, index) in fileUrl" :key="item">
+                        <div class="image-box">
+                          <img :src="item" class="ad-img">
+                          <div class="demo-upload-list-cover">
+                            <Icon type="ios-trash-outline" @click.native="handleRemove(index)"></Icon>
+                          </div>
+                        </div>
+                      </Col>
+                    </Row>
+                    <div v-show="!fileUrl.length" class="image-box">
+                      <img :src="defaultUploadImgSrc" class="ad-img">
+                    </div>
+                  </Col>
+                </Row>
+              </FormItem>
+            </Col>
+            <Col span="12">
+              <FormItem label="事件状态">
+                <Select v-model="formDialog.matterStatus" placeholder="请选择事件状态" style="width:150px;">
+                  <Option v-for="item in matterStatus" :value="item.value" :key="item.value">{{ item.label }}</Option>
+                </Select>
+              </FormItem>
+            </Col>
+          </Row>
+          <!-- <Row>
+            <Col span="12">
+              <FormItem label="事项级别">
+                <Select v-model="workerLevel" placeholder="请选择" style="width:150px;">
+                  <Option v-for="item in level" :value="item.value" :key="item.value">{{ item.label }}</Option>
+                </Select>
+              </FormItem>
+            </Col>
+          </Row> -->
+          <!-- <Row v-if="workerLevel==2"> -->
+          <Row>
+            <Col span="12">
+              <FormItem label="办事地址">
+                <Button @click="addAddrBtn">添加地址</Button>
+              </FormItem>
+            </Col>
+          </Row>
+          <Row v-for="(item,index) in addrDialog.addressArr.slice(0,2)" :key="index" style="margin-bottom: 8px;">
+            <Col span="18">
+              办事地址{{index+1}}:  {{item}}
+            </Col>   
+            <Col span="6">
+              <Button size="small" type="primary" @click="editAddrBtn(index)">编辑</Button>
+              <Button size="small" type="error" @click="delAddr(index)" style="margin-left:8px;">删除</Button>
+            </Col>
+          </Row>
+          <Button v-if="addrDialog.addressArr.length>2" size="small" type="primary" @click="isPreview=false;seeAddress(formDialog)">查看更多</Button>
+        </Form>
+      </div>
       <div slot="footer">
         <Button @click="resetDialogForm('formDialog')">{{label.clear}}</Button>
         <Button type="primary" @click="submitDialogForm('formDialog')" :loading="dialogSubmitLoading">{{label.submit}}</Button>
       </div>
     </Modal>
     <!-- 地址列表 -->
-    <Modal v-model="addressList" title="地址列表" :mask-closable="false" @on-cancel="closeAddrList" width="1100">
+    <Modal v-model="addressList" title="地址列表" :mask-closable="false" @on-cancel="closeAddrList" width="1100" :styles="{'top': '30px'}">
       <!-- 后期这里还要做搜索功能 -->
       <Row>
           <Col span="12" v-for="(item,index) in addrDialog.addressArr" :key="index" style="margin-bottom: 8px;"> 
-              <Row>
+              <Row v-if="!isPreview">
                   <Col span="18">
                       办事地址{{index+1}}:  {{item}}
                   </Col>   
-                  <Col span="5" offset="1">
+                  <Col span="5" offset="1" >
                       <Button size="small" type="primary" @click="editAddrBtn(index)">编辑</Button>
                       <Button size="small" type="error" @click="delAddr(index)" style="margin-left:8px;">删除</Button>
                   </Col>
-              </Row>    
+              </Row>
+              <div v-else>
+                办事地址{{index+1}}:  {{item}}
+              </div>
           </Col>                
       </Row>
       <div slot="footer">
@@ -277,7 +320,7 @@
       </div>
     </Modal>
     <!-- 预览 -->
-    <Modal v-model="previewModal" title="预览" id="preview-modal" :mask-closable="false" width="750" @on-cancel="resetPreview">
+    <Modal v-model="previewModal" title="预览" id="preview-modal" :mask-closable="false" :styles="{top:'30px'}" width="750" @on-cancel="resetPreview">
       <Row>
           <Col span="24" class="title">事项基本信息:</Col>
       </Row>
@@ -298,7 +341,7 @@
           <Col span="12">收费标准:  {{previewData.chargingStandard}}</Col>
       </Row>
       <Row :gutter="16" class-name="preview-row">
-          <Col span="12">所属省市:  {{previewData.provinceCity}}</Col>
+          <Col span="12">关联省市:  {{previewData.provinceCity}}</Col>
           <Col span="12">事项状态:  {{previewData.matterStatus}}</Col>
       </Row>        
       <Row :gutter="16" class-name="preview-row" style="border-bottom: .5px solid #e9eaec;padding-bottom: 5px;">
@@ -387,124 +430,60 @@
     data () {
       return {
         url: {
-          add: 'workMatter/add.do',
-          edit: 'workMatter/edit.do',
-          delete: 'workMatter/delete.do',
-          check: 'workMatter/checkName.do'
+          add: 'web/work/matter/add',
+          edit: 'web/work/matter/edit',
+          delete: 'web/work/matter/delete',
+          workclass: 'web/work/class/dataGrid',
+          check: '',
+          upload: 'file/',
+          sId: 'id/id',
+          address: {
+            add: 'web/work/address/add',
+            delete: 'web/work/address/delete',
+            edit: 'web/work/address/edit'
+          },
+          clearCache: 'web/cache/work'
         },
         pager: {
-          data: [
-            {
-              id: '213123213',
-              provincesId: '410000',
-              citiesId: '410100',
-              matterName: '名称1', // 事项名称
-              matterSoucreName: '来源1', // 事项来源
-              matterIcon: 'http://img.taopic.com/uploads/allimg/120727/201995-120HG1030762.jpg',
-              workClassId: '', // 所属分类
-              matterCreateTime: '2017-11-17 00:00:00',
-              matterStatus: '0', // 事件状态
-              requiredConditions: '1、条件1&nbsp;2、条件2', // 办理条件
-              materialRequested: '材料1', // 所需材料
-              onlineManagement: '流程1', // 网上流程
-              windowManagement: '窗口流程',
-              timeLimitExplanation: '说明1', // 限时说明
-              chargingStandard: '标准1', // 收费标准
-              managementBasis: '依据1', // 办理依据
-              serviceObject: '个人', // 服务对象
-              workPhone: '0371-12345678', // 工作电话
-              complaintPhone: '0371-12345678', // 监督电话
-              workMatterAddressesList: [
-                {
-                  areasId:"410103",
-                  companyName:"324",
-                  matterSoucreUrl:"234",
-                  workAddress:"234",
-                  workDate:"1324"
-                },{
-                  areasId:"410103",
-                  companyName:"324",
-                  matterSoucreUrl:"234",
-                  workAddress:"234",
-                  workDate:"1324"
-                },{
-                  areasId:"410103",
-                  companyName:"324",
-                  matterSoucreUrl:"234",
-                  workAddress:"234",
-                  workDate:"1324"
-                }
-              ]
-            }, {
-              id: '213123245',
-              provincesId: '410000',
-              citiesId: '411000',
-              matterName: '名称2', // 事项名称
-              matterSoucreName: '来源2', // 事项来源
-              matterIcon: 'http://img.zcool.cn/community/01690955496f930000019ae92f3a4e.jpg@2o.jpg',
-              workClassId: '', // 所属分类
-              matterCreateTime: '2017-11-17 00:00:00',
-              matterStatus: '1', // 事件状态
-              requiredConditions: '条件2', // 办理条件
-              materialRequested: '材料2', // 所需材料
-              onlineManagement: '流程2', // 网上流程
-              windowManagement: '窗口流程2',
-              timeLimitExplanation: '说明2', // 限时说明
-              chargingStandard: '标准2', // 收费标准
-              managementBasis: '依据2', // 办理依据
-              serviceObject: '公司', // 服务对象
-              workPhone: '0371-12345678', // 工作电话
-              complaintPhone: '0371-12345678', // 监督电话
-              workMatterAddressesList: [
-                {
-                  areasId:"411023",
-                  companyName:"324",
-                  matterSoucreUrl:"234",
-                  workAddress:"234",
-                  workDate:"1324"
-                },{
-                  areasId:"411023",
-                  companyName:"324",
-                  matterSoucreUrl:"234",
-                  workAddress:"234",
-                  workDate:"1324"
-                }
-              ]
-            }, {
-              id: '213123232',
-              provincesId: '410000',
-              citiesId: '410500',
-              matterName: '名称3', // 事项名称
-              matterSoucreName: '来源3', // 事项来源
-              matterIcon: 'http://img.zcool.cn/community/0142135541fe180000019ae9b8cf86.jpg@1280w_1l_2o_100sh.png',
-              workClassId: '', // 所属分类
-              matterCreateTime: '2017-11-17 00:00:00',
-              matterStatus: '1', // 事件状态
-              requiredConditions: '条件3', // 办理条件
-              materialRequested: '材料3', // 所需材料
-              onlineManagement: '流程3', // 网上流程
-              windowManagement: '窗口流程3',
-              timeLimitExplanation: '说明3', // 限时说明
-              chargingStandard: '标准3', // 收费标准
-              managementBasis: '依据3', // 办理依据
-              serviceObject: '工作人员', // 服务对象
-              workPhone: '0371-12345678', // 工作电话
-              complaintPhone: '0371-12345678', // 监督电话
-              workMatterAddressesList: [
-                {
-                  areasId:"410502",
-                  companyName:"324",
-                  matterSoucreUrl:"234",
-                  workAddress:"234",
-                  workDate:"1324"
-                }
-              ]
-            }
-          ],
-          url: 'workMatter/dataGrid.do'
+          data: [],
+          url: 'web/work/matter/dataGrid',
+          method: 'post',
+          addMethod: 'post',
+          editMethod: 'post',
+          searchMethod: 'post',
+          nowpage: 1,
+          pagesize: 10,
         },
+        // 是不是预览状态  预览状态不显示编辑删除按钮
+        isPreview: false,
+        fileUrl: [],
+        uploadImgArr: [],
+        uploadLoading: false,
+        // 是否通过事项名称重复的检查
+        checking: true,
         addressList: false,
+        searchWorkClassId: [],
+        allWorkClassId: [],
+        allWorkClassIdMap: {
+          // 市code : [ 该市的所有分类 ]
+        },
         workClassId: [],
+        workClassIdMap: {}, // 全部分类的map
+        workerLevel: 2,
+        level: [
+          {
+            value: 1,
+            label: '全国'
+          },
+          {
+            value: 2,
+            label: '区域'
+          }
+        ],
+        levelMap: {
+          1: '全国',
+          2: '地区'
+        },
         matterStatus: [
           {
             value: '0',
@@ -572,6 +551,7 @@
           matterStatus: '',
           areaId: ''
         },
+        matterCreateTime: '',
         formDialog: {
           id: '',
           provincesId: '',
@@ -594,13 +574,21 @@
           workMatterAddressesList: [], // 编辑时至少有一个值
           complaintPhone: '' // 监督电话
         },
+        // 全国性的事项地址默认值
+        defaultWorkerWindow: {
+          areasId: 1,
+          companyName: '',
+          matterSoucreUrl: '',
+          workAddress: '',
+          workDate: '',
+        },
         columns: [
-          {
-            title: '编号',
-            key: 'id',
-            fixed: 'left',
-            width: 180
-          },
+          // {
+          //   title: 'ID',
+          //   key: 'id',
+          //   fixed: 'left',
+          //   width: 180
+          // },
           {
             title: '事项名称',
             key: 'matterName',
@@ -618,44 +606,66 @@
             width: 220
           },
           {
-            title: '事项图标',
-            key: 'matterIcon',
-            width: 180,
-            render: function (create, params) {
-              if (params.row.matterIcon === '' || params.row.matterIcon === 'null') {
-                return create('span', '暂无图标')
-              } else {
-                return create('img', {
-                  style: {
-                    maxWidth: '100px',
-                    margin: '10px'
-                  },
-                  attrs: {
-                    src: params.row.matterIcon
-                  }
-                })
+            title: '事项区域',
+            key: 'workerRegion',
+            width: 220,
+            render: (create, params) => {
+              let vm = this,provincesId=params.row.provincesId,citiesId=params.row.citiesId,txt='无'
+              if(provincesId==1&&citiesId==1){
+                txt = '全国'
+              }else if(provincesId&&citiesId){
+                txt = vm.util.getProvinceCityArea([provincesId, citiesId],vm.chinaJson, true)
               }
+              return create('span', txt)
+            }
+          },
+          {
+            title: '办事地址',
+            key: 'workAddress',
+            width: 150,
+            render: (create, params) => {
+              let vm = this,provincesId=params.row.provincesId,citiesId=params.row.citiesId
+              // if(provincesId==1&&citiesId==1){
+              //   return create('span','全国事项')
+              // }else{
+                return create('Button', {
+                  props: { type: 'primary', size: 'small' },
+                  on: {
+                    click: function () {
+                      vm.isPreview = true
+                      vm.seeAddress(params.row)
+                    }
+                  }
+                }, '查看地址列表')
+              // }
             }
           },
           {
             title: '所属分类',
-            key: 'workMatterClassName',
-            width: 100
+            key: 'workClassId',
+            width: 100,
+            render: (create, params) => {
+              var key = params.row.workClassId,map=this.workClassIdMap
+              var txt = map[key] ? map[key] : key
+              return create('span',txt)
+            }
           },
-          {
-            title: '发布时间',
-            key: 'matterCreateTime',
-            width: 180
-          },
+          // {
+          //   title: '发布时间',
+          //   key: 'matterCreateTime',
+          //   width: 180
+          // },
           {
             title: '办理条件',
             key: 'requiredConditions',
             width: 500,
             ellipsis: true,
             render: (create, params) => {
-              let vm = this
-              let hasNbsp = !!params.row.requiredConditions.indexOf('&nbsp;')
-              let txt = hasNbsp ? (params.row.requiredConditions + '').split("&nbsp;").join(" ") : params.row.requiredConditions
+              let vm = this,txt=params.row.requiredConditions
+              if (txt) {
+                let hasNbsp = !!txt.indexOf('&nbsp;')
+                txt = hasNbsp ? (txt + '').split("&nbsp;").join(" ") : txt
+              }
               return create('span',txt)
             }
           },
@@ -665,9 +675,11 @@
             width: 350,
             ellipsis: true,
             render: (create, params) => {
-              let vm = this
-              let hasNbsp = !!params.row.materialRequested.indexOf('&nbsp;')
-              let txt = hasNbsp ? (params.row.materialRequested + '').split("&nbsp;").join(" ") : params.row.materialRequested
+              let vm = this,txt=params.row.materialRequested
+              if (txt) {
+                let hasNbsp = !!txt.indexOf('&nbsp;')
+                txt = hasNbsp ? (txt + '').split("&nbsp;").join(" ") : txt
+              }
               return create('span',txt)
             }
           },
@@ -677,11 +689,10 @@
             width: 500,
             ellipsis: true,
             render: (create, params) => {
-              let vm = this
-              let txt = ''
-              if (params.row.onlineManagement) {
-                let hasNbsp = !!params.row.onlineManagement.indexOf('&nbsp;')
-                txt = hasNbsp ? (params.row.onlineManagement + '').split("&nbsp;").join(" ") : params.row.onlineManagement
+              let vm = this,txt=params.row.onlineManagement
+              if (txt) {
+                let hasNbsp = !!txt.indexOf('&nbsp;')
+                txt = hasNbsp ? (txt + '').split("&nbsp;").join(" ") : txt
               }
               return create('span',txt)
             }
@@ -692,11 +703,10 @@
             width: 500,
             ellipsis: true,
             render: (create, params) => {
-              let vm = this
-              let txt = ''
-              if (params.row.windowManagement) {
-                let hasNbsp = !!params.row.windowManagement.indexOf('&nbsp;')
-                txt = hasNbsp ? (params.row.windowManagement + '').split("&nbsp;").join(" ") : params.row.windowManagement
+              let vm = this,txt=params.row.windowManagement
+              if (txt) {
+                let hasNbsp = !!txt.indexOf('&nbsp;')
+                txt = hasNbsp ? (txt + '').split("&nbsp;").join(" ") : txt
               }
               return create('span',txt)
             }
@@ -704,18 +714,27 @@
           {
             title: '限时说明',
             key: 'timeLimitExplanation',
-            width: 170
+            width: 200,
+            ellipsis: true,
+            render: function(create, params){
+              var txt = params.row.timeLimitExplanation
+              return create('span',{
+                props: {
+                  alt: txt
+                }
+              },txt)
+            }
+          },
+          {
+            title: '办理依据',
+            key: 'managementBasis',
+            width: 200,
+            ellipsis: true
           },
           {
             title: '收费标准',
             key: 'chargingStandard',
             width: 150
-          },
-          {
-            title: '办理依据',
-            key: 'managementBasis',
-            width: 150,
-            ellipsis: true
           },
           {
             title: '工作电话',
@@ -726,6 +745,36 @@
             title: '监督电话',
             key: 'complaintPhone',
             width: 150
+          },
+          {
+            title: '事项图标',
+            key: 'matterIcon',
+            width: 180,
+            render: (create, params) => {
+              var imageHost=this.imageHost || sessionStorage.imageHost,url=params.row.matterIcon
+              if (!url) {
+                return create('span', '暂无图标')
+              } else {
+                if(url.indexOf('http')==-1){
+                  url = imageHost + url
+                }
+                return create('a',{
+                  attrs: {
+                    href: url,
+                    target: '_blank'
+                  },
+                },[create('img', {
+                  style: {
+                    maxWidth: '100px',
+                    margin: '10px'
+                  },
+                  attrs: {
+                    src: url,
+                    alt: url
+                  }
+                })])
+              }
+            }
           },
           {
             title: '事件状态',
@@ -740,24 +789,9 @@
             }
           },
           {
-            title: '办事地址',
-            key: 'workAddress',
-            width: 150,
-            render: (create, params) => {
-              let vm = this
-              return create('div', [
-                (function (vm, create, params) {
-                  return create('Button', {
-                    props: { type: 'primary', size: 'small' },
-                    on: {
-                      click: function () {
-                        vm.seeAddress(params.row)
-                      }
-                    }
-                  }, '查看地址列表')
-                })(vm, create, params)
-              ])
-            }
+            title: '创建时间',
+            key: 'createTime',
+            width: 180
           },
           {
             title: '操作',
@@ -766,48 +800,304 @@
             align: 'center',
             fixed: 'right',
             render: (create, params) => {
-              let vm = this
-              return create('div', [
-                create('Button', {
-                  props: { type: 'primary', size: 'small' },
-                  style: { marginRight: '5px' },
-                  on: {
-                    click: function () {
-                      vm.workMatterPreview(params.row)
-                    }
+              let vm = this,arr=[]
+              var previewBtn = create('Button', {
+                props: { type: 'success', size: 'small' },
+                style: { marginRight: '5px' },
+                on: {
+                  click: function () {
+                    vm.workMatterPreview(params.row)
                   }
-                }, '预览'),
-                create('Button', {
-                  props: { type: 'primary', size: 'small' },
-                  style: { marginRight: '5px' },
-                  on: {
-                    click: function () {
-                      vm.editRow(params.row)
-                    }
-                  }
-                }, vm.label.edit),
-                vm.createDelBtn(create, params.row.id)
-              ])
+                }
+              }, '预览')
+              if(vm.hasPerm('workMatter:preview')){
+                arr.push(previewBtn)
+              }
+              if(vm.hasPerm('workMatter:edit')){
+                arr.push(vm.createEditBtn(create, params.row))
+              }
+              if(vm.hasPerm('workMatter:delete')){
+                arr.push(vm.createDelBtn(create, params.row.id))
+              }
+              return create('div', arr)
             }
           }
         ],
         rules: {
           matterName: [
-            { required: true,message: '事件名称不能为空',trigger: 'change' },
             { required: true,message: '事件名称不能为空',trigger: 'blur' }
           ],
           workAddress: [
-            { required: true,message: '详细地址不能为空',trigger: 'change' },
             { required: true,message: '详细地址不能为空',trigger: 'blur' }
           ],
           companyName: [
-            { required: true,message: '窗口单位名称不能为空',trigger: 'change' },
             { required: true,message: '窗口单位名称不能为空',trigger: 'blur' }
           ],
         }
       }
     },
     methods: {
+       // 上传图片
+      imgTest(fileObj){
+        var vm = this,obj = {},
+        code = 1,
+        message = '',
+        type = fileObj.type.split('/')[1],
+        size = fileObj.size
+        var fileUrl = vm.fileUrl,
+          imgUploadFormat = vm.imgUploadFormat || ['jpg','jpeg','png','gif'],
+          imgMaxSize = vm.imgMaxSize || 3,
+          imgMinSize = vm.imgMinSize || 10
+        var len = fileUrl.length,len2 = imgUploadFormat.length,typeIsOk = false,sizeIsOk = false,typeTxt=''
+        if(!type){
+          code = 0
+          message = '文件格式未知，请重新选择'
+        }else{
+          type = type.toLocaleLowerCase()
+        }
+        for(let i=0;i<len2;i++){
+          typeTxt += i==len2-1 ? imgUploadFormat[i] : imgUploadFormat[i] + '、' 
+          if(type==imgUploadFormat[i]){
+            typeIsOk = true
+            break
+          }
+        }
+        if(!typeIsOk){
+          obj.code = 0
+          obj.message = `请选择${typeTxt}格式的文件`
+          return obj
+        }
+        if(imgMaxSize&&size/1000/1000>imgMaxSize){
+          obj.code = 0
+          obj.message = `请选择小于${imgMaxSize}Mb的文件`
+          return obj
+        }
+        if(imgMinSize&&size/1000<imgMinSize){
+          obj.code = 0
+          obj.message = `请选择大于${imgMinSize}Kb的文件`
+          return obj
+        }
+        obj.code = code
+        obj.message = message
+        return obj
+      }, 
+      myBeforeUpload(file){
+        var vm = this;
+        var imgTestResult = vm.imgTest(file)
+        if(!imgTestResult.code){
+          vm.$Message.error({
+            content: imgTestResult.message,
+            duration: 3
+          })
+          return false
+        }
+        let reader = new FileReader()
+        reader.readAsDataURL(file)
+        reader.onloadend = function (e) {
+          vm.fileUrl = [reader.result]
+          vm.uploadImgArr = [file]
+        }
+        return false
+      },
+      handleFormatError(){},
+      handleMaxSize(){},
+      myUpload(){
+        // 确认上传
+        var vm = this
+        if(!vm.uploadImgArr.length){
+          vm.$Message.error('请先选择上传的图片')
+          return
+        }
+        vm.uploadLoading = true
+        if(vm.currDialog=='add' && !vm.formDialog.id){
+          vm.$http.post(vm.url.sId).then(res=>{
+            var resData = res.data
+            if(resData.code==1){
+              var sId = resData.data;
+              vm.formDialog.id = sId;
+              vm.uploadFile(sId)
+            }
+          }).catch(err=>{})
+        }else{
+          var sId = vm.formDialog.id
+          vm.uploadFile(sId)
+        }
+      },
+      uploadFile(sId){
+        var vm = this;
+        let params = new FormData();
+        vm.uploadImgArr.forEach(file =>{
+          params.append('file', file)
+        });
+        params.append('sId',sId)
+        // s   1  用户  2  帖子  3  广告
+        params.append('s',3)
+        // 使用位置 1：用户头像 2：帖子列表 3：帖子回复 4:创建群头像 5:编辑群头像  6广告
+        params.append('p',6)
+        var config =  {
+            headers: {
+              'Content-Type': 'multipart/form-data'
+            }
+        };
+        var user = JSON.parse(sessionStorage.user)
+        var userId = userId || user.userId || 10
+        vm.$http.post(vm.url.upload + userId, params, config).then(res=>{
+          let rd = res.data;
+          if(rd.code==1){
+            // 清空已上传数组
+            vm.uploadImgArr = [];
+            vm.$Message.success('上传图片成功！');
+            var arr = [rd.data[0]]
+            vm.formDialog.matterIcon = arr[0] || '';
+            vm.uploadLoading = false
+          }else{
+            vm.$Message.error(rd.message)
+          }
+        }).catch(err=>{})
+      },
+      handleRemove(index){
+        var vm = this
+        vm.fileUrl.splice(index,1)
+        vm.uploadImgArr.splice(index,1)
+        vm.formDialog.matterIcon = ''
+      },
+      // 上传图片  end
+      createTimeChange(time){
+        this.formDialog.matterCreateTime = time
+      },
+      onBlur(){
+        var vm = this
+        if(!vm.formDialog.matterName.trim())return
+        var ajaxData = {
+          "name": vm.formDialog.matterName
+        }
+        var params={
+          url: vm.url.check,
+          method: 'post',
+          data: ajaxData
+        }
+        return
+        vm.$http(params).then(res=>{
+          
+        }).catch(err=>{})
+      },
+      submitSearch(){
+        // 为什么使用 clearable 清空选择框的值，值就成了 undefined
+        var vm = this,item
+        for(let key in vm.formSearch){
+          item = vm.formSearch[key]
+          if(typeof(item) == 'undefined'){
+            vm.formSearch[key] = ''
+          }
+        }
+        var obj = $.extend({}, vm.pager, vm.formSearch);
+        $.each(obj, function (key, val) {
+            if (val == '') {
+                delete obj[key];
+            }
+        });
+        vm.pager = obj;
+        vm.paging(1);
+      },
+      // 不同的分页键名
+      pagingFiltData(object) {
+        let obj = this.util.deepcopy(object)
+        for (let key in obj) {
+          if (typeof obj[key] === 'string' && obj[key].trim() === '') {
+            delete obj[key]
+          }
+        }
+        if (typeof obj.data != 'undefined') {
+          delete obj.data
+        }
+        if (typeof obj.url != 'undefined') {
+          delete obj.url
+        }
+        if (typeof obj.method != 'undefined') {
+          delete obj.method
+        }
+        if (typeof obj.total != 'undefined') {
+          delete obj.total
+        }
+        if (typeof obj.addMethod != 'undefined') {
+          delete obj.addMethod
+        }
+        if (typeof obj.deleteMethod != 'undefined') {
+          delete obj.deleteMethod
+        }
+        if (typeof obj.editMethod != 'undefined') {
+          delete obj.editMethod
+        }
+        if (typeof obj.searchMethod != 'undefined') {
+          delete obj.searchMethod
+        }
+        if (typeof obj.current != 'undefined') {
+          delete obj.current
+        }
+        if (typeof obj.size != 'undefined') {
+          delete obj.size
+        }
+        return obj
+      },
+      paging (current) {
+        let vm = this
+        if (current && Number(current)) {
+          vm.changePager(current)
+          return
+        }
+        vm.pageLoading = true
+        var pager = vm.pager
+        var method = pager.method
+        var params = {
+          url: pager.url,
+          method: method,
+        }
+        var ajaxData = vm.pagingFiltData(pager),_ajaxData = {}
+        _ajaxData.pageInfo={}
+        for(let key in ajaxData){
+          if(key=='nowpage' || key=='pagesize'){
+            _ajaxData.pageInfo[key] = ajaxData[key]
+          }else{
+            _ajaxData[key] = ajaxData[key]
+          }
+        }
+        if(method=='get'){
+          params.params = _ajaxData
+        }else{
+          params.data = _ajaxData
+        }
+        vm.$http(params).then(res => {
+          let resData = res.data
+          if (resData.code == 1) {
+            vm.pageLoading = false
+            if (typeof vm.pagerResult == 'function') {
+              // 返回数据预处理
+              resData.data = vm.pagerResult(resData.data)
+            }
+            // vm.$nextTick(function(){
+            //   pager.data = resData.data
+            //   pager.total = resData.total
+            // })
+            setTimeout(function(){
+              pager.data = resData.data
+              pager.total = resData.total
+            },100)
+          }
+        }).catch(err=>{})
+      },
+      changePager (data) {
+        let vm = this
+        var pager = vm.pager
+        if (typeof data === 'object') {
+          for (let key in data) {
+            pager[key] = data[key]
+          }
+        } else {
+          pager.nowpage = data
+        }
+        vm.paging()
+      },
+      //  不同的分页键名 
       upExeclSuccess (res) {
         if (res.code) {
           this.$Message.success('上传成功！')
@@ -819,11 +1109,11 @@
       // 编辑行
       editRow (data) {
         let vm = this
-        let _data = vm.util.extend(data)
+        let _data = vm.util.deepcopy(data)
         vm.addrDialog.derail_address_obj = [data.provincesId, data.citiesId]
         for (let key in vm.formDialog) {
           if (key == 'workMatterAddressesList' && typeof _data[key] == 'string') {
-            // 这里的值为什么时字符串类型
+            // 这里的值什么时字符串类型
             vm.formDialog[key] = JSON.parse(_data[key])
           } else {
             vm.formDialog[key] = _data[key]
@@ -837,15 +1127,23 @@
             onlineManagement: vm.formDialog.onlineManagement,
             windowManagement: vm.formDialog.windowManagement
         }
+        if(typeof data.matterStatus != 'undefined'){
+          vm.formDialog.matterStatus = data.matterStatus.toString()
+        }
         vm.currDialog = 'edit'
         vm.dialogShow = true
       },
       resetDialogForm (name) {
+        name = name || 'formDialog'
         let vm = this
+        vm.workerLevel = 2
+        vm.workClassId = vm.allWorkClassId
+        vm.isPreview = false
         vm.formDialog.provincesId = ''
         vm.formDialog.citiesId = ''
         vm.formDialog.matterIcon = ''
         vm.formDialog.matterStatus = '1'
+        // vm.matterCreateTime = ''
         vm.formDialog.workMatterAddressesList = []
         vm.addrDialog.derail_address_obj = []
         vm.addrDialog.addressArr = []
@@ -866,7 +1164,15 @@
         let vm = this
         vm.$refs[name].validate(function (valid) {
           if (valid) {
-            if (!vm.addrDialog.derail_address_obj.length) {
+            if(!vm.checking){
+              vm.$Message.info({
+                content: '当前事项已添加，请勿重复添加！',
+                duration: 3
+              })
+              return
+            }
+            if(!vm.formDialog.provincesId || !vm.formDialog.citiesId){
+            // if (!vm.addrDialog.derail_address_obj.length) {
               vm.$Message.error('请选择省市，并添加办事地址')
               return
             }
@@ -886,7 +1192,7 @@
                   workMatter[key] = vm.formDialog[key]
                 }
               }
-              workMatterAddressesList = vm.util.extend(vm.formDialog.workMatterAddressesList)
+              workMatterAddressesList = vm.util.deepcopy(vm.formDialog.workMatterAddressesList)
             } else if (vm.currDialog === 'edit') {
               for (let key in vm.formDialog) {
                 workMatter[key] = vm.formDialog[key]
@@ -899,37 +1205,79 @@
             }
             ajaxData.workMatter = JSON.stringify(workMatter)
             ajaxData.workMatterAddressesList = JSON.stringify(workMatterAddressesList)
-            console.log(ajaxData)
-            vm.$store.dispatch('submitDialogForm', {
-              'vm': vm,
-              'name': name
-            })
-            vm.editAddrData = [] //提交数据后清除
+            // 不转成字符串传给后台
+            if(vm.currDialog=='add'){
+              ajaxData = {}
+              for(let key in vm.formDialog){
+                if(key!='id'){
+                  ajaxData[key] = vm.formDialog[key]
+                }
+              }
+            }else if(vm.currDialog=='edit'){
+              ajaxData = vm.formDialog
+            }
+            // 不转成字符串传给后台  end
+            var currDialog = vm.currDialog,pager=vm.pager
+            var url = vm.url[currDialog]
+            var method =  pager.method
+            if(currDialog=='add' && typeof pager.addMethod != 'undefined'){
+              method = pager.addMethod
+            }
+            if(currDialog=='edit' && typeof pager.editMethod != 'undefined'){
+              method = pager.editMethod
+            }
+            var params = {
+              url: url,
+              method: method
+            }
+            if(method=='get'){
+              params.params = ajaxData
+            }else{
+              params.data = ajaxData
+            }
+            vm.$http(params).then(res=>{
+              var resData = res.data
+              if(resData.code==1){
+                vm.dialogShow = false
+                vm.$Message.success(vm.label[vm.currDialog]+'成功!')
+                if(vm.currDialog=='add'){
+                  vm.paging(1);
+                }else{
+                  vm.paging();
+                }
+                if(typeof vm.resetDialogForm == 'function'){
+                  vm.resetDialogForm(name)
+                }
+              }else{
+                vm.$Message.error(resData.message)
+              }
+            }).catch(err=>{})
+            // vm.editAddrData = [] //提交数据后清除
           }
         })
       },
       // 预览
       workMatterPreview (data) {
         let vm = this
-        let _data = vm.util.extend(data)
+        let _data = vm.util.deepcopy(data)
         let status = {
           '0': '无效',
           '1': '有效'
         }
         _data.matterStatus = status[_data.matterStatus]
-        if(_data.requiredConditions.indexOf("&nbsp;")){
-          // 原数据直接展示  有  &nbsp; 的数据去掉 &nbsp;
-          _data.requiredConditions = _data.requiredConditions.split("&nbsp;").join(" ");
-        }
-        if(_data.materialRequested.indexOf("&nbsp;")){
-          _data.materialRequested = _data.materialRequested.split("&nbsp;").join(" ");
-        }
-        if(_data.onlineManagement.indexOf("&nbsp;")){
-          _data.onlineManagement = _data.onlineManagement.split("&nbsp;").join(" ");
-        }
-        if(_data.windowManagement.indexOf("&nbsp;")){
-          _data.windowManagement = _data.windowManagement.split("&nbsp;").join(" ");
-        }
+        // if(_data.requiredConditions.indexOf("&nbsp;")){
+        //   // 原数据直接展示  有  &nbsp; 的数据去掉 &nbsp;
+        //   _data.requiredConditions = _data.requiredConditions.split("&nbsp;").join(" ");
+        // }
+        // if(_data.materialRequested.indexOf("&nbsp;")){
+        //   _data.materialRequested = _data.materialRequested.split("&nbsp;").join(" ");
+        // }
+        // if(_data.onlineManagement.indexOf("&nbsp;")){
+        //   _data.onlineManagement = _data.onlineManagement.split("&nbsp;").join(" ");
+        // }
+        // if(_data.windowManagement.indexOf("&nbsp;")){
+        //   _data.windowManagement = _data.windowManagement.split("&nbsp;").join(" ");
+        // }
         vm.previewData = _data
         vm.previewData.provinceCity = vm.util.getProvinceCityArea([_data.provincesId,_data.citiesId],vm.chinaJson,true)
         vm.previewModal = true
@@ -942,17 +1290,36 @@
       resetSearch (name) {
         var vm = this
         vm.derail_address_obj_s = []
+        vm.formSearch.areaId = ''
+        vm.searchWorkClassId = vm.allWorkClassId
         vm.$refs[name].resetFields()
         vm.submitSearch(name)
+        // vm.paging(1)
       },
       searchAddrChange (value) {
-        this.formSearch.areaId = value[2]
+        // 开启filterable  返回的数组中值为字符串
+        var vm = this
+        vm.formSearch.areaId = value ? value[2] : ''
+        vm.formSearch.workClassId = ''
+        if(value){
+          vm.searchWorkClassId = vm.allWorkClassIdMap[value[1]]
+          vm.derail_address_obj_s = [Number(value[0]),Number(value[1]),Number(value[2])]
+        }
       },
       addrChange (value) {
-        var vm = this
-        vm.formDialog.provincesId = value[0]
-        vm.formDialog.citiesId = value[1]
-        vm.addrDialog.derail_address_obj = value
+        var vm = this,provincesId=value[0],citiesId=value[1],workClassId=[]
+        if(value){
+          vm.addrDialog.derail_address_obj = [Number(value[0]),Number(value[1])]
+        }
+        vm.formDialog.provincesId = provincesId
+        vm.formDialog.citiesId = citiesId
+        if(citiesId){
+          workClassId = vm.allWorkClassIdMap[citiesId]
+          if(value&&value[0]!=1&&!workClassId){
+            vm.$Message.info('当前选区无分类数据，请先添加当前选区的分类数据')
+          }
+        }
+        vm.workClassId = workClassId
       },
       handleSuccess (res) {
         if(res.state=="SUCCESS"){
@@ -965,11 +1332,12 @@
       },
       addAddrBtn () {
         var vm = this
-        if (vm.addrDialog.derail_address_obj.length) {
-          vm.areasId = vm.getArea(vm.addrDialog.derail_address_obj[1])
+        var arr = vm.addrDialog.derail_address_obj
+        if (arr.length) {
+          vm.areasId = vm.getArea(arr[1])
           vm.addrModal = true
         }else{
-          vm.$Message.error("请先选择事项所属省市")
+          vm.$Message.error("请先选择事项关联省市")
         }
       },
       getArea (cityId) {
@@ -977,8 +1345,9 @@
         let areaJson = vm.chinaJson[cityId]
         let areasId = []
         for (let key in areaJson) {
+          // 从json中取到的key是string类型，需要转换成number类型
           areasId.push({
-            'value': key,
+            'value': Number(key),
             'label': areaJson[key]
           })
         }
@@ -995,16 +1364,22 @@
       },
       // 确定添加、编辑地址
       beSure (name) {
-        var vm = this;     
-        vm.$refs[name].validate(function (valid) {  
-          if(vm.addrDialog.areasId){
-            if(vm.currDialog=="edit"){
-                vm.addAddrAjax()
-            }
-            // 确定添加、编辑地址后的显示处理
+        var vm = this;
+        vm.$refs[name].validate(function (valid) {
+          var areasId = vm.addrDialog.areasId
+          if(!areasId){
+            vm.$Message.info('请先选择区！')
+            return
+          }
+          if(vm.currDialog=="edit"){
+            // 这个时候传状态，因为请求发送完的时候新增或编辑的状态就已经发生变化了
+            vm.addAddrAjax(areasId,vm.addEdit)
+          }else{
+            // 新增时 修改地址数据不进行提交，所有数据一起提交
             if (vm.addEdit) {
               // 如果是新增时的地址新增确定
               vm.formDialog.workMatterAddressesList.push({
+                workMatterId: vm.formDialog.id,
                 areasId: vm.addrDialog.areasId,
                 workAddress: vm.addrDialog.workAddress,
                 workDate: vm.addrDialog.workDate,
@@ -1017,18 +1392,67 @@
                 vm.formDialog.workMatterAddressesList[vm.editIndex][key] = vm.addrDialog[key]
               }
             }
-            vm.addrDialog.addressArr = vm.getAddressArr(vm.formDialog.workMatterAddressesList)
-            vm.resetAddr(name)
-          }else{
-            vm.$Message.error("请选择区");
+          }
+          vm.addrDialog.addressArr = vm.getAddressArr(vm.formDialog.workMatterAddressesList)
+          vm.resetAddr(name)
+        })
+      },
+      addAddrAjax (areasId,isAddStatus) {
+        // 编辑时编辑地址，确认请求
+        var vm = this;
+        var ajaxData = {
+            workMatterId: vm.formDialog.id,
+            // provincesId: vm.addrDialog.derail_address_obj[0],
+            // citiesId: vm.addrDialog.derail_address_obj[1],                    
+            areasId: areasId,
+            workAddress: vm.addrDialog.workAddress,
+            workDate: vm.addrDialog.workDate,                    
+            companyName: vm.addrDialog.companyName,
+            matterSoucreUrl: vm.addrDialog.matterSoucreUrl,
+        };
+        if(!isAddStatus){
+          // 编辑地址
+          var id = vm.formDialog.workMatterAddressesList[vm.editIndex].id
+          ajaxData.id = id
+        }
+        var url = isAddStatus ? vm.url.address.add : vm.url.address.edit
+        var params = {
+          url: url,
+          method: 'post',
+          data: ajaxData
+        }
+        vm.$http(params).then(res=>{
+          if(res&&res.data){
+            var resData = res.data
+            if(resData.code==1){
+              vm.$Message.success((isAddStatus ? '新增' : '编辑') + '地址成功！')
+              if(isAddStatus){
+                var addressId = resData.data
+                vm.formDialog.workMatterAddressesList.push({
+                  id: addressId,
+                  workMatterId: vm.formDialog.id,
+                  areasId: vm.addrDialog.areasId,
+                  workAddress: vm.addrDialog.workAddress,
+                  workDate: vm.addrDialog.workDate,
+                  companyName: vm.addrDialog.companyName,
+                  matterSoucreUrl: vm.addrDialog.matterSoucreUrl
+                })
+                vm.addrDialog.addressArr.push(ajaxData.workAddress)
+              }else{
+                for (let key in vm.formDialog.workMatterAddressesList[vm.editIndex]) {
+                  // 需同时修改用于提交和用于展示的数据
+                  vm.formDialog.workMatterAddressesList[vm.editIndex][key] = ajaxData[key]
+                  vm.addrDialog[key] = ajaxData[key]
+                }
+                vm.addrDialog.addressArr[vm.editIndex] = ajaxData.workAddress
+              }
+            }
           }
         })
       },
-      addAddrAjax () {
-        console.log('编辑时点击新增地址，确定时发送请求')
-      },
       // 获取详细地址数据
       getAddressArr (addressArr) {
+        if(!addressArr) return []
         let arr = []
         if (addressArr.length) {
           for(var i=0;i<addressArr.length;i++){
@@ -1039,15 +1463,21 @@
       },
       // 编辑地址
       editAddrBtn (index) {
-        let vm = this
+        let vm = this,areasId=''
         vm.addEdit = false
         vm.editIndex = index
         vm.areasId = vm.getArea(vm.addrDialog.derail_address_obj[1])
         let data = vm.formDialog.workMatterAddressesList[index]
         for (let key in data) {
+          if(key=='areasId'){
+            areasId = data[key]
+          }
           vm.addrDialog[key] = data[key]
         }
         vm.editAddrData.push(vm.formDialog.workMatterAddressesList[index])
+        setTimeout(function(){
+          vm.addrDialog.areasId = areasId
+        },50)
         vm.addrModal = true
       },
       // 删除地址
@@ -1065,18 +1495,26 @@
                 vm.formDialog.workMatterAddressesList.splice(index,1)
               } else if (vm.currDialog == 'edit') {
                 // 发送删除请求
-                // 暂时没有 workMatterAddressesId 所以ajaxId未定义
-                var ajaxId = vm.formDialog.workMatterAddressesList[index].workMatterAddressesId
+                var ajaxId = vm.formDialog.workMatterAddressesList[index].id
                 if(ajaxId){
-                  var delAddrData = {
-                      "id": ajaxId
+                  var ajaxData = {
+                    "id": ajaxId
                   }
-                  if (true) {
-                    vm.addrDialog.addressArr.splice(index,1)
-                    vm.formDialog.workMatterAddressesList.splice(index,1)
-                    vm.paging()
-                    vm.$Message.success("操作成功")
+                  var params = {
+                    url: vm.url.address.delete,
+                    method: 'delete',
+                    params: ajaxData
                   }
+                  vm.$http(params).then(res=>{
+                    if(res&&res.data){
+                      var resData = res.data
+                      if(resData.code==1){
+                        vm.addrDialog.addressArr.splice(index,1)
+                        vm.formDialog.workMatterAddressesList.splice(index,1)
+                        vm.$Message.success("删除成功！")
+                      }
+                    }
+                  })
                 } else {
                   vm.$Message.error("区id不存在");
                 }
@@ -1092,12 +1530,14 @@
             data.provincesId,
             data.citiesId
         ]
-        vm.formDialog.workMatterAddressesList = data.workMatterAddressesList
-        vm.addrDialog.addressArr = vm.getAddressArr(data.workMatterAddressesList)
+        var addressArr = data.workMatterAddressesList
+        vm.formDialog.workMatterAddressesList = addressArr
+        vm.addrDialog.addressArr = vm.getAddressArr(addressArr)
         vm.addressList = true
       },
       closeAddrList: function(){
         let vm = this
+        vm.isPreview = false
         vm.addrDialog.derail_address_obj = []
         vm.formDialog.workMatterAddressesList = []
         vm.addrDialog.addressArr = []
@@ -1118,7 +1558,7 @@
             }
           }
         }else{
-          arr = vm.util.extend(data)
+          arr = vm.util.deepcopy(data)
         }
         return arr
       },
@@ -1215,7 +1655,7 @@
       },
       addHandleBesure () {
         var vm = this
-        var _data = vm.util.extend(vm.handleData)
+        var _data = vm.util.deepcopy(vm.handleData)
         if(vm.handleAddEdit){
           // 新增
           vm.handleData.push(vm.addHandleDialog.addHandleText)
@@ -1225,24 +1665,24 @@
         }
         vm.addHandleCancle()
       },
-      // 操作 end
-      initData () {
-        let vm = this
-        // 初始化所属分类
-        // vm.$http.post('workClass/dataGrid.do', {}).then(res => {
-        //   let workClassId = []
-        //   res.data.forEach(item => {
-        //     workClassId.push({
-        //       'value': item.id,
-        //       'label': item.className
-        //     })
-        //   })
-        //   vm.workClassId = workClassId
-        // })
+      // 初始化所属分类
+      initWorkclass(){
+        var vm = this
         // 初始化省市区
         let chinaJson = JSON.parse(sessionStorage.chinaJson)
         let chinaData = JSON.parse(sessionStorage.chinaData)
-        let _chinaData = []
+        let _chinaData = [
+          {
+            'value': 1,
+            'label': '全国',
+            children: [
+              {
+                'value': 1,
+                'label': '全国',
+              }
+            ]
+          }
+        ]
         chinaData.forEach(item => {
           let childArr = []
           item.children.forEach(child => {
@@ -1257,13 +1697,72 @@
             'children': childArr
           })
         })
-        vm.derail_address_arr_ss = chinaData
+        vm.derail_address_arr_ss = [{
+            'value': 1,
+            'label': '全国',
+            children: [
+              {
+                'value': 1,
+                'label': '全国',
+                children: [{
+                  'value': 1,
+                  'label': '全国',
+                }]
+              }
+            ]
+          }].concat(chinaData)
         vm.derail_address_arr = _chinaData
+        // 自定义全国类型的json数据
+        chinaJson['100000'][1] = '全国'
+        chinaJson[1] = {}
+        chinaJson[1][1] = '全国'
         vm.chinaJson = chinaJson
-      }
+        var params = {
+          url: vm.url.workclass,
+          method: 'post',
+          data: {}
+        }
+        vm.$http(params).then(res => {
+          var arr = [],workClassIdMap={},allWorkClassIdMap={},cityCode,provinceCode,_item,txt = '',label=''
+          if(res.data&&res.data.code==1){
+            var data = res.data.data
+            data.forEach(item => {
+              cityCode = item.cityCode
+              if(cityCode==1){
+                provinceCode = 1
+                txt = '全国'
+              }else{
+                provinceCode = parseInt(cityCode/10000)*10000
+                if(provinceCode&&cityCode){
+                  txt = vm.util.getProvinceCityArea([provinceCode,cityCode],chinaJson,true)
+                }
+              }
+              label = txt ? (item.className + '  -  ' + txt) : item.className
+              _item = {
+                'value': item.id,
+                'label': label
+              }
+              arr.push(_item)
+              if(allWorkClassIdMap[cityCode]){
+                allWorkClassIdMap[cityCode].push(_item)
+              }else{
+                allWorkClassIdMap[cityCode] = [_item]
+              }
+              workClassIdMap[item.id] = item.className
+            })
+          }
+          vm.allWorkClassIdMap = allWorkClassIdMap
+          vm.allWorkClassId = arr
+          vm.searchWorkClassId = arr
+          vm.workClassIdMap = workClassIdMap
+        })
+      },
+      // 操作 end
+      initData () {
+        let vm = this
+        vm.initWorkclass()
+      },
     },
-    // 计算属性
-    computed: {},
     watch: {
       derail_address_obj_s (val) {
         if (val.length) {
@@ -1271,10 +1770,24 @@
         } else {
           this.formSearch.areaId = ''
         }
-      }
+      },
+      // workerLevel(val){
+      //   var vm = this
+      //   if(val==1){
+      //     // vm.addrDialog.derail_address_obj = [1,1]
+      //     vm.formDialog.provincesId = 1
+      //     vm.formDialog.citiesId = 1
+      //     vm.formDialog.workMatterAddressesList = [vm.defaultWorkerWindow]
+      //   // }else if(val==2){
+      //   }else{
+      //     vm.formDialog.provincesId = ''
+      //     vm.formDialog.citiesId = ''
+      //     vm.formDialog.workMatterAddressesList = []
+      //     vm.addrDialog.derail_address_obj = []
+      //   }
+      //   vm.addrDialog.addressArr = []
+      // }
     },
-    created () {},
-    mounted () {}
   }
 </script>
 
@@ -1294,5 +1807,36 @@
   max-height: 165px;
   overflow-y: auto;    
   text-indent: 28px;
+}
+.image-box{
+  position: relative;
+  width:132px;
+  height:132px;
+  border:1px solid #eee;
+  text-align: center;
+  margin-bottom: 10px;
+}
+.ad-img{
+  max-width: 100%;
+  max-height: 100%;
+}
+.demo-upload-list-cover{
+  display: none;
+  position: absolute;
+  padding-top: 40px;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0,0,0,.6);
+}
+.image-box:hover .demo-upload-list-cover{
+  display: block;
+}
+.demo-upload-list-cover i{
+  color: #fff;
+  font-size: 20px;
+  cursor: pointer;
+  margin: 0 2px;
 }
 </style>

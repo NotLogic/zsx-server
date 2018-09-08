@@ -4,7 +4,7 @@
       <Dropdown @on-click="clickDropdown">
         <Button type="primary">
             菜单选项
-            <Icon type="arrow-down-b"></Icon>
+            <Icon type="ios-arrow-down"></Icon>
         </Button>
         <DropdownMenu slot="list">
             <DropdownItem name="closeAll">关闭所有</DropdownItem>
@@ -12,17 +12,27 @@
         </DropdownMenu>
       </Dropdown>
     </div>
-    <div class="tags-page-opened">
+    <div class="tags-page-opened" id="scroll-wrapper">
       <Tag
-        v-for="item in pageTagsList"
+        v-for="item in pageOpenedList"
         :key="item.name"
         type="dot"
         :closable="item.name==='home' ? false : true"
-        :color="currentPageName===item.name ? 'blue' : 'default'"
+        :color="currentPageName===item.name ? 'primary' : 'default'"
         :name="item.name"
         @click.native="openPage(item.name)"
         @on-close="closeTag">{{item.meta.title}}</Tag>
-        <!-- 选中的菜单color值改为blue -->
+      <!-- <ul id="scroller" :style="'width:' + scrollerWidth + 'px'">
+        <li v-for="item in pageOpenedList" :key="item.name" class="scroll-item">
+          <Tag
+            type="dot"
+            :closable="item.name==='home' ? false : true"
+            :color="currentPageName===item.name ? 'primary' : 'default'"
+            :name="item.name"
+            @click.native="openPage(item.name)"
+            @on-close="closeTag">{{item.meta.title}}</Tag>
+        </li>
+      </ul> -->
     </div>
   </div>
 </template>
@@ -32,11 +42,13 @@
   export default {
     name: 'tagsPageOpened',
     props: {
-      pageTagsList: Array
+      pageOpenedList: Array
     },
     data () {
       return {
-        // currentPageName: this.$route.name
+        // currentPageName: this.$route.name,
+        scrollerWidth: 500,
+        myScroll: null,
       }
     },
     computed: {
@@ -84,32 +96,53 @@
         if (name ==='closeAll') {
           // 清空标签
           vm.$store.commit('closeAllPage')
-          // 清空左侧展开的菜单（效果暂未实现）    这个效果会操控侧边栏组件，形成耦合
-          // vm.$store.commit('clearAllOpenedSubmenuArr')
+          // 处理左侧菜单展示
+          vm.$store.commit('clearOpenedSubmenuArr')
           vm.$router.push({name: 'home'})
         } else if (name === 'closeOther') {
           vm.$store.commit('closeOtherPage', vm.currentPageName)
-          // 清空其他，只剩一个展开（效果暂未实现）  这个效果会操控侧边栏组件，形成耦合
-          // let parentName = util.getParentRouterNameByName(vm.currentPageName)
-          // if (parentName) {
-          //   vm.$store.commit('clearOtherOpenedSubmenuArr', parentName)
-          // }
+          let parentName = getParentRouterNameByName(vm.currentPageName)
+          if (parentName) {
+            vm.$store.commit('clearOtherOpenedSubmenuArr', parentName)
+          }
         }
+      },
+      initIScroll: function(){
+        var vm = this;
+        vm.$nextTick(function(){
+          var myScroll = new IScroll('#scroll-wrapper', { scrollX: true, scrollY: false, mouseWheel: true });
+          window.addEventListener('resize',myScroll.refresh())
+          vm.myScroll = myScroll
+        })
+      },
+      iScrollRefresh: function(){
+        var vm = this
+        vm.myScroll && vm.myScroll.refresh();
+      },
+      updateScrollWidth(){
+       var vm = this
+       vm.$nextTick(function(){
+          var len = $('.scroll-item').length,i;
+          var width = 0,w=0;
+          for(i=0;i<len;i++){
+            w = $('.scroll-item').eq(i).width()
+            width += w
+          }
+          vm.scrollerWidth = Math.ceil(width);
+          vm.iScrollRefresh()
+       })
       }
     },
-    beforeCreate () {
-      // if (sessionStorage.pageOpenedList && sessionStorage.currentPageName) {
-      //   let homeObj = JSON.parse(sessionStorage.pageOpenedList)[0]
-      //   console.log(sessionStorage.pageOpenedList)
-      //   let currPageArr = JSON.parse(sessionStorage.pageOpenedList).filter(item => {
-      //     if (sessionStorage.currentPageName === 'home') {
-      //       return []
-      //     }
-      //     return item.name === sessionStorage.currentPageName
-      //   })
-      //   this.$store.commit('updatePageOpenedList', [homeObj].concat(currPageArr))
-      // }
-    }
+    // watch: {
+    //   pageOpenedList(val){
+    //     if(val.length){
+    //       this.updateScrollWidth()
+    //     }
+    //   }
+    // },
+    // mounted(){
+    //   this.initIScroll()
+    // },
   }
 </script>
 
@@ -134,6 +167,20 @@
   .tags-page-opened{
     margin-right: 110px;
     height: 40px;
+    /* background-color: aqua; */
     overflow: hidden;
+  }
+  /* 滚动设置 */
+  #scroll-wrapper{
+
+  }
+  #scroller{
+    width: 5000px;
+  }
+  #scroller ul{
+    height: 100%;
+  }
+  .scroll-item{
+    float: left;
   }
 </style>

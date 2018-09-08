@@ -8,10 +8,48 @@
     <title>众善行后台管理系统</title>
     <link rel="shortcut icon" href="static/images/favicon.png" type="image/x-icon">
     <link rel="stylesheet" href="static/styles/iview.css">
+    <link rel="stylesheet" href="static/styles/element-ui.css">
+    <link rel="stylesheet" href="static/third-party/cropper/cropper.css">
+    <link rel="stylesheet" href="static/styles/common.css">
   </head>
   <body>
     <div id="app"></div>
-    <script src="static/js/md5.js"></script>
+    <script src="static/third-party/md5.js"></script>
+    <script src="static/third-party/jquery-3.3.1.min.js"></script>
+    <script>
+      function clean_135helper() { 
+        if (current_editor && current_editor.selection) { 
+          var editor_document = current_editor.selection.document; 
+          jQuery(editor_document).find('._135editor').each(function () { 
+            jQuery(this).removeClass('active'); 
+            jQuery(this).css({ 'border': '0 none' }); 
+          }); 
+          jQuery(editor_document).find('.tool-border').remove(); 
+          jQuery(editor_document).find('.otf-poptools').remove(); 
+        } 
+      }
+    </script>
+    <!-- <script src="static/third-party/underscore-min.js"></script> -->
+    <!-- 使用135编辑器 -->
+    <script src="static/third-party/135/js/ueditor.config.js"></script>
+    <script src="static/third-party/135/js/ueditor.all.min.js"></script>
+    <script src="static/third-party/135/js/lang/zh-cn/zh-cn.js"></script>
+    <!-- 使用百度编辑器 -->
+    <!-- <script src="static/third-party/ueditor/ueditor.config.js"></script>
+    <script src="static/third-party/ueditor/ueditor.all.min.js"></script>
+    <script src="static/third-party/ueditor/lang/zh-cn/zh-cn.js"></script> -->
+    <!-- 百度编辑器添加135插件  但是还是会丢失样式 -->
+    <!-- <script src="static/third-party/ueditor/plugins/135editor.js"></script> -->
+    <script src="static/third-party/cropper/cropper.js"></script>
+    <script src="static/third-party/echars/echarts.js"></script>
+    <!-- <script src="static/third-party/echars/echarts.min.js"></script> -->
+    <!-- 完整型：地图显示“省”字 -->
+    <!-- <script src="static/third-party/china.js"></script> -->
+    <!-- 简短行：地图不显示“省”字 -->
+    <script src="static/third-party/china2.js"></script>
+    <!-- <script src="static/third-party/china2.js"></script> -->
+    <script src="static/third-party/iscroll-lite.js"></script>
+    <!-- <script src="http://api.map.baidu.com/api?v=2.0&ak=Bqc5TTXbH7md0kbU3cLp5W11"></script> -->
     <!-- built files will be auto injected -->
   </body>
 </html>

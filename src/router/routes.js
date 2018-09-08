@@ -19,7 +19,7 @@ export const mainRoutes = {
     icon: ''
   },
   redirect: {
-    name: 'home'
+    name: 'home',
   },
   children: [
     {
@@ -35,50 +35,50 @@ export const mainRoutes = {
   ]
 }
 export const appRoutes = [
-  // 模板
-  // {
-  //   path: '/template',
-  //   name: 'template',
-  //   meta: {
-  //     title: '模板',
-  //     access: 1,
-  //     icon: ''
-  //   },
-  //   component: main,
-  //   children: [
-  //     {
-  //       path: 'template_index',
-  //       name: 'template_index',
-  //       meta: {
-  //         title: '模板',
-  //         access: 1,
-  //         icon: ''
-  //       },
-  //       component: resolve => { require(['@/pages/pageTemplate'], resolve) }
-  //     }
-  //   ]
-  // },
-  // 用户
+  // 模板,测试
   {
-    path: '/user',
-    name: 'user',
+    path: '/template',
+    name: 'template',
     meta: {
-      title: '用户管理',
+      title: '模板/测试',
       access: 1,
       icon: ''
     },
     component: main,
     children: [
       {
-        path: 'app',
-        name: 'app',
+        path: 'test',
+        name: 'test',
         meta: {
-          title: 'APP用户',
+          title: '测试',
           access: 1,
           icon: ''
         },
-        component: resolve => { require(['@/pages/authority/user'], resolve) }
+        component: resolve => { require(['@/pages/test'], resolve) }
       },
+      {
+        path: 'template_index',
+        name: 'template_index',
+        meta: {
+          title: '模板',
+          access: 1,
+          icon: ''
+        },
+        component: resolve => { require(['@/pages/pageTemplate'], resolve) }
+      }
+    ]
+  },
+  // 权限
+  {
+    path: '/authority',
+    name: 'authority',
+    meta: {
+      title: '权限管理',
+      access: 1,
+      icon: 'key'
+    },
+    component: main,
+    children: [
       {
         path: 'systemUser',
         name: 'systemUser',
@@ -87,7 +87,27 @@ export const appRoutes = [
           access: 1,
           icon: ''
         },
-        component: resolve => { require(['@/pages/authority/systemUser'], resolve) }
+        component: resolve => { require(['@/pages/user/systemUser'], resolve) }
+      },
+      {
+        path: 'role',
+        name: 'role',
+        meta: {
+          title: '系统角色',
+          access: 1,
+          icon: ''
+        },
+        component: resolve => { require(['@/pages/user/role'], resolve) }
+      },
+      {
+        path: 'authority_index',
+        name: 'authority_index',
+        meta: {
+          title: '权限列表',
+          access: 1,
+          icon: ''
+        },
+        component: resolve => { require(['@/pages/authority'], resolve) }
       },
     ]
   },
@@ -129,14 +149,25 @@ export const appRoutes = [
         path: 'index',
         name: 'adviceBack_index',
         meta: {
-          title: '意见反馈',
+          title: '反馈基础数据',
           access: 1,
           icon: ''
         },
         component: resolve => { require(['@/pages/adviceBack'], resolve) }
-      }
+      },
+      {
+        path: 'adviceContent',
+        name: 'adviceContent',
+        meta: {
+          title: '反馈内容',
+          access: 1,
+          icon: ''
+        },
+        component: resolve => { require(['@/pages/adviceBack/adviceContent'], resolve) }
+      },
     ]
   },
+  // 内容管理
   {
     path: '/content',
     name: 'content',
@@ -148,24 +179,34 @@ export const appRoutes = [
     },
     children: [
       {
-        path: 'news',
-        name: 'news',
+        path: 'softtext',
+        name: 'softtext',
         meta: {
-          title: '新闻管理',
+          title: '资讯软文',
           access: 1,
           icon: ''
         },
-        component: resolve => { require(['@/pages/content/news'], resolve) }
+        component: resolve => { require(['@/pages/content/softtext'], resolve) }
       },
       {
-        path: 'gover',
-        name: 'gover',
+        path: 'chickenSoup',
+        name: 'chickenSoup',
         meta: {
-          title: '政务信息',
+          title: '简报心语',
           access: 1,
           icon: ''
         },
-        component: resolve => { require(['@/pages/content/gover'], resolve) }
+        component: resolve => { require(['@/pages/content/chickenSoup'], resolve) }
+      },
+      {
+        path: 'easypaper',
+        name: 'easypaper',
+        meta: {
+          title: '每日简报',
+          access: 1,
+          icon: ''
+        },
+        component: resolve => { require(['@/pages/content/easypaper'], resolve) }
       },
       {
         path: 'policy',
@@ -176,6 +217,16 @@ export const appRoutes = [
           icon: ''
         },
         component: resolve => { require(['@/pages/content/policy'], resolve) }
+      },
+      {
+        path: 'gover',
+        name: 'gover',
+        meta: {
+          title: '政务信息',
+          access: 1,
+          icon: ''
+        },
+        component: resolve => { require(['@/pages/content/gover'], resolve) }
       },
       {
         path: 'workClass',
@@ -196,20 +247,8 @@ export const appRoutes = [
           icon: ''
         },
         component: resolve => { require(['@/pages/content/workMatter'], resolve) }
-      }
+      },
     ]
-  },
-  // 权限
-  {
-    path: '/authority',
-    name: 'authority',
-    meta: {
-      title: '权限管理',
-      access: 1,
-      icon: 'key'
-    },
-    component: main,
-    children: []
   },
   // 系统配置
   {
@@ -226,21 +265,21 @@ export const appRoutes = [
         path: 'article',
         name: 'article',
         meta: {
-          title: '推送',
+          title: '系统通知',
           access: 1,
           icon: ''
         },
-        component: resolve => { require(['@/pages/content/article'], resolve) }
+        component: resolve => { require(['@/pages/systemSetting/article'], resolve) }
       },
       {
         path: 'message',
         name: 'message',
         meta: {
-          title: '系统消息',
+          title: '用户消息',
           access: 1,
           icon: ''
         },
-        component: resolve => { require(['@/pages/content/message'], resolve) }
+        component: resolve => { require(['@/pages/systemSetting/message'], resolve) }
       },
       {
         path: 'sensitiveWords',
@@ -250,16 +289,125 @@ export const appRoutes = [
           access: 1,
           icon: ''
         },
-        component: resolve => { require(['@/pages/sensitiveWord/sensitiveWords.vue'], resolve) }
-      }, {
-        path: 'sensitiveWordSettting',
-        name: 'sensitiveWordSettting',
+        component: resolve => { require(['@/pages/systemSetting/sensitiveWords.vue'], resolve) }
+      },
+      {
+        path: 'appVersion',
+        name: 'appVersion',
         meta: {
-          title: '匹配规则',
+          title: 'APP版本',
           access: 1,
           icon: ''
         },
-        component: resolve => { require(['@/pages/sensitiveWord/sensitiveWordSettting.vue'], resolve) }
+        component: resolve => { require(['@/pages/systemSetting/appVersion'], resolve) }
+      },
+    ]
+  },
+  // 用户
+  {
+    path: '/user',
+    name: 'user',
+    meta: {
+      title: '用户管理',
+      access: 1,
+      icon: ''
+    },
+    component: main,
+    children: [
+      {
+        path: 'app',
+        name: 'app',
+        meta: {
+          title: 'APP用户',
+          access: 1,
+          icon: ''
+        },
+        component: resolve => { require(['@/pages/user/user'], resolve) }
+      },
+      {
+        path: 'postUser',
+        name: 'postUser',
+        meta: {
+          title: 'WEB用户',
+          access: 1,
+          icon: ''
+        },
+        component: resolve => { require(['@/pages/user/postUser'], resolve) }
+      },
+      {
+        path: 'agent',
+        name: 'agent',
+        meta: {
+          title: '代理商',
+          access: 1,
+          icon: ''
+        },
+        component: resolve => { require(['@/pages/user/agent'], resolve) }
+      },
+    ]
+  },
+  // 举报
+  {
+    path: '/report',
+    name: 'report',
+    meta: {
+      title: '举报管理',
+      access: 1,
+      icon: ''
+    },
+    component: main,
+    children: [
+      {
+        path: 'report_index',
+        name: 'report_index',
+        meta: {
+          title: '基础信息',
+          access: 1,
+          icon: ''
+        },
+        component: resolve => { require(['@/pages/report'], resolve) }
+      },
+      {
+        path: 'reportClass',
+        name: 'reportClass',
+        meta: {
+          title: '举报分类',
+          access: 1,
+          icon: ''
+        },
+        component: resolve => { require(['@/pages/report/reportClass'], resolve) }
+      },
+      {
+        path: 'userReport',
+        name: 'userReport',
+        meta: {
+          title: '用户举报',
+          access: 1,
+          icon: ''
+        },
+        component: resolve => { require(['@/pages/report/userReport'], resolve) }
+      },
+    ]
+  },
+  {
+    path: '/post',
+    name: 'post',
+    meta: {
+      title: '所有帖子',
+      access: 1,
+      icon: ''
+    },
+    component: main,
+    children: [
+      {
+        path: 'post_index',
+        name: 'post_index',
+        meta: {
+          title: '帖子列表',
+          access: 1,
+          icon: ''
+        },
+        component: resolve => { require(['@/pages/post'], resolve) }
       }
     ]
   },
@@ -285,18 +433,40 @@ export const appRoutes = [
         component: resolve => { require(['@/pages/basiceData/province'], resolve) }
       }
     ]
+  },
+  {
+    path: '/count',
+    name: 'count',
+    meta: {
+      title: '统计',
+      access: 1,
+      icon: ''
+    },
+    component: main,
+    children: [
+      {
+        path: 'hometown',
+        name: 'hometown',
+        meta: {
+          title: '用户家乡分布',
+          access: 1,
+          icon: ''
+        },
+        component: resolve => { require(['@/pages/count/hometown'], resolve) }
+      }
+    ]
   }
 ]
-const errorRoutes = [
+export const errorRoutes = [
   {
-    path: '404',
+    path: '/404',
     name: 'error_404',
-    component: require('@/pages/error/404.vue')
+    component: resolve => { require(['@/pages/error/404'], resolve) }
   },
-  // {
-  //   path: '*',
-  //   redirect: {name: 'error_404'}
-  // }
+  {
+    path: '*',
+    redirect: '/404',
+  }
 ]
 
 const routes = [
@@ -305,5 +475,7 @@ const routes = [
   ...appRoutes,
   ...errorRoutes
 ]
-export const commonRoutes = [loginRoute, mainRoutes, errorRoutes]
+export const commonRoutes = [loginRoute, mainRoutes, ...errorRoutes]
+// 动态挂载路由:404的路由需要在动态新增路由时再挂载，否则可能会先匹配到404路由
+// export const commonRoutes = [loginRoute, mainRoutes]
 export default routes

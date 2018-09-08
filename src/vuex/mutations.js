@@ -1,9 +1,9 @@
 import util from '@/plugins/util'
 import { appRoutes } from '@/router/routes'
 // 从路由中初始化左侧菜单数据
-export function updateMenulist (state) {
+export function updateMenulist (state,permissionRoutes) {
   let menuList = []
-  let _appRoutes = util.extend(appRoutes)
+  let _appRoutes = util.deepcopy(permissionRoutes || appRoutes)
   _appRoutes.forEach((item, index) => {
     // 根据 accessArr 改变item.meta.access
     if (state.accessArr.length) { // 更改所有的父路由
@@ -43,11 +43,23 @@ export function updateMenulist (state) {
   })
   state.menuList = menuList
 }
+
+export function updateMenulist2 (state,permissionRoutes) {
+  var arr = permissionRoutes || []
+  state.menuList = arr
+  // state.tagsList.push(...arr)
+}
+
+export function setTagsList (state, list) {
+  state.tagsList.push(...list)
+}
+
 // 更新面包屑数组
 export function setCurrentPath (state, pathArr) {
   state.currentPath = pathArr
+  sessionStorage.currentPath = JSON.stringify(pathArr)
 }
-// 新增标签（缓存页面的name）
+// 新增标签（缓存页面的name） 缓存所有的已打开的页面
 export function increateTag (state, tagObj) {
   state.cachePage.push(tagObj.name)
   state.pageOpenedList.push(tagObj)
@@ -65,9 +77,7 @@ export function removeTag (state, name) {
 export function setCurrentPageName (state, name) {
   state.currentPageName = name
 }
-export function setTagsList (state, list) {
-  state.tagsList.push(...list)
-}
+
 // 关闭一个页面，该页面不再缓存
 export function closePage (state, name) {
   for (let i = 0; i < state.cachePage.length; i++) {
@@ -75,40 +85,46 @@ export function closePage (state, name) {
       state.cachePage.splice(i, 1)
     }
   }
+  var arr = JSON.parse(sessionStorage.pageOpenedList),_arr=[]
+  arr.forEach(item=>{
+    if(name != item.name){
+      _arr.push(item)
+    }
+  })
+  sessionStorage.pageOpenedList = JSON.stringify(_arr)
 }
 // 关闭所有（除主页home）
 export function closeAllPage (state) {
-  state.pageOpenedList.splice(1)
+  var home = [state.pageOpenedList[0]]
+  state.pageOpenedList = home
   state.cachePage = []
+  sessionStorage.pageOpenedList = JSON.stringify(home)
 }
 // 关闭其他页
 export function closeOtherPage (state, currentPageName) {
-  let arr = [[].concat(state.pageOpenedList)[0]]
+  let home = [state.pageOpenedList[0]],arr=[]
   if (currentPageName === 'home') {
-    state.pageOpenedList = arr
+    arr = home
   } else {
-    state.pageOpenedList = arr.concat(state.pageOpenedList.filter(item => {
+    arr = home.concat(state.pageOpenedList.filter(item => {
       return item.name === currentPageName
     }))
   }
+  state.pageOpenedList = arr
+  sessionStorage.pageOpenedList = JSON.stringify(arr)
   state.cachePage = [currentPageName]
 }
-// 打开页面，缓存该页面 只在新增标签时才缓存页面
-export function openPage (state, name) {
-  // state.cachePage.push(name)
-}
+
+
 // 解决刷新时已经打开的页面数组状态丢失问题
 export function updatePageOpenedList (state, arrList) {
   state.pageOpenedList = arrList
 }
-// 清空已打开的左侧菜单
-export function clearOpenedSubmenu (state) {
-  state.openedSubmenuArr = []
-}
 // 清空快捷导航菜单数组
 export function clearPageOpenedList (state) {
-  state.pageOpenedList.splice(1)
-  sessionStorage.pageOpenedList = JSON.stringify(state.pageOpenedList)
+  var home = [state.pageOpenedList[0]]
+  state.pageOpenedList = home
+  sessionStorage.pageOpenedList = JSON.stringify(home)
 }
 // 清空面包屑
 export function clearCurrentPath (state) {
@@ -123,36 +139,28 @@ export function setPageOpenedList (state, arr) {
 export function setOpenedSubmenuArr (state, name) {
   state.openedSubmenuArr.push(name)
 }
-// 只展开一个
-export function oneOpenedSubmenuArr (state, name) {
-  state.openedSubmenuArr = [name]
-}
 // 关闭所有时清空左侧展开数组
-export function clearAllOpenedSubmenuArr (state) {
+export function clearOpenedSubmenuArr (state) {
   state.openedSubmenuArr = []
 }
 // 关闭其他时只剩一个
 export function clearOtherOpenedSubmenuArr (state, name) {
-  state.openedSubmenuArr = state.openedSubmenuArr.filter(item => {
-    return item === name
-  })
+  state.openedSubmenuArr = [name]
 }
-// 初始化每页的pager
-// export function initPager (state, vm) {
-//   let _data = util.extend(vm.pager)
-//   vm.pager = util.extend(state.pager)
-//   for (let key in _data) {
-//     vm.pager[key] = _data[key]
-//   }
-// }
+
+// 更新按钮权限数组
+export function updatePermissionList (state, arr) {
+  state.permissionList = arr
+}
+
+// 重置权限按钮数组
+export function resetPermissionList(state){
+  state.permissionList = []
+}
+
+// 更新有权访问的菜单的name数组
+export function setPermissionMenuNames(state, arr){
+  state.permissionMenuNames = arr
+}
+
 // -----------------------  action 提交的mutation  -------------------------------
-// export function submitDialogForm (state) {
-//   console.log('state.pager.data: ',state.pager.data)
-//   console.log('新增或编辑')
-// }
-// export function submitSearch (state) {
-//   console.log('搜索操作')
-// }
-// export function delRow (state) {
-    
-// }

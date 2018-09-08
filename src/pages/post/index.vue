@@ -1,244 +1,158 @@
 <template>
   <div class="post">
-    <Form :model="formSearch" ref="formSearch" inline :label-width="60">
-      <FormItem label="帖子ID" prop="id">
-        <Input v-model="formSearch.id" style="width:150px" placeholder="帖子ID" size="small"></Input>
-      </FormItem>
-      <Button type="ghost" style="margin:5px 8px 24px 0;" @click="resetSearch('formSearch')" size="small">{{label.clear}}</Button>
-      <Button type="primary" style="margin: 5px 8px 24px 0;" @click="submitSearch('formSearch')" size="small">{{label.search}}</Button>
-      <Button type="primary" style="margin: 5px 8px 24px 0;" @click="addRow" size="small">{{label.add}}</Button>
-    </Form>
-    <mainTable :columns="columns" :data="pager.data"></mainTable>
-    <paging @changePager="changePager" @paging="paging" :total="pager.total" :currPage="pager.currPage"></paging>
-    <Modal v-model="dialogShow" :title="label[currDialog]" :mask-closable="false" width="750" @on-cancel="resetDialogForm('formDialog')">
-        <Form :model="formDialog" ref="formDialog" :rules="rules" :label-width="80">
-          <Row>
-            <Col span="12">
-              <FormItem label="用户ID" prop="userId">
-                <Input type="text" v-model="formDialog.userId" placeholder="请输入用户ID">
-                </Input>
-              </FormItem>
-            </Col>
-            <Col span="12">
-              <FormItem label="帖子状态" prop="postStatus">
-                <Select v-model="formDialog.postStatus" placeholder="请选择"  clearable>
-                  <Option v-for="item in postStatus" :value="item.value" :key="item.value">{{ item.label }}</Option>
-                </Select>
-              </FormItem>
-            </Col>
-          </Row>
-          <Row>
-            <Col span="24">
-              <FormItem label="帖子内容" prop="postContent">
-                <Input type="textarea" :rows="4" v-model="formDialog.postContent" placeholder="请输入帖子内容">
-                </Input>
-              </FormItem>
-            </Col>
-          </Row>
-          <!-- 上传图片 -->
-          <Row>
-            <Col span="24">
-              <FormItem label="图片/视频">
-                <Row>
-                  <Col span="6">
-                    <Upload name="file"
-                        :action="url.upload"
-                        multiple
-                        :before-upload="myBeforeUpload"
-                        :format="['jpg','jpeg','png','gif','mp4']"
-                        :on-format-error="handleFormatError"
-                        :max-size="20000"
-                        :on-exceeded-size="handleMaxSize"
-                        :on-success="myHandleSuccess">
-                      <Button type="ghost" icon="ios-cloud-upload-outline">选择文件</Button>
-                    </Upload>
-                    <Button type="primary" @click="myUpload" :loading="uploadLoading">确定上传</Button>
-                  </Col>
-                  <Col span="18">
-                    <Row v-if="fileUrl.length">
-                      <Col span="8" v-for="(item, index) in fileUrl" :key="item">
-                        <div class="image-box">
-                          <video :src="item" v-if="isVideo(item)" controls="controls" @click="toggle(index)"></video>
-                          <img :src="item" v-else class="ad-img">
-                          <div class="demo-upload-list-cover">
-                            <!-- <Icon type="ios-eye-outline" @click.native="handleView(index)"></Icon> -->
-                            <Icon type="ios-trash-outline" @click.native="handleRemove(index)"></Icon>
-                          </div>
-                        </div>
-                      </Col>
-                    </Row>
-                    <div v-show="!fileUrl.length" class="image-box">
-                      <img src="static/images/img-upload-default.png" class="ad-img">
-                    </div>
-                  </Col>
-                </Row>
-              </FormItem>
-            </Col>
-          </Row>
-        </Form>
-        <div slot="footer">
-          <Button @click="resetDialogForm('formDialog')">{{label.clear}}</Button>
-          <Button type="primary" @click="submitDialogForm('formDialog')" :loading="dialogSubmitLoading">{{label.submit}}</Button>
-        </div>
-    </Modal>
-    <!-- 预览 -->
-    <Modal v-model="noteDetailModal" title="预览" width="1000">
-      <Row>
-        <Col span="4" class="rightt"><strong>贴子内容:</strong></Col>
-        <Col span="19"><p>{{look_data.postContent}}</p></Col>
-      </Row>
-      <Row>
-        <Col span="4" class="rightt"><strong>用户ID:</strong></Col>
-        <Col span="19" ><p>{{look_data.userId}}</p></Col>
-      </Row>
-      <Row>
-        <Col span="4" class="rightt"><strong>帖子状态:</strong></Col>
-        <Col span="19" ><p>{{look_data.postStatus}}</p></Col>
-      </Row>
-      <Row>
-        <Col span="4" class="rightt"><strong>创建时间:</strong></Col>
-        <Col span="19" ><p>{{look_data.createTime}}</p></Col>
-      </Row>
+    <div id="search-wrapper">
+      <Form :model="formSearch" ref="formSearch" inline :label-width="60">
+        <template v-if="hasPerm('post_index:search')">
+
+          <Button type="default" style="margin:5px 8px 24px 0;" @click="resetSearch('formSearch')" :disabled="pageLoading" size="small">{{label.clear}}</Button>
+          <Button type="primary" style="margin: 5px 8px 24px 0;" @click="submitSearch('formSearch')" :disabled="pageLoading" size="small">{{label.search}}</Button>
+        </template>
+        <Button v-if="hasPerm('post_index:delete')" type="warning" :disabled="batchIdArr.length==0" style="margin: 5px 8px 24px 0;" @click="batchDelete2" size="small">批量状态删除</Button>
+        <Button v-if="hasPerm('post_index:delete')" type="error" :disabled="batchIdArr.length==0" style="margin: 5px 8px 24px 0;" @click="batchDelete" size="small">批量删除</Button>
+      </Form>
+    </div>
+
+    <mainTable :columns="columns" :data="pager.data" @updateSelect="updateSelect" :height="tableHeight" :loading="pageLoading"></mainTable>
+    <paging @changePager="changePager" @paging="paging" :total="pager.total" :current="pager.current" :loading="pageLoading"></paging>
+    <Modal v-model="dialogShow" :title="label[currDialog]" :mask-closable="false" width="900" @on-cancel="resetDialogForm('formDialog')">
+      <Form :model="formDialog" ref="formDialog" :rules="rules" :label-width="80">
+        
+      </Form>
       <div slot="footer">
-        <Button type="primary" size="large"  :loading="modal_loading" @click="noteDetailModal = false">关闭</Button>
+        <Button @click="resetDialogForm('formDialog')">{{label.clear}}</Button>
+        <Button type="primary" @click="submitDialogForm('formDialog')" :loading="dialogSubmitLoading">{{label.submit}}</Button>
+      </div>
+    </Modal>
+
+    <!-- 所有的图片 -->
+    <Modal v-model="imgShow" title="所有的图片" :mask-closable="false">
+      <div class="preview-editor-content clearfix">
+        <div v-for="item in imgSrcArr" :key="item" style="float: left;width: 48%;padding: 1%;max-height:250px;overflow: auto;">
+          <a :href="item" target="_blank" style="display: block;">
+            <img :src="item" :alt="item" style="max-width: 100%;">
+          </a>
+        </div>
+      </div>
+      <div slot="footer">
+        <Button @click="imgShow=false;imgSrcArr=[]">{{label.close}}</Button>
       </div>
     </Modal>
   </div>
 </template>
-
 <script>
   import mainTable from '@/components/mainTable'
   import paging from '@/components/paging'
   import page from '@/mixins/page'
   export default {
-    name: 'post_index',
+    name: 'post',
+    mixins: [page],
     components: {
       mainTable,
-      paging
+      paging,
     },
-    mixins: [page],
-    data () {
+    data(){
       return {
         url: {
-          add: 'post/add',
-          edit: 'post/update',
-          delete: 'post/delete',
-          search: 'post/dataSearch',
-          upload: 'file/',
-          sId: 'id/id',
+          // 增删改查
+          add: '',
+          delete: 'post/delete', // 物理删除
+          statusDelete: 'post/delete/vartual',  // 状态删除
+          edit: '',
+          search: '',
         },
         pager: {
-          data: [],
+          // 页面初始化
           url: 'post/dataGrid',
+          // 主区域表格数据
+          data: [],
         },
-        needId: true,
-        noteDetailModal: false,
-        modal_loading: false,
-        uploadLoading: false,
-        look_data:{
-          postContent: '',
-          userId: '',
-          postStatus: '',
-          createTime: '',
-        },
-        postStatus: [
-          {
-            value: '0',
-            label: '正常'
-          },
-          {
-            value: '1',
-            label: '已删除'
-          }
-        ],
-        postStatusMap: {
-          "0": "正常",
-          "1": "已删除"
-        },
-        isAuth: [{label:'否', value:'0'}, {label:"是", value:'1'}],
-        isAuthMap: {
-          '0': '否',
-          '1': '是',
-        },
-        sexMap: {
-          '0': '女',
-          '1': '男',
-          '': '保密'
-        },
-        fileUrl: [],
-        uploadImgArr: [],
+        // 搜索表单
         formSearch: {
-          id: '',
+          
         },
+        postStatusMap: {
+          '0':"正常",
+          '1':"已删除"
+        },
+        // 新增/编辑表单
         formDialog: {
-          // id: '',
-          postContent: '',
-          userId: '1003922948007866370',
-          postStatus: '0',
-          createTime: '',
-          imagePath: [],
-          userheadPortrait: '',
+
         },
+        imgShow: false,
+        imgSrcArr: [],
+        batchIdArr: [],
         columns: [
           {
-            "title": "ID",
-            "key": "id",
-            "width": 180,
-            "sortable": true,
-            "fixed": "left"
+            'type': 'selection',
+            'width': 80,
+            'fixed': 'left',
+            'align': 'center'
           },
           {
-            'title': '用户ID',
-            'key': 'userId',
-            'width': 180,
-            'sortable': true
-          },
-          {
-            'title': '收藏数量',
-            'key': 'postCollectionCount',
-            'width': 120,
-            'sortable': true
-          },
-          {
-            'title': '评论数量',
-            'key': 'postCommentsCount',
-            'width': 120,
-            'sortable': true
-          },
-          {
-            'title': '点赞数量',
-            'key': 'postThumbCount',
-            'width': 120,
-            'sortable': true
-          },
-          {
-            'title': '转发数量',
-            'key': 'postTransmitCount',
-            'width': 120,
-            'sortable': true
-          },
-          {
-            'title': '是否认证',
-            'key': 'userIsAuth',
-            'width': 150,
-            'sortable': true,
-            render: (create, params) => {
-              return create('span', this.isAuthMap[params.row.userIsAuth.toString()]);
-            }
-          },
-          {
-            'title': '昵称',
+            'title': '发帖用户',
             'key': 'userNickName',
-            'width': 150,
-            'sortable': true
+            'width': 200,
           },
           {
-            'title': '性别',
-            'key': 'userSex',
-            'width': 150,
-            'sortable': true,
+            'title': '帖子内容',
+            'key': 'postContent',
+            'width': 400,
+          },
+          {
+            'title': '图片/视频',
+            'key': 'fileManageList',
+            'width': 400,
             render: (create, params) => {
-              return create('span',this.sexMap[params.row.userSex])
+              var vm=this,arr=[],createArr=[]
+              var imgSrcArr = vm.getSrcArr(params.row.fileManageList)
+              var lookMoreBtn = create('Button',{
+                props: {
+                  type: 'primary',
+                  size: 'small'
+                },
+                style: {
+                  'margin-top': '-40px'
+                },
+                on: {
+                  click: function(){
+                    vm.imgSrcArr = imgSrcArr
+                    vm.imgShow = true
+                  }
+                }
+              },'查看全部')
+              if(imgSrcArr.length){
+                if(typeof(imgSrcArr[0])=='object'){
+                  // 视频
+                }else{
+                  // 图片
+                  imgSrcArr.forEach(src=>{
+                    arr.push(create('a',{
+                      attrs: {
+                        href: src,
+                        target: '_blank'
+                      },
+                    },[create('img',{
+                      attrs: {
+                        src: src,
+                        alt: src
+                      },
+                      style: {
+                        'max-width': '100px',
+                        'max-height': '100px',
+                        'margin': '10px'
+                      }
+                    })]))
+                  })
+                  if(imgSrcArr.length>3){
+                    createArr = [arr[0],arr[1],lookMoreBtn]
+                  }else{
+                    createArr = arr
+                  }
+                }
+                return create('div', createArr)
+              }else{
+                return create('span', '无')
+              }
             }
           },
           {
@@ -247,49 +161,49 @@
             'width': 150,
             'sortable': true,
             render: (create, params) => {
-              return create('span',this.postStatusMap[params.row.postStatus])
+              var vm = this,key = params.row.postStatus,map = vm.postStatusMap,style={}
+              var txt = map[key] ? map[key] : key
+              if(key==1){
+                style = {color: 'red'}
+              }
+              return create('span',{style},txt)
             }
           },
           {
-            'title': '创建时间',
-            'key': 'createTime',
+            'title': '点赞数量',
+            'key': 'postThumbCount',
+            'width': 130,
+            'sortable': true
+          },
+          {
+            'title': '收藏数量',
+            'key': 'postCollectionCount',
+            'width': 130,
+            'sortable': true
+          },
+          {
+            'title': '评论数量',
+            'key': 'postCommentsCount',
+            'width': 130,
+            'sortable': true
+          },
+          {
+            'title': '分享数量',
+            'key': 'postTransmitCount',
+            'width': 130,
+            'sortable': true
+          },
+          {
+            'title': '发帖时间',
+            'key': 'postTime',
             'width': 150,
-            'sortable': true
-          },
-          {
-            'title': '帖子内容',
-            'key': 'postContent',
-            'width': 250,
-            'ellipsis': true,
-            'sortable': true
-          },
-          {
-            'title': '用户头像',
-            'key': 'userheadPortrait',
-            'width': 250,
             'sortable': true,
-            render: function (create, params) {
-              return create('img', {
-                attrs: {
-                  src: params.row.userheadPortrait
-                },
-                style: {
-                  'border': '1px solid transparent',
-                  'border-radius': '4px',
-                  'margin': '10px 0',
-                  'max-width': '100px',
-                  'max-height': '100px'
-                }
-              })
-            }
-          },
-          {
-            'title': '帖子图片',
-            'key': 'fileManageList',
-            'width': 250,
-            'sortable': true,
-            render(create,params){
-              return create('span','图片数据')
+            render: (create, params)=>{
+              var vm = this,key = params.row.postTime,txt=key
+              if(typeof key == 'number'){
+                txt = vm.util.timestampToTime(key)
+              }
+              return create('span',txt)
             }
           },
           {
@@ -299,34 +213,29 @@
             'align': 'center',
             'fixed': 'right',
             render: (create, params) => {
-              let vm = this
-              var btn_text = params.row.lockStatus==1?'屏蔽':'取消屏蔽'
-              return create('div', [
-                create('Button', {
-                  props: { type: 'primary', size: 'small' },
-                  style: { marginRight: '5px' },
-                  on: {
-                    click: function () {
-                      var look_data = {}
-                      for(var key in vm.look_data){
-                        look_data[key] = vm.util.isNumber(params.row[key]) ? params.row[key].toString() : params.row[key]
-                      }
-                      vm.look_data = look_data
-                      vm.noteDetailModal = true
-                    }
-                  }
-                }, '预览'),
-                create('Button', {
-                  props: {type: 'warning', size: 'small'},
-                  style: {marginRight: '5px'},
-                  on: {
-                    click: function () {
-                      vm.$Message.info(vm.label.wait)
-                    }
-                  }
-                }, btn_text),
-                vm.createDelBtn(create, params.row.id)
-              ])
+             let vm = this,arr = [],status = params.row.postStatus
+             var statusDeleteBtn = create('Button',{
+               props: {
+                type: 'warning',
+                size: 'small',
+                disabled: status==1
+              },
+              style: {
+                marginRight: '5px'
+              },
+              on: {
+                click: function(){
+                  vm.statusDel(params.row.postId)
+                }
+              }
+             },'状态删除')
+              if(vm.hasPerm('post_index:delete')){
+                arr = [
+                  statusDeleteBtn,
+                  vm.createDelBtn(create, params.row.postId)
+                ]
+              }
+              return create('div',arr)
             }
           }
         ],
@@ -334,161 +243,133 @@
       }
     },
     methods: {
-      myBeforeUpload(file){
-        var vm = this;
-        let reader = new FileReader()
-        reader.readAsDataURL(file)
-        reader.onloadend = function (e) {
-          if(vm.uploadImgMax==1){
-            vm.fileUrl = [reader.result]
-            vm.uploadImgArr = [file]
-          }else{
-            vm.fileUrl.push(reader.result)
-            vm.uploadImgArr.push(file)
+      updateSelect (selection) {
+        var vm=this,batchIdArr = [],len=selection.length,i,item
+        if(len){
+          for(i=0;i<len;i++){
+            item=selection[i]
+            batchIdArr.push(item.postId)
           }
         }
-        return false
+        vm.batchIdArr = batchIdArr
       },
-      handleFormatError(){
-        this.$Message.error('文件格式错误，请选择jpg、jpeg、png或gif格式的文件！')
-      },
-      myHandleSuccess(){},
-      handleView(index){},
-      handleRemove(index){
-        console.log('删除index: ',index)
-        var vm = this
-        vm.fileUrl.splice(index,1)
-      },
-      myUpload(){
-        var vm = this
-        if(!vm.uploadImgArr.length){
-          vm.$Message.error('请先选择上传的图片')
-          return
-        }
-        if(!vm.formDialog.userId){
-          vm.$Message.error('请先选择发帖用户')
-          return
-        }
-        vm.uploadLoading = true;
-        if(vm.currDialog=='add'){
-          vm.$http.post(vm.url.sId).then(res=>{
-            var resData = res.data
-            if(resData.code==1){
-              var sId = resData.data;
-              vm.formDialog.id = sId;
-              vm.uploadFile(sId)
+      // 根据fileManageList生成图片或视频的数组
+      getSrcArr(data){
+        var vm=this,arr =[],src='',obj={}
+        if(data&&data.length){
+          var imageHost = vm.imageHost || sessionStorage.imageHost,
+            fileType = data[0].fileType,
+            filePath = data[0].filePath,
+            fileList = data[0].fileList
+          if(fileType==1){
+            // 图片
+            if(fileList.length){
+              fileList.forEach(item=>{
+                src = imageHost + filePath + item.fileName
+                arr.push(src)
+              })
             }
-          }).catch(err=>{})
-        }else{
-          var sId = vm.formDialog.id
-          vm.uploadFile(sId)
+          }else if(fileType==2){
+            // 视频
+            arr.push({
+              
+            })
+          }
         }
+        return arr
       },
-      uploadFile(sId){
+      // 重置搜索表单
+      resetSearch(name){
+        name = name || 'formSearch'
+        var vm = this
+        vm.$refs[name].resetFields()
+        // vm.submitSearch(name)
+        vm.paging(1)
+      },
+      // 重置新增/编辑表单
+      resetDialogForm(name){
+        name = name || 'formDialog'
+        var vm = this
+        vm.$refs[name].resetFields()
+      },
+      delRow (data) {
         var vm = this;
-        let params = new FormData();
-        vm.uploadImgArr.forEach(file =>{
-          params.append('file', file)
-        });
-        params.append('sId',sId)
-        // s   1  用户  2  帖子  3  广告
-        params.append('s',2)
-        // 使用位置 1：用户头像 2：帖子列表 3：帖子回复 4:创建群头像 5:编辑群头像
-        params.append('p',2)
-        var config =  {
-            headers: {
-              'Content-Type': 'multipart/form-data'
+        var parmas = {
+          method: 'post',
+          url: vm.url.delete,
+          data: {
+            ids: [data.id]
+          }
+        }
+        vm.batchoperation(parmas,vm.paging)
+      },
+      statusDel(id){
+        var vm = this;
+        vm.$Modal.confirm({
+          title: '确认',
+          content: '确认状态删除此帖子吗？',
+          onOk: function () {
+            var parmas = {
+              method: 'post',
+              url: vm.url.statusDelete,
+              data: {
+                ids: [id]
+              }
             }
-        };
-        var url = vm.url.upload + sId;
-        vm.$http.post(url, params, config).then(res=>{
-          let rd = res.data;
-          if(rd.code==1){
-            // 清空已上传数组
-            vm.uploadLoading = false;
-            vm.uploadImgArr = [];
-            vm.$Message.success('上传成功！');
-            for(let key in rd.data){
-              vm.formDialog.imagePath.push(rd.data[key]);
+            vm.batchoperation(parmas,vm.paging)    
+          }
+        })
+      },
+      batchDelete(){
+        var vm = this
+        vm.$Modal.confirm({
+          title: '确认',
+          content: '确认删除这些帖子吗？',
+          onOk: function () {
+            var parmas = {
+              method: 'post',
+              url: vm.url.delete,
+              data: {
+                ids: vm.batchIdArr
+              }
             }
+            vm.batchoperation(parmas)
+          }
+        })
+      },
+      batchDelete2(){
+        var vm = this
+        vm.$Modal.confirm({
+          title: '确认',
+          content: '确认状态删除这些帖子吗？',
+          onOk: function () {
+            var parmas = {
+              method: 'post',
+              url: vm.url.statusDelete,
+              data: {
+                ids: vm.batchIdArr
+              }
+            }
+            vm.batchoperation(parmas)
+          }
+        })
+      },
+      batchoperation(parmas,refresh){
+        var vm = this
+        vm.$http2(parmas).then(res=>{
+          var resData = res.data
+          if(resData.code==1){
+            vm.$Message.success('操作成功');
+            vm.batchIdArr = []
+            vm.paging()
           }else{
-            vm.$Message.error(rd.message)
+            vm.$Message.error(resData.message);
           }
         }).catch(err=>{})
       },
-      handleMaxSize(){
-        this.$Message.error('请选择小于20000KB的文件')
-      },
-      isVideo(fileUrl){
-        var str = ('' + fileUrl).split('base64')[0];
-        var isVideo = false
-        if(str.indexOf('.mp4') != -1){
-          isVideo = true
-        }
-        return isVideo
-      },
-
-      initDialog (data) {
-        let _data = util.extend(data)
-        this.provinceCity = [_data.cityCode.toString().slice(0, 2) + '0000', _data.cityCode.toString().slice(0, 4) + '00', _data.cityCode.toString()]
-      },
-      resetSearch (name) {
-        let vm = this
-        vm.derail_address_obj_s = []
-        vm.$refs[name].resetFields()
-        vm.submitSearch(name)
-      },
-      resetDialogForm (name) {
-        name = name || 'formDialog'
-        let vm = this
-        vm.fileUrl = []
-        vm.uploadImgArr = []
-        vm.uploadLoading = false;
-        vm.dialogSubmitLoading = false;
-        vm.$refs[name].resetFields()
-      },
-      initData () {
-        let vm = this        
-      }
     }
   }
 </script>
-
 <style scoped>
-  .rightt{
-    text-align: right;
-    padding-right: 20px;
-    font-size: 120%;
-  }
-  .image-box{
-    position: relative;
-    width:102px;
-    height:102px;
-    margin-bottom: 10px;
-    border:1px solid #eee;
-    text-align: center;
-  }
-  .ad-img{
-    max-width: 100px;
-    max-height: 100px;
-  }
-  .demo-upload-list-cover{
-    display: none;
-    position: absolute;
-    padding-top: 40px;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: rgba(0,0,0,.6);
-  }
-  .image-box:hover .demo-upload-list-cover{
-    display: block;
-  }
-  .demo-upload-list-cover i{
-    color: #fff;
-    font-size: 20px;
-    cursor: pointer;
-    margin: 0 2px;
-  }
+
 </style>

@@ -2,7 +2,7 @@
   <div class="zsx-main main" id="main">
     <div class="side-menu" :style="{left: hideMenuText ? '-200px' : '0'}">
       <div class="logo">
-        <img src="/static/images/logo.jpg" alt="">
+        <!-- <img src="/static/images/logo.png" alt=""> -->
       </div>
       <sidebar :menuList="menuList"></sidebar>
     </div>
@@ -10,7 +10,7 @@
       <div class="main-header">
         <div class="navicon-con">
           <Button type="text" @click="toggleClick" :style="{transform: 'rotateZ(' + (this.hideMenuText ? '-90' : '0') + 'deg)'}">
-            <Icon type="navicon" size="32"></Icon>
+            <Icon type="md-reorder" size="32"></Icon>
           </Button>
         </div>
         <div class="header-middle-con">
@@ -19,23 +19,81 @@
           </div>
         </div>
         <div class="header-avator-con">
-          <Button type="text" class="btn-logout" icon="log-out" size="large" @click="exitToLogin">注销</Button>
+          <span>欢迎</span>
+          <span v-if="isAgent">
+            <strong>{{agentAddress}}</strong>
+            <span>代理商</span>
+          </span>
+          <Dropdown @on-click="clickDropdown" style="margin-right: 30px;">
+            <Button type="text">
+              <span>{{user.nickName || user.loginName}}</span>
+              <Icon type="ios-arrow-down"></Icon>
+            </Button>
+            <DropdownMenu slot="list">
+              <DropdownItem name="modify">修改昵称/密码</DropdownItem>
+              <DropdownItem name="logout">注销</DropdownItem>
+            </DropdownMenu>
+          </Dropdown>
+          <!-- <Button type="text" class="btn-logout" icon="log-out" size="large" style="margin-right: 20px;" @click="exitToLogin">注销</Button> -->
         </div>
       </div>
       <!-- 已打开过页面的快捷导航 -->      
-      <tags-page-opened :pageTagsList="pageTagsList"></tags-page-opened>
+      <tags-page-opened :pageOpenedList="pageOpenedList"></tags-page-opened>
       <!-- 单页内容展示区域 -->
       <div class="single-page" :style="{left:hideMenuText?0:'200px'}">
-        <div class="single-box">
+        <div class="single-box" id="single-box">
           <keep-alive :include="cachePage">
             <router-view></router-view>
           </keep-alive>
         </div>
       </div>
       <div class="copyright" :style="{left:hideMenuText?0:'200px'}">
-        Copyright © 阿斯蒂芬规划局版权所有
+        Copyright © 深圳市众善行文化传播有限公司版权所有
       </div>
     </div>
+
+    <!-- 修改昵称密码 -->
+    <Modal v-model="dialogShow" title="修改昵称/密码" :mask-closable="false" @on-cancel="resetDialogForm('formDialog')">
+      <Form :model="formDialog" ref="formDialog" :rules="rules" :label-width="80">
+        <Row>
+          <Col span="12">
+            <FormItem label="账号" prop="loginName">
+              <Input v-model="formDialog.loginName" placeholder="请输入账号" disabled></Input>
+            </FormItem>
+          </Col>
+          <Col span="12">
+            <FormItem label="昵称" prop="nickName">
+              <Input v-model="formDialog.nickName" placeholder="请输入昵称"></Input>
+            </FormItem>
+          </Col>
+        </Row>
+        <Row>
+          <Col span="12">
+            <FormItem label="修改密码">
+              <Select v-model="passType" placeholder="请选择" style="width: 100px;">
+                <Option v-for="item in type" :value="item.value" :key="item.value">{{ item.label }}</Option>
+              </Select>
+            </FormItem>
+          </Col>
+        </Row>
+        <Row v-if="passType==1">
+          <Col span="12">
+            <FormItem label="密码" prop="loginPass">
+              <Input v-model="formDialog.loginPass" placeholder="请输入密码" type="password"></Input>
+            </FormItem>
+          </Col>
+          <Col span="12">
+            <FormItem label="确认密码">
+              <Input v-model="loginPass" placeholder="请确认密码" type="password"></Input>
+            </FormItem>
+          </Col>
+        </Row>
+      </Form>
+      <div slot="footer">
+        <Button @click="resetDialogForm('formDialog')">重置</Button>
+        <Button type="primary" @click="submitDialogForm('formDialog')" :loading="dialogSubmitLoading">提交</Button>
+      </div>
+    </Modal>
   </div>
 </template>
 
@@ -54,7 +112,60 @@
     data () {
       return {
         hideMenuText: false,
-        exitUrl: 'web/sys/user/quit/'
+        // exitUrl: 'web/sys/user/quit/',
+        exitUrl: 'web/sys/user/quit',
+        modify: 'web/sys/user/update',
+        typeMap:{
+          0:"否",
+          1:"是"
+        },
+        type:[
+          {
+            value: 0,
+            label:"否"
+          },
+          {
+            value: 1,
+            label:"是"
+          }
+        ],
+        areaType: [
+          {
+            value: 1,
+            label: '全国'
+          }, {
+            value: 2,
+            label: '省级'
+          }, {
+            value: 3,
+            label: '市级'
+          }, {
+            value: 4,
+            label: '区级'
+          }
+        ],
+        isAgent: false,
+        agentAddress: '',
+        dialogSubmitLoading: false,
+        dialogShow: false,
+        passType: 0,
+        chinaJson: {},
+        user: {
+          id: '',
+          loginName: '',
+          nickName: '',
+        },
+        formDialog: {
+          id: '',
+          loginName: '',
+          loginPass: '',
+          nickName: '',
+        },
+        rules: {
+          loginPass: [
+            { required: true, message: '密码不能为空', trigger: 'blur' }
+          ],
+        }
       }
     },
     // 计算属性 引入vuex进行状态管理，从store实例中读取状态最简单的方法就是在计算属性中返回某个状态
@@ -63,7 +174,7 @@
         return this.$store.state.menuList
       },
       // 所有打开的页面
-      pageTagsList () {
+      pageOpenedList () {
         return this.$store.state.pageOpenedList
       },
       // 面包屑数组
@@ -81,65 +192,119 @@
           title: '确认退出',
           content: '点击“取消”将留在当前页，点击“确定”将转向登录页。',
           onOk: function () {
-            var user = JSON.parse(sessionStorage.user);
-            var userId = '';
-            if(typeof(user) == 'object'){
-              userId = user.userId
-            }
-            vm.$http.post(vm.exitUrl + userId).then(res=>{
-              var resData = res.data
-              if(resData.code ==1){
-                vm.exitLogin()
-              }else{
-                vm.$Message.error(resData.message)
+            vm.$http.get(vm.exitUrl).then(res=>{
+              if(res&&res.data){
+                var resData = res.data
+                if(resData.code==1){
+                  vm.$Message.success('退出成功！')
+                  vm.$store.dispatch('exitLogin')
+                }
               }
-            }).catch(err=>{})
+            })
           }
         })
-      },
-      exitLogin(){
-        var vm = this
-        // 清空用户数据
-        if (sessionStorage.user) {sessionStorage.removeItem('user')}
-        // 清空左侧展开菜单数据
-        if (sessionStorage.currentPageName) {sessionStorage.removeItem('currentPageName')}
-        if (sessionStorage.currentPath) {sessionStorage.removeItem('currentPath')}
-        if (sessionStorage.pageOpenedList) {sessionStorage.removeItem('pageOpenedList')}
-        // 清空左侧菜单
-        vm.$store.commit('clearOpenedSubmenu')
-        // 清空快捷导航菜单数组
-        vm.$store.commit('clearPageOpenedList')
-        // 清空面包屑
-        vm.$store.commit('clearCurrentPath')
-        vm.$router.push({name: 'login'})
       },
       toggleClick (e) {
         this.hideMenuText = !this.hideMenuText
         e && e.preventDefault();
       },
-      init () {}
+      clickDropdown(name){
+        var vm = this,key
+        if(name=='modify'){
+          // 修改密码
+          for(key in vm.formDialog){
+            vm.formDialog[key] = vm.user[key]
+          }
+          vm.dialogShow = true
+        }else if(name=='logout'){
+          vm.exitToLogin()
+        }
+      },
+      resetDialogForm(name){
+        name = name || 'formDialog'
+        var vm = this
+        vm.passType = 0
+        vm.formDialog.nickName = vm.user.nickName + ''
+        // 不能清除当前用户信息
+        // vm.$refs[name].resetFields()
+      },
+      submitDialogForm(name){
+        var vm = this
+        vm.$refs[name].validate(function (valid) {
+          if (valid) {
+            var url='',data={},params={},method='post'
+            url = vm.modify + '?type=' + vm.passType
+            data = vm.util.deepcopy(vm.formDialog)
+            if(vm.passType){
+              // 修改密码
+              if(vm.formDialog.loginPass == vm.loginPass){
+                data.loginPass = hex_md5(data.loginPass)
+              }else{
+                vm.$Message.info('您输入的确认密码和密码不一致，请重新输入')
+                return false
+              }
+            }else{
+              // 不修改密码
+              delete data.loginPass
+            }
+            params = {
+              url,
+              method,
+              data
+            }
+            vm.dialogSubmitLoading = true
+            vm.$http(params).then(res=>{
+              vm.dialogSubmitLoading = false
+              if(res&&res.status==200){
+                if(res.data.code==1){
+                  vm.$Message.success('修改成功')
+                  vm.dialogShow = false
+                  if(sessionStorage.sysUser){
+                    var sysUser = JSON.parse(sessionStorage.sysUser)
+                    var nickName = vm.formDialog.nickName + ''
+                    if(typeof(sysUser.nickName) != 'undefined'){
+                      sysUser.nickName = nickName
+                      sessionStorage.sysUser = JSON.stringify(sysUser)
+                    }
+                    vm.user.nickName = nickName
+                  }
+                }else{
+                  if(res.data.message){
+                    vm.$Message.info(res.data.message)
+                  }
+                }
+              }
+            })
+          }
+        })
+      },
+    },
+    watch: {
+      passType(val){
+        var vm = this
+        vm.formDialog.loginPass = ''
+        vm.loginPass = ''
+      }
     },
     mounted () {
       let vm = this
-      vm.init()
       // 解决刷新时已打开快捷导航状态丢失
-      if (sessionStorage.pageOpenedList) {
-        let arr = [].concat(JSON.parse(sessionStorage.pageOpenedList))
-        let myArr = []
-        if (sessionStorage.currentPageName !== 'home') {
-          let arr2 = arr.filter(item => {
-            return item.name === sessionStorage.currentPageName
-          })
-          myArr = [arr[0]].concat(arr2)
-        } else {
-          myArr = [arr[0]]
-        }
-        vm.$store.commit('setPageOpenedList', myArr)
+      var currentPath = sessionStorage.currentPath,pageOpenedList=sessionStorage.pageOpenedList
+      if (pageOpenedList) {
+        vm.$store.commit('setPageOpenedList', JSON.parse(pageOpenedList))
       }
-      // 刷新更新面包屑
-      if (sessionStorage.currentPath) {
-        vm.$store.commit('setCurrentPath', JSON.parse(sessionStorage.currentPath))
+      if (currentPath) {
+        vm.$store.commit('setCurrentPath', JSON.parse(currentPath))
       }
+      var obj = {},key,_obj={}
+      if(sessionStorage.sysUser){
+        obj = JSON.parse(sessionStorage.sysUser)
+      }
+      for(key in vm.user){
+        _obj[key] = obj[key] || ''
+      }
+      vm.user = vm.util.deepcopy(_obj)
+      vm.formDialog = vm.util.deepcopy(_obj)
     }
   }
 </script>
@@ -150,7 +315,8 @@
     top: 0;
     height: 100%;
     width: 200px;
-    background: rgb(73, 80, 96);
+    /* background: rgb(73, 80, 96); */
+    background: #515a6e;
     z-index: 1;
     /* overflow: auto; */
     overflow: hidden;
@@ -158,10 +324,11 @@
   }
   .side-menu .logo{
     padding: 10px 0;
-    text-align: center;
+    /* text-align: center; */
   }
   .side-menu .logo img{
-    max-width: 80%;
+    /* max-width: 80%; */
+    max-width: 100%;
   }
   .main .all-right{
     box-sizing: border-box;
